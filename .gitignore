@@ -1,0 +1,76 @@
+# Created by https://www.gitignore.io/api/swift,macos
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+### Swift ###
+# Xcode
+
+## Build generated
+DerivedData/
+
+## Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+## Other
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+.swiftpm
+
+# End of https://www.gitignore.io/api/swift,macos
+
+## Projects ##
+**/*.xcodeproj
+**/*.xcworkspace
+
+## LicensePlist ##
+**/Settings.bundle/License
+**/Settings.bundle/License.plist
+
+## Tuist ##
+graph.dot
+Derived/
+Tuist/Dependencies/SwiftPackageManager
+Tuist/Dependencies/graph.json
+
+## XCFramework ##
+XCFramework/Cartfile.resolved
+XCFramework/Carthage
