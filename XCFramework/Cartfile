@@ -1,10 +1,6 @@
 # Realm (local binary path)
 binary "XCFramework/Binary/RealmSwift.json"
 
-# Naver Map (local binary path)
-binary "XCFramework/Binary/NMapsMap.json"
-binary "XCFramework/Binary/NMapsGeometry.json"
-
 # Firebase (remote binary path)
 binary "https://dl.google.com/dl/firebase/ios/carthage/FirebaseAnalyticsBinary.json" == 10.25.0
 binary "https://dl.google.com/dl/firebase/ios/carthage/FirebaseCrashlyticsBinary.json" == 10.25.0
