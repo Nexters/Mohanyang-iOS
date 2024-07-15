@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Run Swiftlint
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Swiftlint
+        run: |
+          SwiftLint/swiftlint lint --config SwiftLint/swiftlint.yml --quiet --reporter github-actions-logging
