@@ -1,0 +1,18 @@
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+@_spi(<#T##SPI#>)
+import DependencyPlugin
+
+let project: Project = .project(
+  module: <#T##Modulable#>,
+  scripts: [],
+  targets: [
+    .sources(<#T##Project.MachOType#>),
+    .interface,
+    .tests,
+    .testing,
+    .example
+  ],
+  dependencies: []
+)

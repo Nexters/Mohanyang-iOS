@@ -1,0 +1,31 @@
+//
+// This file defines additional configuration options that are appropriate only
+// for iOS. This file is not standalone -- it is meant to be included into
+// a configuration file for a specific type of target.
+//
+
+#include "../Shared.xcconfig"
+
+DEVELOPMENT_TEAM = 
+
+// Xcode needs this to find archived headers if SKIP_INSTALL is set
+HEADER_SEARCH_PATHS = $(inherited) $(OBJROOT)/UninstalledProducts/include
+
+// The base SDK to use (if no version is specified, the latest version is
+// assumed)
+SDKROOT = iphoneos
+
+// Supported device families (1 is iPhone, 2 is iPad)
+TARGETED_DEVICE_FAMILY = 1,2
+
+// Sets the @rpath for the application such that it can include frameworks in
+// the application bundle two levels up, inside the "Frameworks" folder.
+//
+// Does not search the frameworks folder at the same level as the extension
+// executable since extensions with their own embedded frameworks are rejected
+// with the following error:
+//
+// > Invalid Bundle. The bundle at 'App.app/PlugIns/Extension.appex' contains
+// > disallowed file 'Frameworks'
+//
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../../Frameworks
