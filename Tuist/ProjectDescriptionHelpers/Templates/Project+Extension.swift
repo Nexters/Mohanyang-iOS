@@ -123,7 +123,7 @@ extension Project {
       organizationName: AppEnv.organizationName,
       options: options,
       packages: packages,
-      settings: .projectSettings,
+      settings: .projectSettings(),
       targets: projectTargets,
       schemes: schemes,
       fileHeaderTemplate: nil,

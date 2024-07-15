@@ -1,0 +1,7 @@
+#include "../Shared.xcconfig"
+
+APP_NAME = 뽀모냥
+
+MARKETING_VERSION = 0.0.1
+CURRENT_PROJECT_VERSION = 1
+DEVELOPMENT_TEAM = 

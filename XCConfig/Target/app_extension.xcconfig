@@ -6,17 +6,12 @@
 
 #include "../Shared.xcconfig"
 
-DEVELOPMENT_TEAM = 
-
 // Xcode needs this to find archived headers if SKIP_INSTALL is set
 HEADER_SEARCH_PATHS = $(inherited) $(OBJROOT)/UninstalledProducts/include
 
 // The base SDK to use (if no version is specified, the latest version is
 // assumed)
 SDKROOT = iphoneos
-
-// Supported device families (1 is iPhone, 2 is iPad)
-TARGETED_DEVICE_FAMILY = 1,2
 
 // Sets the @rpath for the application such that it can include frameworks in
 // the application bundle two levels up, inside the "Frameworks" folder.

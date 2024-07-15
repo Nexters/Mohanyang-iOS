@@ -24,7 +24,7 @@ extension InfoPlist {
         // MARK: - Core Foundation
         
         "CFBundleDevelopmentRegion": "ko_KR",
-        "CFBundleDisplayName": "?",
+        "CFBundleDisplayName": "$(APP_NAME)",
         "CFBundleExecutable": "$(EXECUTABLE_NAME)",
         "CFBundleIdentifier": "$(PRODUCT_BUNDLE_IDENTIFIER)",
         "CFBundleInfoDictionaryVersion": "6.0",

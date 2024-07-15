@@ -9,9 +9,12 @@ import UtilityPlugin
 import ProjectDescription
 
 extension ProjectDescription.Settings {
-  public static func appTargetSettings(xcconfig: Path) -> Self {
-    let prodConfig = BuildConfiguration.prod
+  /// 프로젝트 설정
+  public static func projectSettings(
+    xcconfig: Path? = nil
+  ) -> Self {
     let devConfig = BuildConfiguration.dev
+    let prodConfig = BuildConfiguration.prod
     
     return .settings(
       configurations: [
@@ -36,7 +39,10 @@ extension ProjectDescription.Settings {
     )
   }
   
-  public static var projectSettings: Self {
+  /// 타겟 설정
+  public static func targetSettings(
+    product: Product
+  ) -> Self {
     let devConfig = BuildConfiguration.dev
     let prodConfig = BuildConfiguration.prod
     
@@ -44,37 +50,10 @@ extension ProjectDescription.Settings {
       configurations: [
         .debug(
           name: devConfig.configurationName,
-          xcconfig: .projectXCConfig(type: devConfig)
-        ),
-        .release(
-          name: prodConfig.configurationName,
-          xcconfig: .projectXCConfig(type: prodConfig)
-        )
-      ],
-      defaultSettings: .essential
-    )
-  }
-  
-  public static func targetSettings(product: Product) -> Self {
-    let devConfig = BuildConfiguration.dev
-    let prodConfig = BuildConfiguration.prod
-    
-    return .settings(
-      configurations: [
-        .debug(
-          name: devConfig.configurationName,
-          settings: [:]
-            .otherSwiftFlags(["$(inherited)", "-D\(devConfig.name)"])
-            .swiftActiveCompilationConditions([devConfig.name, "DEBUG"])
-          ,
           xcconfig: .targetXCConfig(type: product)
         ),
         .release(
           name: prodConfig.configurationName,
-          settings: [:]
-            .otherSwiftFlags(["$(inherited)", "-D\(prodConfig.name)"])
-            .swiftActiveCompilationConditions([prodConfig.name])
-          ,
           xcconfig: .targetXCConfig(type: product)
         )
       ],
@@ -82,6 +61,7 @@ extension ProjectDescription.Settings {
     )
   }
   
+  /// 패키지 설정
   public static var packageSettings: Self {
     let devConfig = BuildConfiguration.dev
     let prodConfig = BuildConfiguration.prod

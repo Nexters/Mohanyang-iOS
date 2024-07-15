@@ -8,14 +8,10 @@
 import Foundation
 import ProjectDescription
 
-public extension ProjectDescription.Path {
-  static let pomonyangAppXCConfig: Path = .relativeToRoot("XCConfig/App/PomoNyang.xcconfig")
+extension ProjectDescription.Path {
+  public static let pomonyangAppXCConfig: Path = .relativeToRoot("XCConfig/Project/PomoNyang.xcconfig")
   
-  static func targetXCConfig(type: Product) -> Self {
+  public static func targetXCConfig(type: Product) -> Self {
     return .relativeToRoot("XCConfig/Target/\(type.rawValue).xcconfig")
-  }
-  
-  static func projectXCConfig(type: BuildConfiguration) -> Self {
-    return .relativeToRoot("XCConfig/Project/\(type.name).xcconfig")
   }
 }

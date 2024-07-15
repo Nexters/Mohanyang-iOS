@@ -43,7 +43,7 @@ let appTarget: Target = .target(
     .dependency(module: PomoNyang.Feature.AppFeature),
     .dependency(module: PomoNyang.Shared.DesignSystem)
   ],
-  settings: .appTargetSettings(xcconfig: .pomonyangAppXCConfig)
+  settings: .targetSettings(product: .app)
 )
 
 // MARK: - Scheme
@@ -60,7 +60,7 @@ let project: Project = .init(
   name: "App",
   organizationName: AppEnv.organizationName,
   options: .options(automaticSchemesOptions: .disabled, disableSynthesizedResourceAccessors: true),
-  settings: .projectSettings,
+  settings: .projectSettings(xcconfig: .pomonyangAppXCConfig),
   targets: [appTarget],
   schemes: [appScheme]
 )
