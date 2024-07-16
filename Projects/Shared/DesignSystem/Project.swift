@@ -11,8 +11,7 @@ let project: Project = .project(
     .sources(.staticFramework),
     .interface,
     .tests,
-    .testing,
-    .example
+    .testing
   ],
   dependencies: []
 )
