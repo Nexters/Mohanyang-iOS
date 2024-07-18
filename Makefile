@@ -1,5 +1,9 @@
 ### Tuist ###
 
+.PHONY: editor
+editor:
+	tuist edit
+
 .PHONY: install
 install:
 	carthage update --platform iOS --use-xcframeworks --use-netrc --cache-builds --verbose --project-directory "XCFramework/"
@@ -17,7 +21,7 @@ cache:
 module:
 	tuist scaffold Framework --layer ${layer} --name ${name}
 
-.PHONY: cleanj
+.PHONY: clean
 clean:
 	tuist clean
 	rm -rf XCFramework/Carthage
@@ -27,9 +31,14 @@ clean:
 
 ### SUGAR ###
 
-.PHONY: pomonyang
-pomonyang:
-	make generate config=${config} target="PomoNyang"
+.PHONY: dev
+dev:
+	make generate config=dev
+
+.PHONY: prod
+prod:
+	make generate config=prod
+
 
 ### Script ###
 
