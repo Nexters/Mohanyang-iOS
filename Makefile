@@ -1,7 +1,7 @@
 ### Tuist ###
 
-.PHONY: editor
-editor:
+.PHONY: manifests
+manifests:
 	tuist edit
 
 .PHONY: install

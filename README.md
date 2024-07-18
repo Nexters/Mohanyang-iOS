@@ -14,6 +14,8 @@
   - ```make prod```
 
 ### Tuist
+- Manifests 생성
+  - ```make manifests```
 - 외부 라이브러리 구성
   - ```make install```
 - 프로젝트 변경 사항 반영 및 열기 (target: 타겟명)
