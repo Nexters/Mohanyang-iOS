@@ -7,7 +7,6 @@ import ProjectDescriptionHelpers
 
 let packageSettings: PackageSettings = .init(
   productTypes: [
-    "Moya": .framework,
     "KakaoSDKCommon": .framework,
     "KakaoSDKAuth": .framework,
 //    "KakaoSDKUser": .framework,
@@ -25,7 +24,6 @@ let package: Package = .init(
   platforms: [.iOS(.v17)],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.11.2"),
-    .package(url: "https://github.com/kakao/kakao-ios-sdk.git", exact: "2.22.0"),
-    .package(url: "https://github.com/Moya/Moya.git", exact: "15.0.3")
+    .package(url: "https://github.com/kakao/kakao-ios-sdk.git", exact: "2.22.0")
   ]
 )
