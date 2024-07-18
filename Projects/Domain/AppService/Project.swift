@@ -8,7 +8,7 @@ let project: Project = .project(
   module: PomoNyang.Domain.AppService,
   scripts: [],
   targets: [
-    .sources(.staticLibrary),
+    .sources,
     .interface,
     .tests,
     .testing

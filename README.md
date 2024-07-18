@@ -8,12 +8,14 @@
   - ```mise install tuist``` (프로젝트 루트 경로에서)
 
 ### 프로젝트 생성
-- 뽀모냥 앱 프로젝트 생성
-  - ```make pomonyang```
-- conifg={configuration} 붙여서 빌드 환경 변경 (dev, prod)
-  - 예시: ```make pomonyang config=dev```
+- 개발환경 생성
+  - ```make dev```
+- 운영환경 생성
+  - ```make prod```
 
 ### Tuist
+- Manifests 생성
+  - ```make manifests```
 - 외부 라이브러리 구성
   - ```make install```
 - 프로젝트 변경 사항 반영 및 열기 (target: 타겟명)
@@ -31,5 +33,8 @@
 - Xcode 파일 생성 템플릿 추가
   - ```make template```
 
-### 의존성 그래프 (테스트, 데모, 외부의존성 제외)
-  ![PomoNyang](DependencyGraph/pomonyang_graph.png)
+### 의존성 그래프 (외부의존성 제외)
+- 운영 환경
+![PomoNyang](DependencyGraph/pomonyang_prod_graph.png)
+- 개발 환경
+![PomoNyang](DependencyGraph/pomonyang_dev_graph.png)

@@ -25,7 +25,4 @@ public extension DEP.SPMTarget {
   static let KakaoSDKNavi: TargetDependency = .external(name: "KakaoSDKNavi")
   static let KakaoSDKTemplate: TargetDependency = .external(name: "KakaoSDKTemplate")
   static let KakaoAdSDK: TargetDependency = .external(name: "KakaoAdSDK")
-  
-  // MARK: - Moya
-  static let Moya: TargetDependency = .external(name: "Moya")
 }

@@ -16,14 +16,14 @@ extension TargetDependency {
   /// ex) path: "Projects/Core/Logger", target: "LoggerInterface"
   public static func dependency<T: Modulable>(module: T, target: TargetType = .sources) -> TargetDependency {
     let moduleName = String(describing: module)
-    return .project(target: "\(moduleName)\(target.postfixName)", path: .relativeToRoot("Projects/\(module.path)"))
+    return .project(target: "\(moduleName)\(target.suffixName)", path: .relativeToRoot("Projects/\(module.path)"))
   }
   
   public enum TargetType: Hashable {
     case sources
     case interface
     
-    public var postfixName: String {
+    public var suffixName: String {
       switch self {
       case .sources:
         return ""
