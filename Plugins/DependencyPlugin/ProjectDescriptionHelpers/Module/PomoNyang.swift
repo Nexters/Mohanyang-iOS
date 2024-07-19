@@ -25,6 +25,7 @@ public enum PomoNyang {
   public enum Shared: Modulable {
     case DesignSystem
     case Utils
+    case Logger
   }
 }
 
