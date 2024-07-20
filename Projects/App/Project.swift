@@ -41,8 +41,6 @@ let appTarget: Target = .target(
   entitlements: Entitlements.PomoNyang.app,
   scripts: scripts,
   dependencies: [
-//    .dependency(module: Feature.AppFeature),
-//    .dependency(module: Shared.DesignSystem)
     .dependency(rootModule: Feature.self)
   ],
   settings: .targetSettings(product: .app)

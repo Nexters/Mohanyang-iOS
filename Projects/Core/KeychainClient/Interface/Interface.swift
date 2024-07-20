@@ -25,15 +25,15 @@ public struct KeychainClient {
   
   /// 앱 재설치시 이전 키체인 데이터를 제거
   public func checkSubsequentRun() {
-    let isSubsequentRun: Bool = UserDefaults.standard.bool(forKey: isSubsequentRun_key)
+    let isSubsequentRun: Bool = UserDefaults.standard.bool(forKey: isSubsequentRunKey)
     if !isSubsequentRun {
       deleteAll()
-      UserDefaults.standard.setValue(true, forKey: isSubsequentRun_key)
+      UserDefaults.standard.setValue(true, forKey: isSubsequentRunKey)
     }
   }
 }
 
-let isSubsequentRun_key: String = "userdefaults_key_isSubsequentRun"
+let isSubsequentRunKey: String = "userdefaults_key_is_subsequent_run"
 
 
 // MARK: - DependencyValues

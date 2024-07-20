@@ -128,10 +128,8 @@ private var serviceId: String = {
     ".imessageappextension"
   ]
   
-  for suffix in applicationExtensionSuffixs {
-    if currentMainBundleId.hasSuffix(suffix) {
-      return String(currentMainBundleId.dropLast(suffix.count))
-    }
+  for suffix in applicationExtensionSuffixs where currentMainBundleId.hasSuffix(suffix) {
+    return String(currentMainBundleId.dropLast(suffix.count))
   }
   
   return currentMainBundleId

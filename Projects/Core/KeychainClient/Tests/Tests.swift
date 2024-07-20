@@ -19,7 +19,8 @@ final class Tests: XCTestCase {
   override func setUp() {
     withDependencies {
       $0.keychainClient = .mock
-    } operation: {}
+    } operation: {
+    }
     super.setUp()
   }
   
