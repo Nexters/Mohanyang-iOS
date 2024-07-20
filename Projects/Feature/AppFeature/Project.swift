@@ -15,9 +15,7 @@ let project: Project = .makeTMABasedProject(
     .testing
   ],
   dependencies: [
-    .sources: [
-      .dependency(module: Domain.AppService),
-    ],
+    .sources: [],
     .interface: [
       .dependency(rootModule: Domain.self),
     ]

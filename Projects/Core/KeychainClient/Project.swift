@@ -10,12 +10,12 @@ let project: Project = .makeTMABasedProject(
   scripts: [],
   targets: [
     .sources,
-    .interface
+    .interface,
+    .tests,
+    .testing
   ],
   dependencies: [
-    .sources: [
-      
-    ],
+    .sources: [],
     .interface: [
       .dependency(rootModule: Shared.self),
     ]

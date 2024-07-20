@@ -8,58 +8,44 @@
 
 import Foundation
 
-//import DependenciesMacros
 import Dependencies
+import DependenciesMacros
 
-//@DependencyClient
+@DependencyClient
 public struct KeychainClient {
-  public var create: @Sendable (String, String) -> Bool
-  public var read: @Sendable (String) -> String?
-  public var update: @Sendable (String, String) -> Bool
-  public var delete: @Sendable (String) -> Bool
+  public var create: @Sendable (_ key: String, _ data: String) -> Bool = { _, _ in true }
+  
+  public var read: @Sendable (_ key: String) -> String?
+  
+  public var update: @Sendable (_ key: String, _ data: String) -> Bool = { _, _ in true }
+  
+  public var delete: @Sendable (_ key: String) -> Bool = { _ in true }
+  
   public var deleteAll: @Sendable () -> Void
   
-//  public func setAPIKey(_ apiKey: String) {
-//    _ = create(apiKey_key, apiKey)
-//  }
-//  
-//  public func getAPIKey() -> String? {
-//    return read(apiKey_key)
-//  }
-//  
-//  /// 앱 재설치시 이전 키체인 데이터를 제거
-//  public func checkSubsequentRun() {
-//    let isSubsequentRun: Bool = UserDefaults.standard.bool(forKey: isSubsequentRun_key)
-//    if !isSubsequentRun {
-//      deleteAll()
-//      UserDefaults.standard.setValue(true, forKey: isSubsequentRun_key)
-//    }
-//  }
-  
-  public init(
-    create: @Sendable @escaping (_: String, _: String) -> Bool,
-    read: @Sendable @escaping (_: String) -> String?,
-    update: @Sendable @escaping (_: String, _: String) -> Bool,
-    delete: @Sendable @escaping (_: String) -> Bool,
-    deleteAll: @Sendable  @escaping () -> Void
-  ) {
-    self.create = create
-    self.read = read
-    self.update = update
-    self.delete = delete
-    self.deleteAll = deleteAll
+  /// 앱 재설치시 이전 키체인 데이터를 제거
+  public func checkSubsequentRun() {
+    let isSubsequentRun: Bool = UserDefaults.standard.bool(forKey: isSubsequentRun_key)
+    if !isSubsequentRun {
+      deleteAll()
+      UserDefaults.standard.setValue(true, forKey: isSubsequentRun_key)
+    }
   }
 }
 
-let isSubsequentRun_key: String = "kimcaddie_userdefaults_key_isSubsequentRun"
-let apiKey_key: String = "kimcaddie_keychain_key_apiKey"
+let isSubsequentRun_key: String = "userdefaults_key_isSubsequentRun"
 
 
 // MARK: - DependencyValues
 
-//extension DependencyValues {
-//  public var keychainClient: KeychainClient {
-//    get { self[KeychainClient.self] }
-//    set { self[KeychainClient.self] = newValue }
-//  }
-//}
+extension DependencyValues {
+  public var keychainClient: KeychainClient {
+    get { self[KeychainClient.self] }
+    set { self[KeychainClient.self] = newValue }
+  }
+}
+
+extension KeychainClient: TestDependencyKey {
+  public static let previewValue = Self()
+  public static let testValue = Self()
+}
