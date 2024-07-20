@@ -28,13 +28,20 @@
   - ```make clean```
 
 ### 스크립트
-- 그래프 생성 (Example, ThirdParty, Dev, Tests 타겟 제외)
+- 그래프 생성
   - ```make graph```
 - Xcode 파일 생성 템플릿 추가
   - ```make template```
 
 ### 의존성 그래프 (외부의존성 제외)
-- 운영 환경
-![PomoNyang](DependencyGraph/pomonyang_prod_graph.png)
-- 개발 환경
-![PomoNyang](DependencyGraph/pomonyang_dev_graph.png)
+<details>
+<summary>운영 환경</summary>
+
+![PROD](DependencyGraph/pomonyang_prod_graph.png)
+</details>
+
+<details>
+<summary>개발 환경</summary>
+
+![DEV](DependencyGraph/pomonyang_dev_graph.png)
+</details>
