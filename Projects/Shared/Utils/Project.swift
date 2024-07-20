@@ -1,11 +1,11 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-@_spi(PomoNyang)
+@_spi(Shared)
 import DependencyPlugin
 
-let project: Project = .project(
-  module: PomoNyang.Shared.Utils,
+let project: Project = .makeTMABasedProject(
+  module: Shared.Utils,
   scripts: [],
   targets: [
     .sources,
@@ -13,5 +13,5 @@ let project: Project = .project(
     .tests,
     .testing
   ],
-  dependencies: []
+  dependencies: [:]
 )

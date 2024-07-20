@@ -12,11 +12,22 @@ public protocol Modulable: CaseIterable {
   var path: String { get }
 }
 
+extension Modulable where Self: RawRepresentable, Self.RawValue == String {
+  public var path: String {
+    return "\(Self.self)/\(self.rawValue)"
+  }
+}
+
 extension TargetDependency {
   /// ex) path: "Projects/Core/Logger", target: "LoggerInterface"
   public static func dependency<T: Modulable>(module: T, target: TargetType = .sources) -> TargetDependency {
     let moduleName = String(describing: module)
     return .project(target: "\(moduleName)\(target.suffixName)", path: .relativeToRoot("Projects/\(module.path)"))
+  }
+  
+  public static func dependency<T: Modulable>(rootModule: T.Type) -> TargetDependency {
+    let moduleName = String(describing: rootModule)
+    return .project(target: "\(moduleName)", path: .relativeToRoot("Projects/\(moduleName)/\(moduleName)"))
   }
   
   public enum TargetType: Hashable {

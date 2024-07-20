@@ -1,11 +1,12 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-@_spi(PomoNyang)
+@_spi(Core)
+@_spi(Domain)
 import DependencyPlugin
 
-let project: Project = .project(
-  module: PomoNyang.Domain.AppService,
+let project: Project = .makeTMABasedProject(
+  module: Domain.AppService,
   scripts: [],
   targets: [
     .sources,
@@ -14,7 +15,11 @@ let project: Project = .project(
     .testing
   ],
   dependencies: [
-    .dependency(module: PomoNyang.Core.APIClient),
-    .dependency(module: PomoNyang.Domain.Model)
+    .sources: [
+      .dependency(module: Domain.Model)
+    ],
+    .interface: [
+      .dependency(rootModule: Core.self),
+    ]
   ]
 )

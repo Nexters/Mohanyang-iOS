@@ -71,16 +71,6 @@ let template = Template(
     .directory(
       path: "Projects/\(layerAttribute)/\(nameAttribute)/Example/Resources/",
       sourcePath: "Assets.xcassets"
-    ),
-    
-    // MARK: - Preview
-    .file(
-      path: "Projects/\(layerAttribute)/\(nameAttribute)/Preview/Sources/\(nameAttribute).swift",
-      templatePath: "Stencil/Source.stencil"
-    ),
-    .string(
-      path: "Projects/\(layerAttribute)/\(nameAttribute)/Preview/Resources/dummy.txt",
-      contents: "dummy file"
     )
   ]
 )

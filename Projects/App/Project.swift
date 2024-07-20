@@ -8,7 +8,8 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-@_spi(PomoNyang)
+@_spi(Feature)
+@_spi(Shared)
 import DependencyPlugin
 
 // MARK: - Target
@@ -40,8 +41,9 @@ let appTarget: Target = .target(
   entitlements: Entitlements.PomoNyang.app,
   scripts: scripts,
   dependencies: [
-    .dependency(module: PomoNyang.Feature.AppFeature),
-    .dependency(module: PomoNyang.Shared.DesignSystem)
+//    .dependency(module: Feature.AppFeature),
+//    .dependency(module: Shared.DesignSystem)
+    .dependency(rootModule: Feature.self)
   ],
   settings: .targetSettings(product: .app)
 )

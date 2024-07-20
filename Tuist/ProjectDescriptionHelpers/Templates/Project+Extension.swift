@@ -10,15 +10,15 @@ import UtilityPlugin
 import DependencyPlugin
 
 extension Project {
-  public static func project<T: Modulable>(
+  public static func makeTMABasedProject<T: Modulable>(
     module: T,
     options: Project.Options = .options(disableSynthesizedResourceAccessors: true),
     packages: [Package] = [],
     infoPlist: InfoPlist = .default,
     includeResource: Bool = false,
     scripts: [TargetScript],
-    targets: Set<TargetType>, // [.sources, .interface, .tests, .testing, .example],
-    dependencies: [TargetDependency],
+    targets: Set<TargetType>, // [.sources, .interface, .tests, .testing, .example]
+    dependencies: [TargetType: [TargetDependency]],
     schemes: [Scheme] = [],
     resourceSynthesizers: [ResourceSynthesizer] = []
   ) -> Project {
@@ -26,6 +26,7 @@ extension Project {
     var projectTargets: [Target] = []
     targets.forEach { targetType in
       let targetName = "\(name)\(targetType.suffixName)"
+      let currentDependencies = dependencies[targetType] ?? []
       
       switch targetType {
       case .sources:
@@ -35,6 +36,8 @@ extension Project {
           currentConfig == .dev ? .framework : .staticLibrary
         }
         let resources: ResourceFileElements? = includeResource ? ["Resources/**"] : nil
+        let interfaceDependency: [TargetDependency] = targets.contains(.interface) ? [.target(name: "\(name)Interface")] : []
+        let dependencies: [TargetDependency] = (interfaceDependency + currentDependencies).compactMap { $0 }
         let target: Target = .target(
           name: targetName,
           product: product,
@@ -42,10 +45,7 @@ extension Project {
           sources: ["Sources/**/*.swift"],
           resources: resources,
           scripts: scripts,
-          dependencies: [
-            targets.contains(.interface) ? [.target(name: "\(name)Interface")] : [],
-            dependencies
-          ].flatMap { $0 }
+          dependencies: dependencies
         )
         projectTargets.append(target)
         
@@ -58,11 +58,14 @@ extension Project {
           sources: ["Interface/**/*.swift"],
           resources: nil,
           scripts: [],
-          dependencies: []
+          dependencies: currentDependencies
         )
         projectTargets.append(target)
         
       case .tests:
+        let sourcesDependency: [TargetDependency] = [.target(name: "\(name)")]
+        let testingDependency: [TargetDependency] = targets.contains(.testing) ? [.target(name: "\(name)Testing")] : []
+        let dependencies: [TargetDependency] = (sourcesDependency + testingDependency + currentDependencies).compactMap { $0 }
         let target: Target = .target(
           name: targetName,
           product: .unitTests,
@@ -70,14 +73,13 @@ extension Project {
           sources: ["Tests/**/*.swift"],
           resources: nil,
           scripts: [],
-          dependencies: [
-            [.target(name: "\(name)")],  // sources 의존성 연결
-            targets.contains(.testing) ? [.target(name: "\(name)Testing")] : []
-          ].flatMap { $0 }
+          dependencies: dependencies
         )
         projectTargets.append(target)
         
       case .testing:
+        let interfaceDependency: [TargetDependency] = targets.contains(.interface) ? [.target(name: "\(name)Interface")] : []
+        let dependencies: [TargetDependency] = (interfaceDependency + currentDependencies).compactMap { $0 }
         let target: Target = .target(
           name: targetName,
           product: .framework,
@@ -85,11 +87,14 @@ extension Project {
           sources: ["Testing/**/*.swift"],
           resources: nil,
           scripts: [],
-          dependencies: targets.contains(.interface) ? [.target(name: "\(name)Interface")] : []
+          dependencies: dependencies
         )
         projectTargets.append(target)
         
       case .example:
+        let sourcesDependency: [TargetDependency] = [.target(name: "\(name)")]
+        let testingDependency: [TargetDependency] = targets.contains(.testing) ? [.target(name: "\(name)Testing")] : []
+        let dependencies: [TargetDependency] = (sourcesDependency + testingDependency + currentDependencies).compactMap { $0 }
         let target: Target = .target(
           name: targetName,
           product: .app,
@@ -97,10 +102,7 @@ extension Project {
           sources: ["Example/Sources/**/*.swift"],
           resources: ["Example/Resources/**"],
           scripts: [.reveal(target: .dev)],
-          dependencies: [
-            [.target(name: "\(name)")], // sources 의존성 연결
-            targets.contains(.testing) ? [.target(name: "\(name)Testing")] : []
-          ].flatMap { $0 }
+          dependencies: dependencies
         )
         projectTargets.append(target)
       }
@@ -119,10 +121,85 @@ extension Project {
       resourceSynthesizers: resourceSynthesizers
     )
   }
+  
+  public static func makeProject<T: Modulable>(
+    module: T,
+    options: Project.Options = .options(disableSynthesizedResourceAccessors: true),
+    packages: [Package] = [],
+    infoPlist: InfoPlist = .default,
+    includeResource: Bool = false,
+    scripts: [TargetScript],
+    product: Product,
+    dependencies: [TargetDependency],
+    schemes: [Scheme] = [],
+    resourceSynthesizers: [ResourceSynthesizer] = []
+  ) -> Project {
+    let targetName = String(describing: module)
+    let resources: ResourceFileElements? = includeResource ? ["Resources/**"] : nil
+    let target: Target = .target(
+      name: targetName,
+      product: product,
+      infoPlist: infoPlist,
+      sources: ["Sources/**/*.swift"],
+      resources: resources,
+      scripts: scripts,
+      dependencies: dependencies
+    )
+    return .init(
+      name: targetName,
+      organizationName: AppEnv.organizationName,
+      options: options,
+      packages: packages,
+      settings: .projectSettings(),
+      targets: [target],
+      schemes: schemes,
+      fileHeaderTemplate: nil,
+      additionalFiles: [],
+      resourceSynthesizers: resourceSynthesizers
+    )
+  }
+  
+  public static func makeRootProject<T: Modulable>(
+    rootModule: T.Type,
+    options: Project.Options = .options(disableSynthesizedResourceAccessors: true),
+    packages: [Package] = [],
+    infoPlist: InfoPlist = .default,
+    scripts: [TargetScript],
+    product: Product,
+    schemes: [Scheme] = [],
+    resourceSynthesizers: [ResourceSynthesizer] = []
+  )  -> Project where T: RawRepresentable, T.RawValue == String {
+    let targetName = String(describing: T.self)
+    let childTargets = T.allCases
+    let dependencies: [TargetDependency] = childTargets.map { .dependency(module: $0) }
+    
+    let target: Target = .target(
+      name: targetName,
+      product: product,
+      infoPlist: infoPlist,
+      sources: ["Sources/**/*.swift"],
+      resources: nil,
+      scripts: scripts,
+      dependencies: dependencies
+    )
+    return .init(
+      name: targetName,
+      organizationName: AppEnv.organizationName,
+      options: options,
+      packages: packages,
+      settings: .projectSettings(),
+      targets: [target],
+      schemes: schemes,
+      fileHeaderTemplate: nil,
+      additionalFiles: [],
+      resourceSynthesizers: resourceSynthesizers
+    )
+  }
 }
 
 extension Project {
-  /// based on µFeatures Architecture
+  /// based on TMA architecture
+  /// - https://docs.tuist.io/guides/develop/projects/tma-architecture
   public enum TargetType: Hashable {
     /// Feature 소스코드 타겟
     case sources
