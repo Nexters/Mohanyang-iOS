@@ -10,6 +10,7 @@ import UtilityPlugin
 import DependencyPlugin
 
 extension Project {
+  /// TMA 기반 프로젝트 생성
   public static func makeTMABasedProject<T: Modulable>(
     module: T,
     options: Project.Options = .options(disableSynthesizedResourceAccessors: true),
@@ -122,6 +123,7 @@ extension Project {
     )
   }
   
+  /// Modulable 모듈 프로젝트 생성
   public static func makeProject<T: Modulable>(
     module: T,
     options: Project.Options = .options(disableSynthesizedResourceAccessors: true),
@@ -159,6 +161,7 @@ extension Project {
     )
   }
   
+  /// Modulable 루트 프로젝트 생성
   public static func makeRootProject<T: Modulable>(
     rootModule: T.Type,
     options: Project.Options = .options(disableSynthesizedResourceAccessors: true),

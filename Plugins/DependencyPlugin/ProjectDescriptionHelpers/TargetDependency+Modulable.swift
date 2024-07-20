@@ -19,12 +19,13 @@ extension Modulable where Self: RawRepresentable, Self.RawValue == String {
 }
 
 extension TargetDependency {
-  /// ex) path: "Projects/Core/Logger", target: "LoggerInterface"
+  /// Modulable 모듈 의존성 연결
   public static func dependency<T: Modulable>(module: T, target: TargetType = .sources) -> TargetDependency {
     let moduleName = String(describing: module)
     return .project(target: "\(moduleName)\(target.suffixName)", path: .relativeToRoot("Projects/\(module.path)"))
   }
   
+  /// Modulable 루트 의존성 연결
   public static func dependency<T: Modulable>(rootModule: T.Type) -> TargetDependency {
     let moduleName = String(describing: rootModule)
     return .project(target: "\(moduleName)", path: .relativeToRoot("Projects/\(moduleName)/\(moduleName)"))
