@@ -11,4 +11,5 @@ import Foundation
 public enum Core: String, Modulable {
   case APIClient
   case KeychainClient
+  case UserNotificationClient
 }

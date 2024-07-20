@@ -15,7 +15,6 @@ let project: Project = .makeTMABasedProject(
     .testing
   ],
   dependencies: [
-    .sources: [],
     .interface: [
       .dependency(rootModule: Core.self)
     ]
