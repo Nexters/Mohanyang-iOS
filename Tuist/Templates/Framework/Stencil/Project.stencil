@@ -4,11 +4,11 @@ import ProjectDescriptionHelpers
 @_spi(<#T##SPI#>)
 import DependencyPlugin
 
-let project: Project = .project(
+let project: Project = .makeTMABasedProject(
   module: <#T##Modulable#>,
   scripts: [],
   targets: [
-    .sources(<#T##Project.MachOType#>),
+    .sources,
     .interface,
     .tests,
     .testing,

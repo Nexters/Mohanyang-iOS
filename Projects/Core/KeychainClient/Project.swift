@@ -1,12 +1,12 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
+@_spi(Core)
 @_spi(Shared)
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Shared.DesignSystem,
-  includeResource: true,
+  module: Core.KeychainClient,
   scripts: [],
   targets: [
     .sources,
@@ -14,5 +14,10 @@ let project: Project = .makeTMABasedProject(
     .tests,
     .testing
   ],
-  dependencies: [:]
+  dependencies: [
+    .sources: [],
+    .interface: [
+      .dependency(rootModule: Shared.self)
+    ]
+  ]
 )

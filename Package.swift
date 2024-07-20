@@ -6,15 +6,7 @@ import struct ProjectDescription.PackageSettings
 import ProjectDescriptionHelpers
 
 let packageSettings: PackageSettings = .init(
-  productTypes: [
-    "KakaoSDKCommon": .framework,
-    "KakaoSDKAuth": .framework,
-//    "KakaoSDKUser": .framework,
-//    "KakaoSDKTalk": .framework,
-//    "KakaoSDKShare": .framework,
-//    "KakaoSDKNavi": .framework,
-//    "KakaoSDKTemplate": .framework,
-  ],
+  productTypes: [:],
   baseSettings: .packageSettings
 )
 #endif
@@ -24,6 +16,7 @@ let package: Package = .init(
   platforms: [.iOS(.v17)],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.11.2"),
-    .package(url: "https://github.com/kakao/kakao-ios-sdk.git", exact: "2.22.0")
+    .package(url: "https://github.com/pointfreeco/swift-dependencies.git", exact: "1.3.3"),
+    .package(url: "https://github.com/rive-app/rive-ios.git", exact: "5.15.1")
   ]
 )
