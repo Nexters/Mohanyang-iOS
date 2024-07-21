@@ -8,7 +8,7 @@
 import ProjectDescription
 
 extension PrivacyManifest {
-  public static var pomonyang: Self {
+  public static var mohanyang: Self {
     return .privacyManifest(
       tracking: true,
       trackingDomains: [],

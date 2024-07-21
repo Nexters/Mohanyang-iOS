@@ -1,4 +1,4 @@
-# PomoNyang iOS 앱
+# 모하냥 iOS 앱
 
 ### 환경 구성
 - Carthage 설치 (XCFramework로 관리중인 외부 라이브러리 대응)
@@ -37,11 +37,11 @@
 <details>
 <summary>운영 환경</summary>
 
-![PROD](DependencyGraph/pomonyang_prod_graph.png)
+![PROD](DependencyGraph/mohanyang_prod_graph.png)
 </details>
 
 <details>
 <summary>개발 환경</summary>
 
-![DEV](DependencyGraph/pomonyang_dev_graph.png)
+![DEV](DependencyGraph/mohanyang_dev_graph.png)
 </details>

@@ -20,14 +20,14 @@ let scripts: [TargetScript] = if currentConfig == .dev {
   [.firebaseCrashlytics]
 }
 
-let appTargetName = "PomoNyang"
+let appTargetName = "Mohanyang"
 let appTarget: Target = .target(
   name: appTargetName,
   destinations: AppEnv.platform,
   product: .app,
   bundleId: AppEnv.bundleId,
   deploymentTargets: AppEnv.deploymentTarget,
-  infoPlist: InfoPlist.PomoNyang.app,
+  infoPlist: InfoPlist.Mohanyang.app,
   sources: [
     "Sources/**"
   ],
@@ -36,9 +36,9 @@ let appTarget: Target = .target(
       "GoogleService-Info.plist",
       "Resources/\(currentConfig.name)/**"
     ],
-    privacyManifest: .pomonyang
+    privacyManifest: .mohanyang
   ),
-  entitlements: Entitlements.PomoNyang.app,
+  entitlements: Entitlements.Mohanyang.app,
   scripts: scripts,
   dependencies: [
     .dependency(rootModule: Feature.self)
@@ -60,7 +60,7 @@ let project: Project = .init(
   name: "App",
   organizationName: AppEnv.organizationName,
   options: .options(automaticSchemesOptions: .disabled, disableSynthesizedResourceAccessors: true),
-  settings: .projectSettings(xcconfig: .pomonyangAppXCConfig),
+  settings: .projectSettings(xcconfig: .mohanyangAppXCConfig),
   targets: [appTarget],
   schemes: [appScheme]
 )

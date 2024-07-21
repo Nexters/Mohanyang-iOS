@@ -16,13 +16,12 @@ public enum AppEnv {
     var moduleName = name.lowercased()
     let validCharacters = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789.")
     moduleName = moduleName.components(separatedBy: validCharacters.inverted).joined(separator: "")
-    return "com.pomonyang.module.\(moduleName)"
+    return "com.pomonyang.mohanyang.\(moduleName)"
   }
   
   public static let organizationName: String = "PomoNyang"
   public static let deploymentTarget: DeploymentTargets = .iOS("17.0")
   public static let platform: Destinations = [.iPhone]
   
-  public static let bundleId: String = "com.pomonyang.ios"
-  public static let testBundleId: String = "com.pomonyang.ios.test"
+  public static let bundleId: String = "com.pomonyang.mohanyang"
 }

@@ -1,5 +1,5 @@
 //
-//  InfoPlist+PomoNyang.swift
+//  InfoPlist+Mohanyang.swift
 //  ProjectDescriptionHelpers
 //
 //  Created by MinseokKang on 2024/07/15.
@@ -8,7 +8,7 @@
 import ProjectDescription
 
 extension InfoPlist {
-  public enum PomoNyang {
+  public enum Mohanyang {
     public static var app: InfoPlist {
       return .dictionary([
         // MARK: - ThirdParty
