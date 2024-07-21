@@ -1,22 +1,20 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-@_spi(Domain)
-@_spi(Feature)
+@_spi(Core)
+@_spi(Shared)
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Feature.AppFeature,
+  module: Core.UserNotificationClient,
   scripts: [],
   targets: [
     .sources,
-    .interface,
-    .tests,
-    .testing
+    .interface
   ],
   dependencies: [
     .interface: [
-      .dependency(rootModule: Domain.self)
+      .dependency(rootModule: Shared.self)
     ]
   ]
 )
