@@ -12,7 +12,7 @@ let project: Project = .makeTMABasedProject(
     .sources
   ],
   dependencies: [
-    .interface: [
+    .sources: [
       .dependency(rootModule: Core.self)
     ]
   ]
