@@ -2,21 +2,18 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 @_spi(Domain)
-@_spi(Feature)
+@_spi(Core)
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Feature.AppFeature,
+  module: Domain.PushService,
   scripts: [],
   targets: [
-    .sources,
-    .interface,
-    .tests,
-    .testing
+    .sources
   ],
   dependencies: [
     .interface: [
-      .dependency(rootModule: Domain.self)
+      .dependency(rootModule: Core.self)
     ]
   ]
 )

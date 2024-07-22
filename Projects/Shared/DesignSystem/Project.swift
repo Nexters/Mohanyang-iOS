@@ -6,6 +6,9 @@ import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
   module: Shared.DesignSystem,
+  options: .options(
+    disableSynthesizedResourceAccessors: false
+  ),
   includeResource: true,
   scripts: [],
   targets: [
@@ -14,5 +17,10 @@ let project: Project = .makeTMABasedProject(
     .tests,
     .testing
   ],
-  dependencies: [:]
+  dependencies: [:],
+  resourceSynthesizers: [
+    .fonts(), // for font
+    .assets(), // for .xcassets,
+    .files(extensions: ["mp4", "gif"])
+  ]
 )

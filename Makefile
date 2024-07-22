@@ -37,7 +37,7 @@ dev:
 
 .PHONY: prod
 prod:
-	make generate config=prod
+	make generate config=prod target=Mohanyang
 
 
 ### Script ###

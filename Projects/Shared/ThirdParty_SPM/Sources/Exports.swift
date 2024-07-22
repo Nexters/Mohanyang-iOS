@@ -1,9 +1,9 @@
 //
 //  Exports.swift
-//  ThirdParty_ComposableArchitecture
+//  ThirdParty_SPM
 //
-//  Created by MinseokKang on 2023/09/20.
-//  Copyright © 2023 Kimcaddie. All rights reserved.
+//  Created by devMinseok on 7/23/24.
+//  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
 @_exported import ComposableArchitecture

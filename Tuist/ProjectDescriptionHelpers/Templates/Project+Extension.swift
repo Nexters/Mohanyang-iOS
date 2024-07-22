@@ -32,9 +32,9 @@ extension Project {
       switch targetType {
       case .sources:
         let product: Product = if includeResource {
-          currentConfig == .dev ? .framework : .staticFramework
+          .staticFramework // currentConfig == .dev ? .framework : .staticFramework
         } else {
-          currentConfig == .dev ? .framework : .staticLibrary
+          .staticLibrary // currentConfig == .dev ? .framework : .staticLibrary
         }
         let resources: ResourceFileElements? = includeResource ? ["Resources/**"] : nil
         let interfaceDependency: [TargetDependency] = targets.contains(.interface) ? [.target(name: "\(name)Interface")] : []
@@ -51,7 +51,7 @@ extension Project {
         projectTargets.append(target)
         
       case .interface:
-        let product: Product = currentConfig == .dev ? .framework : .staticLibrary
+        let product: Product = .staticLibrary //currentConfig == .dev ? .framework : .staticLibrary
         let target: Target = .target(
           name: targetName,
           product: product,
@@ -79,11 +79,12 @@ extension Project {
         projectTargets.append(target)
         
       case .testing:
+        let product: Product = .staticFramework // currentConfig == .dev ? .framework : .staticFramework
         let interfaceDependency: [TargetDependency] = targets.contains(.interface) ? [.target(name: "\(name)Interface")] : []
         let dependencies: [TargetDependency] = (interfaceDependency + currentDependencies).compactMap { $0 }
         let target: Target = .target(
           name: targetName,
-          product: .framework,
+          product: product,
           infoPlist: infoPlist,
           sources: ["Testing/**/*.swift"],
           resources: nil,

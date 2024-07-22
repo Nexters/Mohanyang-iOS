@@ -1,5 +1,5 @@
 import Foundation
 
-public struct AppFeature {
+public struct HomeFeatureTesting {
   public init() {}
 }
