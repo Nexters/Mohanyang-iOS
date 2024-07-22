@@ -57,7 +57,7 @@ struct MohanyangApp: App {
     WindowGroup {
       AppView(store: self.appDelegate.store)
     }
-    .onChange(of: self.scenePhase) { oldValue, newValue in
+    .onChange(of: self.scenePhase) { _, newValue in
       self.appDelegate.store.send(.didChangeScenePhase(newValue))
     }
   }

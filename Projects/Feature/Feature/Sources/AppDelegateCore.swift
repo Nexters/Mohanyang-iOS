@@ -38,7 +38,10 @@ public struct AppDelegateCore {
     Reduce(self.core)
   }
   
-  private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
+  private func core(
+    _ state: inout State,
+    _ action: Action
+  ) -> EffectOf<Self> {
     switch action {
     case .didFinishLaunching:
       UIApplication.shared.applicationIconBadgeNumber = 0

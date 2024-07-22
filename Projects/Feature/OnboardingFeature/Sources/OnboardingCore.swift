@@ -12,7 +12,7 @@ import ComposableArchitecture
 
 extension OnboardingCore {
   public init() {
-    let reducer = Reduce<State, Action> { state, action  in
+    let reducer = Reduce<State, Action> { _, action  in
       switch action {
       case .onAppear:
         return .none

@@ -67,7 +67,7 @@ public struct AppCore {
         completionHandler()
         return .none
       }
-      return .run { send in
+      return .run { _ in
         switch pushNotiContent {
         case .test:
           break
