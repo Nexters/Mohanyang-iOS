@@ -2,8 +2,8 @@
 //  Exports.swift
 //  ThirdParty_Firebase
 //
-//  Created by MinseokKang on 2023/09/21.
-//  Copyright © 2023 Kimcaddie. All rights reserved.
+//  Created by devMinseok on 7/23/24.
+//  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
 @_exported import FirebaseCore

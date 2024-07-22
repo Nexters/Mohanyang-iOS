@@ -27,7 +27,7 @@ public final class Logger {
   
 #if DEBUG
   private let appIdentifier = Bundle.main.bundleIdentifier ?? "???"
-  private let logsAccessQueue = DispatchQueue(label: "com.kimcaddie.logger.logsAccessQueue", attributes: .concurrent)
+  private let logsAccessQueue = DispatchQueue(label: "com.logger.logsAccessQueue", attributes: .concurrent)
   
   private func logger(category: LogCategory) -> os.Logger {
     return os.Logger(subsystem: appIdentifier, category: category.rawValue)

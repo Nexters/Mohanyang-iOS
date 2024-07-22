@@ -8,7 +8,7 @@
 import ProjectDescription
 
 extension Entitlements {
-  public enum PomoNyang {
+  public enum Mohanyang {
     public static var app: Entitlements {
       return .dictionary([
         "aps-environment": "development",

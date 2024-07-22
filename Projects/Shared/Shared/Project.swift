@@ -7,5 +7,5 @@ import DependencyPlugin
 let project: Project = .makeRootProject(
   rootModule: Shared.self,
   scripts: [],
-  product: .framework
+  product: .staticLibrary
 )

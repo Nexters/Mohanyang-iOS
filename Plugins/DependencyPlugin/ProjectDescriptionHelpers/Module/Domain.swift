@@ -10,4 +10,5 @@ import Foundation
 @_spi(Domain)
 public enum Domain: String, Modulable {
   case AppService
+  case PushService
 }

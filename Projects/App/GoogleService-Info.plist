@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.pomonyang.ios</string>
+	<string>com.pomonyang.mohanyang</string>
 	<key>PROJECT_ID</key>
 	<string>pomonyang</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:283667420790:ios:11049f2edb5fbb6d227157</string>
+	<string>1:283667420790:ios:2178e55c7b33f0e3227157</string>
 </dict>
 </plist>

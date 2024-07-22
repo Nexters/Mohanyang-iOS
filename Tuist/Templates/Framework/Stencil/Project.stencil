@@ -14,5 +14,5 @@ let project: Project = .makeTMABasedProject(
     .testing,
     .example
   ],
-  dependencies: []
+  dependencies: [:]
 )

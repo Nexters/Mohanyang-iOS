@@ -7,7 +7,7 @@ import ProjectDescription
 import DependencyPlugin
 
 let workspace = Workspace(
-  name: "PomoNyang",
+  name: "Mohanyang",
   projects: {
     var projects: [Path] = []
     

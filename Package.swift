@@ -12,7 +12,7 @@ let packageSettings: PackageSettings = .init(
 #endif
 
 let package: Package = .init(
-  name: "PomoNyang",
+  name: "Mohanyang",
   platforms: [.iOS(.v17)],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.11.2"),

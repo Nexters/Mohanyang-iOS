@@ -9,5 +9,6 @@ import Foundation
 
 @_spi(Feature)
 public enum Feature: String, Modulable {
-  case AppFeature
+  case HomeFeature
+  case OnboardingFeature
 }
