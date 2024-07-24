@@ -21,12 +21,6 @@ public struct HomeView: View {
     VStack {
       Text("Home")
         .foregroundStyle(Color.black)
-      
-      Button {
-        store.send(.localPushButtonTapped)
-      } label: {
-        Text("로컬 푸시 테스트")
-      }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.white)

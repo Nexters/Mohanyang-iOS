@@ -18,7 +18,9 @@ extension HomeCore {
   public init() {
     @Dependency(\.userNotificationClient) var userNotificationClient
     
-    let reducer = Reduce<State, Action> { _, action  in
+    let reducer = Reduce<State, Action> {
+      _,
+      action  in
       switch action {
       case .onAppear:
         return .run { send in
@@ -26,12 +28,13 @@ extension HomeCore {
         }
         
       case .localPushButtonTapped:
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
         return .run { send in
           do {
             try await scheduleNotification(
               userNotificationClient: userNotificationClient,
               contentType: .test,
-              trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+              trigger: trigger
             )
           } catch {
             print(error)
