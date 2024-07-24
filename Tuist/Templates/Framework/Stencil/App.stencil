@@ -1,0 +1,17 @@
+//
+//  {{ name }}App.swift
+//  {{ name }}
+//
+//  Created by <#T##Author name#> on {{ nowDate }}.
+//
+
+import SwiftUI
+
+@main
+struct {{ name }}App: App {
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
+    }
+  }
+}
