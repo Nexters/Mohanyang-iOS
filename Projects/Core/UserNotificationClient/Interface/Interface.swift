@@ -27,7 +27,8 @@ public struct UserNotificationClient {
     case didReceiveResponse(Notification.Response, completionHandler: @Sendable () -> Void)
     case openSettingsForNotification(Notification?)
     case willPresentNotification(
-      Notification, completionHandler: @Sendable (UNNotificationPresentationOptions) -> Void
+      Notification,
+      completionHandler: @Sendable (UNNotificationPresentationOptions) -> Void
     )
   }
   
