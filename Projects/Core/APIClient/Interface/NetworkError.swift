@@ -36,10 +36,6 @@ public enum NetworkError: Error {
             return "No Response Error"
         case .authorizationError:
             return "Autorization Error"
-        case .noResponseError:
-            return "No Response Error"
-        case .authorizationError:
-            return "Authorization Error"
         }
     }
 }
