@@ -53,7 +53,7 @@ public struct AppCore {
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
-      let isLoggedIn = false
+      let isLoggedIn = true
       if isLoggedIn { // 로그인 판단
         state.home = HomeCore.State()
       } else {

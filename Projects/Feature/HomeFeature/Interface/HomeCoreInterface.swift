@@ -25,6 +25,7 @@ public struct HomeCore {
   
   public enum Action {
     case onAppear
+    case localPushButtonTapped
   }
   
   public var body: some ReducerOf<Self> {
