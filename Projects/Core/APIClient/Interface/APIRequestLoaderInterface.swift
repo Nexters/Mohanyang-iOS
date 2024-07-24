@@ -7,10 +7,13 @@
 //
 
 import Foundation
+import KeychainClientInterface
 
 public protocol APIRequestLoaderInterface {
+  associatedtype T: TargetType
   func fetchData<M: Decodable> (
-    target: TargetType,
-    responseData: M.Type
+    target: T,
+    responseData: M.Type,
+    keychainClient: KeychainClient
   ) async throws -> M
 }
