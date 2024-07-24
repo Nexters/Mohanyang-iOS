@@ -9,7 +9,6 @@
 import Foundation
 
 import Dependencies
-import DependenciesMacros
 
 public protocol TargetType {
     var baseURL: String { get }

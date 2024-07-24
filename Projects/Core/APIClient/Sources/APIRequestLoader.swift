@@ -20,7 +20,7 @@ public class APIRequestLoader<T: TargetType>: APIRequestLoaderInterface {
     self.session = URLSession(configuration: configuration)
 #elseif DEV
     let sessionDelegate = EventLoggerDelegate()
-    self.session = URLSession(configuration: configuration, delegate: sessionDelegate)
+    self.session = URLSession(configuration: configuration, delegate: sessionDelegate, delegateQueue: nil)
 #endif
 
     // TODO: token interceptor
