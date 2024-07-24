@@ -7,3 +7,12 @@
 //
 
 import Foundation
+
+extension Encodable {
+  public func toDictionary() throws -> [String: Any] {
+    guard let data = try? JSONEncoder().encode(self),
+          let jsonData = try? JSONSerialization.jsonObject(with: data),
+          let dictionaryData = jsonData as? [String: Any] else { return [:] }
+    return dictionaryData
+  }
+}
