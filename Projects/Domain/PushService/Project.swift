@@ -9,7 +9,8 @@ let project: Project = .makeTMABasedProject(
   module: Domain.PushService,
   scripts: [],
   targets: [
-    .sources
+    .sources,
+    .example
   ],
   dependencies: [
     .sources: [

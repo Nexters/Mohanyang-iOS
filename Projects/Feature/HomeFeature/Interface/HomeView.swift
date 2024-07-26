@@ -24,5 +24,8 @@ public struct HomeView: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.white)
+    .onAppear {
+      store.send(.onAppear)
+    }
   }
 }

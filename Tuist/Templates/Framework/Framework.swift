@@ -5,18 +5,25 @@
 //  Created by MinseokKang on 2024/07/15.
 //
 
+import Foundation
 import ProjectDescription
+
+func getNowDateString() -> String {
+  let formatter = DateFormatter()
+  formatter.dateFormat = "M/d/yy"
+  return formatter.string(from: Date())
+}
 
 let layerAttribute: Template.Attribute = .required("layer")
 let nameAttribute: Template.Attribute = .required("name")
-let platformAttribute: Template.Attribute = .optional("platform", default: "ios")
+let nowDateAttribute: Template.Attribute = .optional("nowDate", default: .string(getNowDateString()))
 
 let template = Template(
   description: "Generate Module",
   attributes: [
     layerAttribute,
     nameAttribute,
-    platformAttribute
+    nowDateAttribute
   ],
   items: [ // 템플릿 전부 생성
     // MARK: - Project
@@ -57,8 +64,12 @@ let template = Template(
 
     // MARK: - Example
     .file(
-      path: "Projects/\(layerAttribute)/\(nameAttribute)/Example/Sources/AppDelegate.swift",
-      templatePath: "Stencil/AppDelegate.stencil"
+      path: "Projects/\(layerAttribute)/\(nameAttribute)/Example/Sources/\(nameAttribute)App.swift",
+      templatePath: "Stencil/App.stencil"
+    ),
+    .file(
+      path: "Projects/\(layerAttribute)/\(nameAttribute)/Example/Sources/ContentView.swift",
+      templatePath: "Stencil/ContentView.stencil"
     ),
     .file(
       path: "Projects/\(layerAttribute)/\(nameAttribute)/Example/Resources/LaunchScreen.storyboard",

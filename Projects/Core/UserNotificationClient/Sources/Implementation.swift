@@ -15,7 +15,9 @@ import Dependencies
 
 extension UserNotificationClient: DependencyKey {
   public static let liveValue = Self(
-    add: { try await UNUserNotificationCenter.current().add($0) },
+    add: {
+      try await UNUserNotificationCenter.current().add($0)
+    },
     delegate: {
       AsyncStream { continuation in
         let delegate = Delegate(continuation: continuation)

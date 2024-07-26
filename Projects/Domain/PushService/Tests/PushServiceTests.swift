@@ -1,13 +1,13 @@
 //
-//  {{ name }}Tests.swift
-//  {{ name }}
+//  PushServiceTests.swift
+//  PushService
 //
-//  Created by <#T##Author name#> on {{ nowDate }}.
+//  Created by <#T##Author name#> on 7/24/24.
 //
 
 import XCTest
 
-final class {{ name }}Tests: XCTestCase {
+final class PushServiceTests: XCTestCase {
   override func setUpWithError() throws {
     // Put setup code here. This method is called before the invocation of each test method in the class.
   }
