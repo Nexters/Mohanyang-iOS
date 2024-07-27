@@ -11,6 +11,10 @@ extension InfoPlist {
   public enum Mohanyang {
     public static var app: InfoPlist {
       return .dictionary([
+        // MARK: - Base URL
+
+        "BASE_URL": "$(BASE_URL)",
+
         // MARK: - ThirdParty
         
         "KAKAO_APP_KEY": "",
