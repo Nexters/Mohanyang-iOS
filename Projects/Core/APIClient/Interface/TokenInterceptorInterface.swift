@@ -1,5 +1,5 @@
 //
-//  AccessTokenInterceptor.swift
+//  AccessTokenInterceptorInterface.swift
 //  APIClient
 //
 //  Created by 김지현 on 7/29/24.
@@ -8,16 +8,22 @@
 
 import Foundation
 import KeychainClientInterface
-import APIClientInterface
 
-class AccessTokenInterceptor: AccessTokenInterceptorInterface {
+protocol TokenInterceptorInterface {
+  // adapt, retry 각각 매개변수로 받을지, 프로토콜 변수로 놓을지 고민
+  var keychainClient: KeychainClient { get set }
+  func adapt(_ request: URLRequest) async throws -> URLRequest
+  func retry(_ request: URLRequest, dueTo error: Error) async -> Bool
+}
+
+public class TokenInterceptor: TokenInterceptorInterface {
   var keychainClient: KeychainClient
-  init(keychainClient: KeychainClient) {
+
+  public init(keychainClient: KeychainClient) {
     self.keychainClient = keychainClient
   }
 
-
-  func adapt(_ request: URLRequest) async throws -> URLRequest {
+  public func adapt(_ request: URLRequest) async throws -> URLRequest {
     var requestWithToken = request
     if let accessToken = keychainClient.read(key: "mohanyang_keychain_access_token") {
       requestWithToken.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
@@ -28,7 +34,7 @@ class AccessTokenInterceptor: AccessTokenInterceptorInterface {
 
   }
 
-  func retry(_ request: URLRequest, dueTo error: Error) async -> Bool {
+  public func retry(_ request: URLRequest, dueTo error: Error) async -> Bool {
     do {
       try await refreshAccessToken()
       return true
