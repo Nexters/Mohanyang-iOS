@@ -7,3 +7,26 @@
 //
 
 import Foundation
+
+public protocol Injectable {}
+
+public protocol InjectionKey {
+    associatedtype Value
+    static var currentValue: Self.Value { get }
+}
+
+public extension InjectionKey {
+    static var currentValue: Value {
+        return Container.resolve(for: Self.self)
+    }
+}
+
+public struct Module {
+    let name: String
+    let resolve: () -> Injectable
+
+    public init<T: InjectionKey>(_ name: T.Type, _ resolve: @escaping () -> Injectable) {
+        self.name = String(describing: name)
+        self.resolve = resolve
+    }
+}
