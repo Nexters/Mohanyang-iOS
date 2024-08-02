@@ -29,8 +29,8 @@ public struct AppDelegateCore {
     case userNotifications(UserNotificationClient.DelegateEvent)
   }
   
-  @Dependency(\.keychainClient) var keychainClient
-  @Dependency(\.userNotificationClient) var userNotificationClient
+  @Dependency(KeychainClient.self) var keychainClient
+  @Dependency(UserNotificationClient.self) var userNotificationClient
   
   public init() {}
   

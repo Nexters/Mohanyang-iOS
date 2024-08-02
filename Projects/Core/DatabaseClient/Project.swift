@@ -1,3 +1,10 @@
+//
+//  DatabaseClientTesting.swift
+//  DatabaseClientManifests
+//
+//  Created by devMinseok on 7/27/24.
+//
+
 import ProjectDescription
 import ProjectDescriptionHelpers
 
@@ -6,7 +13,7 @@ import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Core.APIClient,
+  module: Core.DatabaseClient,
   scripts: [],
   targets: [
     .sources,
@@ -16,8 +23,7 @@ let project: Project = .makeTMABasedProject(
   ],
   dependencies: [
     .interface: [
-      .dependency(rootModule: Shared.self),
-      .dependency(module: Core.KeychainClient, target: .interface)
+      .dependency(rootModule: Shared.self)
     ]
   ]
 )

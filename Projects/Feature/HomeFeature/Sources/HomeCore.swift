@@ -16,7 +16,7 @@ import ComposableArchitecture
 
 extension HomeCore {
   public init() {
-    @Dependency(\.userNotificationClient) var userNotificationClient
+    @Dependency(UserNotificationClient.self) var userNotificationClient
     
     let reducer = Reduce<State, Action> {
       _,

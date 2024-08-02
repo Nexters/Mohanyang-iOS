@@ -62,16 +62,6 @@ public struct UserNotificationClient {
   }
 }
 
-
-// MARK: - DependencyValues
-
-extension DependencyValues {
-  public var userNotificationClient: UserNotificationClient {
-    get { self[UserNotificationClient.self] }
-    set { self[UserNotificationClient.self] = newValue }
-  }
-}
-
 extension UserNotificationClient: TestDependencyKey {
   public static let previewValue = Self()
   public static let testValue = Self()
