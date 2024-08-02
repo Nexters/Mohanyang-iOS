@@ -44,13 +44,6 @@ public protocol Persistable where Self: Decodable {
   func managedObject() -> ManagedObject
 }
 
-extension DependencyValues {
-  public var databaseClient: DatabaseClient {
-    get { self[DatabaseClient.self] }
-    set { self[DatabaseClient.self] = newValue }
-  }
-}
-
 extension DatabaseClient: TestDependencyKey {
   public static let previewValue = Self()
   public static let testValue = Self()
