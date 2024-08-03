@@ -17,7 +17,7 @@ public struct DatabaseClient {
   /// Use create<T: Persistable>(object:).
   public var create: @Sendable (any Persistable) async throws -> Void
   /// Use read<T: Persistable>(_ type:).
-  public var read: @Sendable (Object.Type) async throws -> [Object]
+  public var read: @Sendable (any Persistable.Type) async throws -> [Object]
   /// Use read<T: Persistable>(_ type:, predicateFormat:, args:).
   public var readWithFilter: @Sendable (Object.Type, String, Any) async throws -> [Object]
   /// Use update<T: Persistable>(_ object:)
@@ -31,12 +31,12 @@ public struct DatabaseClient {
   /// Use delete<T: Object>(_ type:).
   public var deleteAllTable: @Sendable () async throws -> Void
   
-  public func create<T: Persistable>(object: T) async throws -> Void {
+  public func create<T: Persistable>(object: T) async throws {
     try await create(object)
   }
   
   public func read<T: Persistable>(_ type: T.Type) async throws -> [T] {
-    let results = try await self.read(type.ManagedObject)
+    let results = try await self.read(type)
     return await Self.realmActor?.convertToPersistable(type: type, objects: results) ?? []
   }
   

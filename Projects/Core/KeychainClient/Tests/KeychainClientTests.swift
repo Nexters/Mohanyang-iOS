@@ -17,10 +17,6 @@ import Dependencies
 final class Tests: XCTestCase {
   @Dependency(KeychainClient.self) var keychainClient
   
-  override func setUp() {
-    super.setUp()
-  }
-  
   override func tearDown() {
     withDependencies {
       $0[KeychainClient.self] = KeychainClient.live()
