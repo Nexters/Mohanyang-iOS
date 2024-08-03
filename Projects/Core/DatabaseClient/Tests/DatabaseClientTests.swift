@@ -1,33 +1,56 @@
-//
+
 //  DatabaseClientTests.swift
 //  DatabaseClient
 //
-//  Created by <#T##Author name#> on 7/27/24.
+//  Created by devMinseok on 7/27/24.
 //
 
 import XCTest
 
+import DatabaseClient
+import DatabaseClientInterface
+import DatabaseClientTesting
+
+import RealmSwift
+import Dependencies
+
 final class DatabaseClientTests: XCTestCase {
-  override func setUpWithError() throws {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+  @Dependency(DatabaseClient.self) var databaseClient
+  
+  override func setUp() async throws {
+    try await withDependencies {
+      $0[DatabaseClient.self] = DatabaseClient.live()
+    } operation: {
+      let inmemoryConfig = Realm.Configuration(inMemoryIdentifier: "DatabaseClientTests")
+      try await databaseClient.initialize(inmemoryConfig)
+    }
+    try await super.setUp()
   }
   
-  override func tearDownWithError() throws {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-  }
-  
-  func testExample() throws {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
-    // Any test you write for XCTest can be annotated as throws and async.
-    // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-    // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-  }
-  
-  func testPerformanceExample() throws {
-    // This is an example of a performance test case.
-    self.measure {
-      // Put the code you want to measure the time of here.
+  func testCRUD() async throws {
+    try await withDependencies {
+      $0[DatabaseClient.self] = DatabaseClient.live()
+    } operation: {
+      // create
+      let initialNumber = 1
+      var testModel = Test(test: initialNumber)
+      try await databaseClient.create(object: testModel)
+      
+      // read
+      let results1 = try await databaseClient.read(Test.self)
+      XCTAssertEqual(results1[0].test, initialNumber)
+      let updateNumber = 2
+      testModel.test = 2
+      
+      // update
+      try await databaseClient.update(testModel)
+      let results2 = try await databaseClient.read(Test.self)
+      XCTAssertEqual(results2[0].test, updateNumber)
+      
+      // delete
+      try await databaseClient.deleteAllTable()
+      let results3 = try await databaseClient.read(Test.self)
+      XCTAssertEqual(results3.count, 0)
     }
   }
 }
