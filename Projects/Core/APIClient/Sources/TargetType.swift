@@ -13,7 +13,7 @@ import Shared
 
 
 extension TargetType {
-  public func asURLRequest(keychainClient: KeychainClient) async throws -> URLRequest {
+  func asURLRequest(keychainClient: KeychainClient) async throws -> URLRequest {
     let url = URL(string: baseURL)!
     var urlRequest = URLRequest(url: url.appendingPathComponent(path))
     urlRequest.httpMethod = method.rawValue
