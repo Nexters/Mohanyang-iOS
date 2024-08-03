@@ -14,7 +14,13 @@ public enum AuthDTO {
 }
 
 public extension AuthDTO.Request {
+  struct GetTokenRequestDTO: Encodable {
+    public var deviceId: String
+  }
 
+  struct RefreshTokenRequestDTO: Encodable {
+    public var refreshToken: String
+  }
 }
 
 public extension AuthDTO.Response {

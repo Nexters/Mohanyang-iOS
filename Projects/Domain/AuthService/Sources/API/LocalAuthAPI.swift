@@ -12,9 +12,9 @@ import AuthServiceInterface
 import KeychainClientInterface
 
 class LocalAuthAPI: APIRequestLoader<AuthAPIService> {
-  func getToken(_ deviceID: String) async throws -> AuthDTO.Response.TokenResponseDTO {
-    try await fetchData(
-      target: .getToken(deviceID),
+  func getToken(_ deviceId: String) async throws -> AuthDTO.Response.TokenResponseDTO {
+    return try await fetchData(
+      target: .getToken(deviceId),
       responseData: AuthDTO.Response.TokenResponseDTO.self,
       keychainClient: self.keychainClient
     )

@@ -10,7 +10,6 @@ import Foundation
 @_spi(Shared)
 public enum Shared: String, Modulable {
   case DesignSystem
-  case DIContainer
   case Utils
   case Logger
   case ThirdParty_SPM

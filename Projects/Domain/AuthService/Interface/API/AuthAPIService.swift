@@ -10,7 +10,7 @@ import Foundation
 import APIClientInterface
 
 public enum AuthAPIService {
-  case getToken(_ deviceID: String)
+  case getToken(_ deviceId: String)
   case refreshToken(_ refreshToken: String)
 }
 
@@ -37,10 +37,12 @@ extension AuthAPIService: TargetType {
 
   public var parameters: RequestParams {
     switch self {
-    case let .getToken(deviceID):
-      return .body(deviceID)
+    case let .getToken(deviceId):
+      let dto = AuthDTO.Request.GetTokenRequestDTO(deviceId: deviceId)
+      return .body(dto)
     case let .refreshToken(refreshToken):
-      return .body(refreshToken)
+      let dto = AuthDTO.Request.RefreshTokenRequestDTO(refreshToken: refreshToken)
+      return .body(dto)
     }
   }
 }

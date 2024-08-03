@@ -53,7 +53,6 @@ open class APIRequestLoader<T: TargetType> {
     case 200..<300:
       do {
         let decodedData = try JSONDecoder().decode(responseData, from: data)
-        print(decodedData)
         return decodedData
       } catch {
         throw NetworkError.decodingError
