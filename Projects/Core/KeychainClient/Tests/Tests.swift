@@ -14,7 +14,7 @@ import KeychainClientTesting
 import Dependencies
 
 final class Tests: XCTestCase {
-  @Dependency(\.keychainClient) var keychainClient
+  @Dependency(KeychainClient.self) var keychainClient
   
   override func setUp() {
     withDependencies {

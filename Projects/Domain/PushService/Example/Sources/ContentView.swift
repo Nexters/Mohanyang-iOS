@@ -14,7 +14,7 @@ import Dependencies
 
 struct ContentView: View {
   @State var selectedInterval: Int = 0
-  @Dependency(\.userNotificationClient) var userNotificationClient
+  @Dependency(UserNotificationClient.self) var userNotificationClient
   
   var body: some View {
     VStack {
