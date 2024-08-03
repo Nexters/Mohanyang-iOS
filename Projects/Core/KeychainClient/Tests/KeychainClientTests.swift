@@ -30,10 +30,6 @@ final class Tests: XCTestCase {
     super.tearDown()
   }
   
-  override func setUpWithError() throws {}
-  
-  override func tearDownWithError() throws {}
-  
   func testCRUD() throws {
     withDependencies {
       $0[KeychainClient.self] = KeychainClient.live()

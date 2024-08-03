@@ -27,6 +27,15 @@ final class DatabaseClientTests: XCTestCase {
     try await super.setUp()
   }
   
+  override func tearDown() async throws {
+    try await withDependencies {
+      $0[DatabaseClient.self] = DatabaseClient.live()
+    } operation: {
+      try await databaseClient.deleteAllTable()
+    }
+    try await super.tearDown()
+  }
+  
   func testCRUD() async throws {
     try await withDependencies {
       $0[DatabaseClient.self] = DatabaseClient.live()
