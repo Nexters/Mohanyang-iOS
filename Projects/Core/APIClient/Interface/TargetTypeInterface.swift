@@ -19,7 +19,7 @@ public protocol TargetType {
 }
 
 public enum API {
-    static var apiBaseURL: String {
+    public static var apiBaseURL: String {
         guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else { fatalError("url missing") }
         return "https://" + baseURL
     }
@@ -42,3 +42,8 @@ public enum RequestParams {
     case body(_ parameter: Encodable)
 }
 
+public extension TargetType {
+  var contentType: ContentType {
+    return .json
+  }
+}
