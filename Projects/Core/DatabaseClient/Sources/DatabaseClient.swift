@@ -17,9 +17,9 @@ extension DatabaseClient: DependencyKey {
   
   private static func live() -> DatabaseClient {
     return .init(
-      initialize: {
+      initialize: { configuration in
         if realmActor == nil {
-          realmActor = try await RealmActor()
+          realmActor = try await RealmActor(configuration: configuration)
         } else {
           throw(NSError(domain: "Realm already initialized", code: 0))
         }
@@ -34,11 +34,11 @@ extension DatabaseClient: DependencyKey {
       },
       read: { type, isIncluded in
         if let realmActor {
-          let results = realmActor.read(type.ManagedObject)
+          let results = await realmActor.read(type)
           if let isIncluded {
-            return results.where(isIncluded).compactMap { type(managedObject: $0) }
+            return results.where(isIncluded).map { $0 }
           } else {
-            return results.compactMap { type(managedObject: $0) }
+            return results.map { $0 }
           }
         } else {
           throw(NSError(domain: "Realm is not initialized", code: 0))
@@ -70,8 +70,8 @@ extension DatabaseClient: DependencyKey {
   actor RealmActor {
     var realm: Realm!
     
-    init() async throws {
-      realm = try await Realm(actor: self)
+    init(configuration: Realm.Configuration) async throws {
+      realm = try await Realm(configuration: configuration, actor: self)
     }
     
     func create<T: Object>(_ object: ThreadSafeReference<T>) async throws {
