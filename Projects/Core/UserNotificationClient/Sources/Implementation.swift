@@ -76,7 +76,11 @@ extension UserNotificationClient {
       withCompletionHandler completionHandler: @escaping () -> Void
     ) {
       self.continuation.yield(
-        .didReceiveResponse(.init(rawValue: response)) { completionHandler() }
+        .didReceiveResponse(.init(rawValue: response)) {
+          Task { @MainActor in
+            completionHandler()
+          }
+        }
       )
     }
     
@@ -96,7 +100,11 @@ extension UserNotificationClient {
       @escaping (UNNotificationPresentationOptions) -> Void
     ) {
       self.continuation.yield(
-        .willPresentNotification(.init(rawValue: notification)) { completionHandler($0) }
+        .willPresentNotification(.init(rawValue: notification)) { options in
+          Task { @MainActor in
+            completionHandler(options)
+          }
+        }
       )
     }
   }

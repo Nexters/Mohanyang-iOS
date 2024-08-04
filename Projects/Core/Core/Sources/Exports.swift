@@ -10,3 +10,9 @@
 @_exported import APIClientInterface
 @_exported import KeychainClient
 @_exported import KeychainClientInterface
+@_exported import UserDefaultsClient
+@_exported import UserDefaultsClientInterface
+@_exported import UserNotificationClient
+@_exported import UserNotificationClientInterface
+@_exported import DatabaseClient
+@_exported import DatabaseClientInterface

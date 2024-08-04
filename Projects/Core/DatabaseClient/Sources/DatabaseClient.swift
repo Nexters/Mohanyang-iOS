@@ -31,7 +31,7 @@ extension DatabaseClient: DependencyKey {
       },
       read: { type in
         if let realmActor {
-          let results = await realmActor.read(type.ManagedObject as! Object.Type)
+          let results = await realmActor.read(type as! Object.Type)
           return results
         } else {
           throw(NSError(domain: "Realm is not initialized", code: 0))

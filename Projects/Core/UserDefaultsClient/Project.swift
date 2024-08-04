@@ -1,3 +1,10 @@
+//
+//  UserDefaultsClientTesting.swift
+//  UserDefaultsClientManifests
+//
+//  Created by devMinseok on 8/4/24.
+//
+
 import ProjectDescription
 import ProjectDescriptionHelpers
 
@@ -6,7 +13,7 @@ import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Core.KeychainClient,
+  module: Core.UserDefaultsClient,
   scripts: [],
   targets: [
     .sources,
