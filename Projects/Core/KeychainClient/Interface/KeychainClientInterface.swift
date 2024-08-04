@@ -1,5 +1,5 @@
 //
-//  Interface.swift
+//  KeychainClientInterface.swift
 //  KeychainClient
 //
 //  Created by devMinseok on 7/20/24.
@@ -34,16 +34,6 @@ public struct KeychainClient {
 }
 
 let isSubsequentRunKey: String = "userdefaults_key_is_subsequent_run"
-
-
-// MARK: - DependencyValues
-
-extension DependencyValues {
-  public var keychainClient: KeychainClient {
-    get { self[KeychainClient.self] }
-    set { self[KeychainClient.self] = newValue }
-  }
-}
 
 extension KeychainClient: TestDependencyKey {
   public static let previewValue = Self()

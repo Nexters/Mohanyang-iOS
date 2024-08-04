@@ -8,9 +8,12 @@
 
 import UIKit
 import Foundation
+import Logger
 
 import UserNotificationClientInterface
 import KeychainClientInterface
+import DatabaseClientInterface
+import AppService
 
 import ComposableArchitecture
 import FirebaseCore
@@ -29,8 +32,9 @@ public struct AppDelegateCore {
     case userNotifications(UserNotificationClient.DelegateEvent)
   }
   
-  @Dependency(\.keychainClient) var keychainClient
-  @Dependency(\.userNotificationClient) var userNotificationClient
+  @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(KeychainClient.self) var keychainClient
+  @Dependency(UserNotificationClient.self) var userNotificationClient
   
   public init() {}
   
@@ -49,7 +53,12 @@ public struct AppDelegateCore {
       keychainClient.checkSubsequentRun()
       let userNotificationEventStream = userNotificationClient.delegate()
       
+      Logger.shared.log("FCMToken: \(Messaging.messaging().fcmToken ?? "not generated")")
+      
       return .run { send in
+        // TODO: - 임시로 현재 위치에 넣어논거고 Splash 개발시 SplashCore에 넣어서 작업이 완전히 끝났을때 메인화면으로 랜딩할 것.
+        try await initilizeDatabaseSystem(databaseClient: databaseClient)
+        
         await withThrowingTaskGroup(of: Void.self) { group in
           group.addTask {
             for await event in userNotificationEventStream {

@@ -1,5 +1,5 @@
 //
-//  Implementation.swift
+//  KeychainClient.swift
 //  KeychainClient
 //
 //  Created by devMinseok on 7/20/24.
@@ -16,7 +16,7 @@ import Dependencies
 extension KeychainClient: DependencyKey {
   public static let liveValue: KeychainClient = .live()
   
-  private static func live() -> KeychainClient {
+  public static func live() -> KeychainClient {
     return KeychainClient(
       create: { key, data in
         if let data = data.data(using: .utf8) {

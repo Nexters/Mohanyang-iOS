@@ -9,13 +9,10 @@ let project: Project = .makeTMABasedProject(
   module: Domain.AppService,
   scripts: [],
   targets: [
-    .sources,
-    .interface,
-    .tests,
-    .testing
+    .sources
   ],
   dependencies: [
-    .interface: [
+    .sources: [
       .dependency(rootModule: Core.self)
     ]
   ]
