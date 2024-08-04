@@ -1,6 +1,6 @@
 //
 //  AppCore.swift
-//  AppServiceInterface
+//  Feature
 //
 //  Created by devMinseok on 7/22/24.
 //  Copyright © 2024 PomoNyang. All rights reserved.
