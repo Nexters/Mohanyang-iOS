@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import DIContainer
 import KeychainClientInterface
 
 public protocol TokenInterceptorInterface {

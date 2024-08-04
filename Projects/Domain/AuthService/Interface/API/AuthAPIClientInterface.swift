@@ -14,14 +14,7 @@ import KeychainClientInterface
 
 @DependencyClient
 public struct AuthAPIClient {
-  public var getToken: @Sendable (_ deviceID: String) async throws -> AuthDTO.Response.TokenResponseDTO?
-}
-
-extension DependencyValues {
-  public var authAPIClient: AuthAPIClient {
-    get { self[AuthAPIClient.self] }
-    set { self[AuthAPIClient.self] = newValue }
-  }
+  public var getToken: @Sendable (_ deviceID: String, _ keychainClient: KeychainClient) async throws -> AuthDTO.Response.TokenResponseDTO?
 }
 
 extension AuthAPIClient: TestDependencyKey {

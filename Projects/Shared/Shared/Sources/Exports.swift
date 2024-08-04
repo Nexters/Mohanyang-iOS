@@ -9,7 +9,6 @@
 @_exported import Logger
 @_exported import DesignSystem
 @_exported import DesignSystemInterface
-@_exported import DIContainer
 @_exported import Utils
 @_exported import UtilsInterface
 

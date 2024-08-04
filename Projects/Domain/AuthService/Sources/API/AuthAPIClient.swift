@@ -14,11 +14,9 @@ import Dependencies
 extension AuthAPIClient: DependencyKey {
   public static let liveValue: AuthAPIClient = .live()
   private static func live() -> AuthAPIClient {
-    // MARK: CAT-98: keychain을 feature에서부터 가지고 오는 방법 ..
-    @Dependency(\.keychainClient) var keychainClient
     return AuthAPIClient(
-      getToken: { deviceID in
-        var response = try await LocalAuthAPI(keychainClient: keychainClient).getToken(deviceID)
+      getToken: { deviceID, keychainClient in
+        var response = try await LocalAuthAPI().getToken(deviceID, keychainClient)
         return response
       }
     )

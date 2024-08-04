@@ -14,15 +14,10 @@ open class APIRequestLoader<T: TargetType> {
 
   public var session: URLSession
   public var urlConfiguration: URLSessionConfiguration
-  public var keychainClient: KeychainClient
   //public var tokenInterceptor: TokenInterceptor
 
-  public init(
-    configuration: URLSessionConfiguration = .default,
-    keychainClient: KeychainClient
-  ) {
+  public init(configuration: URLSessionConfiguration = .default) {
     self.urlConfiguration = configuration
-    self.keychainClient = keychainClient
 #if PROD
     self.session = URLSession(configuration: configuration)
 #elseif DEV
