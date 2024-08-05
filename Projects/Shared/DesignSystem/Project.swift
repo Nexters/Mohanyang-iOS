@@ -1,3 +1,10 @@
+//
+//  DesignSystemTesting.swift
+//  DesignSystemManifests
+//
+//  Created by devMinseok on 8/5/24.
+//
+
 import ProjectDescription
 import ProjectDescriptionHelpers
 
@@ -13,9 +20,9 @@ let project: Project = .makeTMABasedProject(
   scripts: [],
   targets: [
     .sources,
-    .interface,
     .tests,
-    .testing
+    .testing,
+    .example
   ],
   dependencies: [:],
   resourceSynthesizers: [
