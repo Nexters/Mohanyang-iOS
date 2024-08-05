@@ -8,3 +8,5 @@
 
 @_exported import AppService
 @_exported import PushService
+@_exported import AuthService
+@_exported import AuthServiceInterface

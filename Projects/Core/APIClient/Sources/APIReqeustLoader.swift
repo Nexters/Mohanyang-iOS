@@ -1,38 +1,43 @@
 //
-//  APIRequestLoader.swift
+//  APIReqeustLoader.swift
 //  APIClientInterface
 //
-//  Created by 김지현 on 7/24/24.
+//  Created by 김지현 on 8/3/24.
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
-
+// MARK: CAT-98 : token interceptor 진행중 (8.4)
 import Foundation
 import APIClientInterface
 import KeychainClientInterface
 
-public class APIRequestLoader<T: TargetType>: APIRequestLoaderInterface {
-  let coniguration: URLSessionConfiguration
-  let session: URLSession
+open class APIRequestLoader<T: TargetType> {
+
+  public var session: URLSession
+  public var urlConfiguration: URLSessionConfiguration
+  //public var tokenInterceptor: TokenInterceptor
 
   public init(configuration: URLSessionConfiguration = .default) {
-    self.coniguration = configuration
+    self.urlConfiguration = configuration
 #if PROD
     self.session = URLSession(configuration: configuration)
 #elseif DEV
     let sessionDelegate = EventLoggerDelegate()
     self.session = URLSession(configuration: configuration, delegate: sessionDelegate, delegateQueue: nil)
 #endif
-
-    // TODO: token interceptor
+    //self.tokenInterceptor = TokenInterceptor(session: self.session, keychainClient: keychainClient)
   }
 
   public func fetchData<M: Decodable>(
     target: T,
     responseData: M.Type,
+    isWithInterceptor: Bool = true,
     keychainClient: KeychainClient
   ) async throws -> M {
     let urlRequest = try await target.asURLRequest(keychainClient: keychainClient)
-    
+
+    /*
+     let session = isWithInterceptor ? ~~
+     */
     let (data, response) = try await session.data(for: urlRequest)
 
     guard let httpResponse = response as? HTTPURLResponse else {
@@ -47,7 +52,7 @@ public class APIRequestLoader<T: TargetType>: APIRequestLoaderInterface {
       } catch {
         throw NetworkError.decodingError
       }
-    case 401: // token interceptor 예정
+    case 401:
       throw NetworkError.authorizationError
     case 400..<500:
       throw NetworkError.requestError("bad request")
