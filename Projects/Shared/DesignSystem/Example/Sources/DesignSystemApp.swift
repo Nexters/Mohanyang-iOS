@@ -2,7 +2,7 @@
 //  DesignSystemApp.swift
 //  DesignSystem
 //
-//  Created by <#T##Author name#> on 8/5/24.
+//  Created by devMinseok on 8/5/24.
 //
 
 import SwiftUI
