@@ -12,18 +12,17 @@ import KeychainClientInterface
 import Shared
 
 
-extension TargetType {
-  func asURLRequest(keychainClient: KeychainClient) async throws -> URLRequest {
-    let url = URL(string: baseURL)!
-    var urlRequest = URLRequest(url: url.appendingPathComponent(path))
+extension APIBaseRequest {
+  func asURLRequest(baseURL: URL, token: String?) async throws -> URLRequest {
+    var urlRequest = URLRequest(url: baseURL.appendingPathComponent(path))
     urlRequest.httpMethod = method.rawValue
     urlRequest.setValue(
       contentType.rawValue,
       forHTTPHeaderField: HTTPHeaderField.contentType.rawValue
     )
-    if let jwt = keychainClient.read(key: "jwt") {
+    if let token = token {
       urlRequest.addValue(
-        jwt,
+        token,
         forHTTPHeaderField: HTTPHeaderField.authentication.rawValue
       )
     }
@@ -32,7 +31,7 @@ extension TargetType {
     case .query(let request):
       let params = try request.toDictionary()
       let queryParams = params.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
-      var components = URLComponents(string: url.appendingPathComponent(path).absoluteString)
+      var components = URLComponents(string: baseURL.appendingPathComponent(path).absoluteString)
       components?.queryItems = queryParams
       urlRequest.url = components?.url
 
@@ -57,7 +56,7 @@ extension TargetType {
   }
 }
 
-public extension TargetType {
+public extension APIBaseRequest {
   var contentType: ContentType {
     return .json
   }

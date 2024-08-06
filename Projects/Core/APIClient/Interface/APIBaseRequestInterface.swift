@@ -10,19 +10,11 @@ import Foundation
 
 import Dependencies
 
-public protocol TargetType {
-  var baseURL: String { get }
+public protocol APIBaseRequest {
   var path: String { get }
   var method: HTTPMethod { get }
   var parameters: RequestParams { get }
   var contentType: ContentType { get }
-}
-
-public enum API {
-  public static var apiBaseURL: String {
-    guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else { fatalError("url missing") }
-    return "https://" + baseURL
-  }
 }
 
 public enum HTTPHeaderField: String {
@@ -42,7 +34,7 @@ public enum RequestParams {
   case body(_ parameter: Encodable)
 }
 
-public extension TargetType {
+public extension APIBaseRequest {
   var contentType: ContentType {
     return .json
   }

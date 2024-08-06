@@ -16,8 +16,9 @@ extension AuthAPIClient: DependencyKey {
   private static func live() -> AuthAPIClient {
     return AuthAPIClient(
       getToken: { deviceID, keychainClient in
-        var response = try await LocalAuthAPI().getToken(deviceID, keychainClient)
-        return response
+        return nil
+//        var response = try await LocalAuthAPI().getToken(deviceID, keychainClient)
+//        return response
       }
     )
   }

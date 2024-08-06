@@ -14,11 +14,7 @@ public enum AuthAPIService {
   case refreshToken(_ refreshToken: String)
 }
 
-extension AuthAPIService: TargetType {
-  public var baseURL: String {
-    return API.apiBaseURL
-  }
-
+extension AuthAPIService: APIBaseRequest {
   public var path: String {
     switch self {
     case .getToken:
