@@ -161,3 +161,7 @@ struct GlobalTokenDetailView: View {
     }
   }
 }
+
+#Preview {
+  GlobalTokenDetailView()
+}

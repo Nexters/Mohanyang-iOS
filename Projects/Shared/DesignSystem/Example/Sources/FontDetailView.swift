@@ -40,3 +40,7 @@ struct FontDetailView: View {
     }
   }
 }
+
+#Preview {
+  FontDetailView()
+}

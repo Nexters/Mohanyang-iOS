@@ -95,7 +95,7 @@ public enum Alias {
   }
   
   public enum Interaction {
-    public static let hover = Global.Color.white.opacity(Global.Opacity._10d)
-    public static let pressed = Global.Color.black.opacity(Global.Opacity._5d)
+    public static let hover = Global.Opacity._10d
+    public static let pressed = Global.Opacity._5d
   }
 }

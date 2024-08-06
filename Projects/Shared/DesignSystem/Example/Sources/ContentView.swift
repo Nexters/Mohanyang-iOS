@@ -37,7 +37,7 @@ struct ContentView: View {
         
         Section("Component") {
           NavigationLink {
-            
+            ButtonDetailView()
           } label: {
             Text("Button")
           }

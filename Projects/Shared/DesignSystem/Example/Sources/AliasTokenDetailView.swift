@@ -84,8 +84,8 @@ struct AliasTokenDetailView: View {
       }
       
       Section("Interaction") {
-        interactionItem(interaction: Alias.Interaction.hover, name: "Hover")
-        interactionItem(interaction: Alias.Interaction.pressed, name: "Pressed")
+        interactionItem(interaction: Global.Color.black.opacity(Alias.Interaction.hover), name: "Hover")
+        interactionItem(interaction: Global.Color.black.opacity(Alias.Interaction.pressed), name: "Pressed")
       }
     }
   }
@@ -145,4 +145,8 @@ struct AliasTokenDetailView: View {
         .frame(width: 30, height: 30)
     }
   }
+}
+
+#Preview {
+  AliasTokenDetailView()
 }
