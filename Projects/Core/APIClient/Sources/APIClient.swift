@@ -17,15 +17,62 @@ extension APIClient {
   public static let liveValue: APIClient = .live()
 
   public static func live() -> Self {
-    guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else {
-      fatalError("url missing")
+
+    actor Session {
+      nonisolated let tokenInterceptor: TokenInterceptor
+
+      let session: URLSession = {
+        let config = URLSessionConfiguration.default
+        return URLSession(configuration: config)
+      }()
+
+      let decoder: JSONDecoder = JSONDecoder()
+
+      init(tokenInterceptor: TokenInterceptor) {
+        self.tokenInterceptor = tokenInterceptor
+      }
+
+      func sendRequest(request: APIBaseRequest, retryCnt: Int = 0) async throws -> (Data, URLResponse) {
+        guard retryCnt < 3 else { throw throwNetworkErr(.timeOutError) }
+
+        var urlRequest = try await request.asURLRequest()
+        urlRequest = try await tokenInterceptor.adapt(urlRequest)
+        Logger.shared.log(category: .network, "API Request:\n\(dump(urlRequest))")
+
+        let (data, response) = try await session.data(for: urlRequest)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+          let error = NetworkError.noResponseError
+          Logger.shared.log(level: .error, category: .network, "API Error:\n\(dump(error))")
+          throw error
+        }
+
+        switch httpResponse.statusCode {
+        case 200..<300:
+          return (data, response)
+        case 401:
+          try await tokenInterceptor.retry(for: self.session)
+          return try await sendRequest(request: request, retryCnt: retryCnt + 1)
+        case 400..<500:
+          throw throwNetworkErr(.requestError("bad request"))
+        case 500..<600:
+          throw throwNetworkErr(.serverError)
+        default:
+          throw throwNetworkErr(.unknownError)
+        }
+
+        func throwNetworkErr(_ error: NetworkError) -> NetworkError {
+          Logger.shared.log(level: .error, category: .network, "\(error.localizedDescription):\n\(dump(error))")
+          return error
+        }
+      }
     }
 
     let tokenInterceptor = TokenInterceptor()
     let session = Session(tokenInterceptor: tokenInterceptor)
 
     return .init(
-      apiRequest: { request, token in
+      apiRequest: { request in
         return try await session.sendRequest(request: request)
       }
     )

@@ -15,14 +15,13 @@ import DependenciesMacros
 
 @DependencyClient
 public struct APIClient {
-  public var apiRequest: @Sendable (_ request: APIBaseRequest, _ token: String?) async throws -> (Data, URLResponse)
+  public var apiRequest: @Sendable (_ request: APIBaseRequest) async throws -> (Data, URLResponse)
 
   public func apiRequest<T: Decodable>(
     request: APIBaseRequest,
-    as: T.Type,
-    token: String?
+    as: T.Type
   ) async throws -> T {
-    let (data, _) = try await self.apiRequest(request, token)
+    let (data, _) = try await self.apiRequest(request)
 
     do {
       let decodedData = try JSONDecoder().decode(T.self, from: data)

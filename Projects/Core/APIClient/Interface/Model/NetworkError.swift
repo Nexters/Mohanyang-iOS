@@ -18,6 +18,7 @@ public enum NetworkError: Error {
   case networkConnectionError
   case timeOutError
   case unknownError
+  case refreshTokenExpired
 
   public var errorMessage: String {
     switch self {
@@ -39,6 +40,8 @@ public enum NetworkError: Error {
       return "No Response Error"
     case .authorizationError:
       return "Autorization Error"
+    case .refreshTokenExpired:
+      return "Refresh Token has been expired Error"
     }
   }
 }

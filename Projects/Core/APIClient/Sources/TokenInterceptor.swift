@@ -12,24 +12,48 @@ import APIClientInterface
 import Logger
 import Dependencies
 
-actor Session {
-  nonisolated let tokenInterceptor: TokenInterceptor
+enum KeychainClientKeys: String {
+  case accessToken = "mohanyang_keychain_access_token"
+  case refreshToken = "mohanyang_keychain_refresh_token"
+}
 
-  let session: URLSession = {
-    let config = URLSessionConfiguration.default
-    return URLSession(configuration: config)
-  }()
+struct TokenInterceptor {
+  @Dependency(KeychainClient.self) var keychainClient
 
-  let decoder: JSONDecoder = JSONDecoder()
-
-  init(tokenInterceptor: TokenInterceptor) {
-    self.tokenInterceptor = tokenInterceptor
+  /// add accessToken to url request's header
+  func adapt(
+    _ request: URLRequest
+  ) async throws -> URLRequest {
+    var requestWithToken = request
+    if let accessToken = keychainClient.read(key: KeychainClientKeys.accessToken.rawValue) {
+      requestWithToken.addValue(
+        "Bearer \(accessToken)",
+        forHTTPHeaderField: HTTPHeaderField.authentication.rawValue
+      )
+      return requestWithToken
+    } else {
+      throw NetworkError.authorizationError
+    }
   }
 
-  func sendRequest(request: APIBaseRequest) async throws -> (Data, URLResponse) {
+  /// refresh access token
+  func retry(
+    for session: URLSession
+  ) async throws {
 
-    let urlRequest = try await request.asURLRequest()
-    Logger.shared.log(category: .network, "API Request:\n\(dump(urlRequest))")
+    guard let refreshToken = keychainClient.read(key: KeychainClientKeys.refreshToken.rawValue) else {
+      throw NetworkError.authorizationError
+    }
+
+    var urlRequest = URLRequest(url: URL(string: "https://" + API.apiBaseURL)!)
+    urlRequest.httpMethod = HTTPMethod.post.rawValue
+    urlRequest.setValue(
+      ContentType.json.rawValue,
+      forHTTPHeaderField: HTTPHeaderField.contentType.rawValue
+    )
+
+    let requestBody = ["refreshToken": refreshToken]
+    urlRequest.httpBody = try? JSONSerialization.data(withJSONObject: requestBody, options: [])
 
     let (data, response) = try await session.data(for: urlRequest)
 
@@ -39,53 +63,13 @@ actor Session {
       throw error
     }
 
-    func throwNetworkErr(_ error: NetworkError) -> NetworkError {
-      Logger.shared.log(level: .error, category: .network, "\(error.localizedDescription):\n\(dump(error))")
-      return error
-    }
-    switch httpResponse.statusCode {
-    case 200..<300:
-      return (data, response)
-    case 401:
-      if await tokenInterceptor.retry(urlRequest, for: self.session) {
-        return try await sendRequest(request: request)
-      } else {
-        throw throwNetworkErr(.unknownError)
-      }
-    case 400..<500:
-      throw throwNetworkErr(.requestError("bad request"))
-    case 500..<600:
-      throw throwNetworkErr(.serverError)
-    default:
-      throw throwNetworkErr(.unknownError)
-    }
-  }
-}
-
-struct TokenInterceptor {
-  @Dependency(KeychainClient.self) var keychainClient
-
-  func adapt(
-    _ request: URLRequest,
-    for session: Session
-  ) async throws -> URLRequest {
-    var requestWithToken = request
-    if let accessToken = keychainClient.read(key: "mohanyang_keychain_access_token") {
-      requestWithToken.addValue(
-        "Bearer \(accessToken)",
-        forHTTPHeaderField: HTTPHeaderField.authentication.rawValue
-      )
-      return requestWithToken
-    } else {
-      throw NetworkError.authorizationError
+    guard (200...299).contains(httpResponse.statusCode) else {
+      let error = NetworkError.authorizationError
+      Logger.shared.log(level: .error, category: .network, "API Error:\n\(dump(error))")
+      throw error
     }
 
-  }
-
-  func retry(
-    _ request: URLRequest,
-    for session: URLSession
-  ) async -> Bool {
-    return true
+    let decodedData = try JSONDecoder().decode(TokenResponseDTO.self, from: data)
+    _ = keychainClient.update(key: KeychainClientKeys.accessToken.rawValue, data: decodedData.accessToken)
   }
 }

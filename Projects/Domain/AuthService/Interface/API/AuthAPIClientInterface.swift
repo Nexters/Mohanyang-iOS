@@ -7,14 +7,20 @@
 //
 
 import Foundation
+
+import APIClientInterface
+import KeychainClientInterface
+
 import Dependencies
 import DependenciesMacros
-import KeychainClientInterface
 
 
 @DependencyClient
 public struct AuthAPIClient {
-  public var getToken: @Sendable (_ deviceID: String, _ keychainClient: KeychainClient) async throws -> AuthDTO.Response.TokenResponseDTO?
+  public var login: @Sendable (
+    _ deviceID: String,
+    _ apiClient: APIClient
+  ) async throws -> AuthDTO.Response.TokenResponseDTO
 }
 
 extension AuthAPIClient: TestDependencyKey {

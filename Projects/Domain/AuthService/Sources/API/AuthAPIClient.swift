@@ -15,10 +15,13 @@ extension AuthAPIClient: DependencyKey {
   public static let liveValue: AuthAPIClient = .live()
   private static func live() -> AuthAPIClient {
     return AuthAPIClient(
-      getToken: { deviceID, keychainClient in
-        return nil
-//        var response = try await LocalAuthAPI().getToken(deviceID, keychainClient)
-//        return response
+      login: { deviceID, apiClient in
+        let service = AuthAPIService.login(deviceID)
+        var response = try await apiClient.apiRequest(
+          request: service,
+          as: AuthDTO.Response.TokenResponseDTO.self
+        ) 
+        return response
       }
     )
   }
