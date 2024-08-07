@@ -8,6 +8,8 @@
 
 import UserNotifications
 
+import APIClientInterface
+import AuthServiceInterface
 import HomeFeatureInterface
 import PushService
 import UserNotificationClientInterface
@@ -17,12 +19,15 @@ import ComposableArchitecture
 extension HomeCore {
   public init() {
     @Dependency(UserNotificationClient.self) var userNotificationClient
-    
+    @Dependency(APIClient.self) var apiClient
+    @Dependency(AuthAPIClient.self) var authAPIClient
+
     let reducer = Reduce<State, Action> { _, action  in
       switch action {
       case .onAppear:
         return .run { send in
           _ = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
+          _ = try await authAPIClient.login(deviceID: "deviceID", apiClient: apiClient)
         }
         
       case .localPushButtonTapped:

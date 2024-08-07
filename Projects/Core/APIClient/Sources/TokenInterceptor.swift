@@ -9,37 +9,67 @@
 import Foundation
 import KeychainClientInterface
 import APIClientInterface
+import Logger
+import Dependencies
 
-public class TokenInterceptor: TokenInterceptorInterface {
-  public var session: URLSession
-  public var keychainClient: KeychainClient
+enum KeychainClientKeys: String {
+  case accessToken = "mohanyang_keychain_access_token"
+  case refreshToken = "mohanyang_keychain_refresh_token"
+}
 
-  public init(session: URLSession, keychainClient: KeychainClient) {
-    self.session = session
-    self.keychainClient = keychainClient
-  }
+struct TokenInterceptor {
+  @Dependency(KeychainClient.self) var keychainClient
 
-  public func adapt(_ request: URLRequest) async throws -> URLRequest {
+  /// add accessToken to url request's header
+  func adapt(
+    _ request: URLRequest
+  ) async throws -> URLRequest {
     var requestWithToken = request
-    if let accessToken = keychainClient.read(key: "mohanyang_keychain_access_token") {
-      requestWithToken.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+    if let accessToken = keychainClient.read(key: KeychainClientKeys.accessToken.rawValue) {
+      requestWithToken.addValue(
+        "Bearer \(accessToken)",
+        forHTTPHeaderField: HTTPHeaderField.authentication.rawValue
+      )
       return requestWithToken
     } else {
       throw NetworkError.authorizationError
     }
-
   }
 
-  public func retry(_ request: URLRequest, dueTo error: Error) async -> Bool {
-    do {
-      try await refreshAccessToken()
-      return true
-    } catch {
-      return false
+  /// refresh access token
+  func retry(
+    for session: URLSession
+  ) async throws {
+
+    guard let refreshToken = keychainClient.read(key: KeychainClientKeys.refreshToken.rawValue) else {
+      throw NetworkError.authorizationError
     }
-  }
 
-  private func refreshAccessToken() async throws {
-// /refresh 호출하는 곳
+    var urlRequest = URLRequest(url: URL(string: "https://" + API.apiBaseURL)!)
+    urlRequest.httpMethod = HTTPMethod.post.rawValue
+    urlRequest.setValue(
+      ContentType.json.rawValue,
+      forHTTPHeaderField: HTTPHeaderField.contentType.rawValue
+    )
+
+    let requestBody = ["refreshToken": refreshToken]
+    urlRequest.httpBody = try? JSONSerialization.data(withJSONObject: requestBody, options: [])
+
+    let (data, response) = try await session.data(for: urlRequest)
+
+    guard let httpResponse = response as? HTTPURLResponse else {
+      let error = NetworkError.noResponseError
+      Logger.shared.log(level: .error, category: .network, "API Error:\n\(dump(error))")
+      throw error
+    }
+
+    guard (200...299).contains(httpResponse.statusCode) else {
+      let error = NetworkError.authorizationError
+      Logger.shared.log(level: .error, category: .network, "API Error:\n\(dump(error))")
+      throw error
+    }
+
+    let decodedData = try JSONDecoder().decode(TokenResponseDTO.self, from: data)
+    _ = keychainClient.update(key: KeychainClientKeys.accessToken.rawValue, data: decodedData.accessToken)
   }
 }
