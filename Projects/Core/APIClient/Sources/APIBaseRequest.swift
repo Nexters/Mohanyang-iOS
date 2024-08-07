@@ -8,24 +8,17 @@
 
 import Foundation
 import APIClientInterface
-import KeychainClientInterface
 import Shared
 
-
 extension APIBaseRequest {
-  func asURLRequest(baseURL: URL, token: String?) async throws -> URLRequest {
+  func asURLRequest() async throws -> URLRequest {
+    let baseURL = URL(string: self.baseURL)!
     var urlRequest = URLRequest(url: baseURL.appendingPathComponent(path))
     urlRequest.httpMethod = method.rawValue
     urlRequest.setValue(
       contentType.rawValue,
       forHTTPHeaderField: HTTPHeaderField.contentType.rawValue
     )
-    if let token = token {
-      urlRequest.addValue(
-        token,
-        forHTTPHeaderField: HTTPHeaderField.authentication.rawValue
-      )
-    }
 
     switch parameters {
     case .query(let request):

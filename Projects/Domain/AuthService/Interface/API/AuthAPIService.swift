@@ -15,6 +15,10 @@ public enum AuthAPIService {
 }
 
 extension AuthAPIService: APIBaseRequest {
+  public var baseURL: String {
+    return API.apiBaseURL
+  }
+  
   public var path: String {
     switch self {
     case .getToken:

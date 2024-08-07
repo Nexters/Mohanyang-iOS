@@ -19,7 +19,7 @@ public enum NetworkError: Error {
   case timeOutError
   case unknownError
 
-  var errorMessage: String {
+  public var errorMessage: String {
     switch self {
     case let .requestError(description):
       return "Request Error: \(description)"
