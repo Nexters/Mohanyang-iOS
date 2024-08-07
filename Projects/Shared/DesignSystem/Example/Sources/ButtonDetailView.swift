@@ -195,6 +195,29 @@ struct ButtonDetailView: View {
             .disabled(false)
           }
         }
+        
+//        VStack {
+//          Text("Secondary")
+//            .frame(maxWidth: .infinity)
+//            .foregroundStyle(Global.Color.white)
+//            .background(Global.Color.black)
+//          HStack(spacing: 10) {
+//            Button(
+//              icon: Image(systemName: "center"),
+//              action: { /*action*/ }
+//            )
+//            .buttonStyle(.round(color: .secondary))
+//            
+//            Button(
+//              icon: Image(systemName: "center"),
+//              action: { /*action*/ }
+//            )
+//            .buttonStyle(.round(color: .primary))
+//          }
+//        }
+        
+        
+        
       }
     }
   }

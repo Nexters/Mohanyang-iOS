@@ -34,7 +34,7 @@ public struct TextButtonStyle: ButtonStyle {
         getForegroundColor(isPressed: configuration.isPressed)
       )
       .labelStyle(TextButtonLabelStyle())
-      .detailStyle(TextButtonDetailStyle())
+      .barButtonDetailStyle(TextButtonDetailStyle())
   }
   
   private func getBackgroundColor(isPressed: Bool) -> Color {
@@ -71,7 +71,7 @@ extension ButtonStyle where Self == TextButtonStyle {
   }
 }
 
-struct TextButtonDetailStyle: DetailStyle {
+struct TextButtonDetailStyle: BarButtonDetailStyle {
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: Alias.Spacing.small) {
       configuration.leftIcon

@@ -1,5 +1,5 @@
 //
-//  Helper.swift
+//  BarButtonDetail.swift
 //  DesignSystem
 //
 //  Created by devMinseok on 8/7/24.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-extension Button where Label == Detail<Text, Image?, Image?> {
+extension Button where Label == BarButtonDetail<Text, Image?, Image?> {
   public init(
     title: LocalizedStringKey,
     leftIcon: Image? = nil,
@@ -16,7 +16,7 @@ extension Button where Label == Detail<Text, Image?, Image?> {
     action: @escaping () -> Void
   ) {
     self.init(action: action) {
-      Detail {
+      BarButtonDetail {
         Text(title)
       } leftIcon: {
         leftIcon
@@ -27,8 +27,8 @@ extension Button where Label == Detail<Text, Image?, Image?> {
   }
 }
 
-public struct Detail<Title: View, LeftIcon: View, RightIcon: View>: View {
-  @Environment(\.detailStyle) private var style
+public struct BarButtonDetail<Title: View, LeftIcon: View, RightIcon: View>: View {
+  @Environment(\.barButtonDetailStyle) private var style
   private let title: Title
   private let leftIcon: LeftIcon
   private let rightIcon: RightIcon
@@ -44,7 +44,7 @@ public struct Detail<Title: View, LeftIcon: View, RightIcon: View>: View {
   }
   
   public var body: some View {
-    let configuration = DetailStyleConfiguration(
+    let configuration = BarButtonDetailConfiguration(
       title: title,
       leftIcon: leftIcon,
       rightIcon: rightIcon
@@ -53,7 +53,7 @@ public struct Detail<Title: View, LeftIcon: View, RightIcon: View>: View {
   }
 }
 
-struct DetailStyleConfiguration {
+struct BarButtonDetailConfiguration {
   struct Title: View {
     let body: AnyView
   }
@@ -77,20 +77,20 @@ struct DetailStyleConfiguration {
   }
 }
 
-protocol DetailStyle: DynamicProperty {
-  typealias Configuration = DetailStyleConfiguration
-  associatedtype Body : View
+protocol BarButtonDetailStyle: DynamicProperty {
+  typealias Configuration = BarButtonDetailConfiguration
+  associatedtype Body: View
   
   @ViewBuilder func makeBody(configuration: Configuration) -> Body
 }
 
-extension DetailStyle {
+extension BarButtonDetailStyle {
   fileprivate func resolve(configuration: Configuration) -> some View {
     ResolvedDetailStyle(style: self, configuration: configuration)
   }
 }
 
-private struct ResolvedDetailStyle<Style: DetailStyle>: View {
+private struct ResolvedDetailStyle<Style: BarButtonDetailStyle>: View {
   let style: Style
   let configuration: Style.Configuration
   
@@ -99,19 +99,19 @@ private struct ResolvedDetailStyle<Style: DetailStyle>: View {
   }
 }
 
-struct DetailStyleKey: EnvironmentKey {
-  static var defaultValue: any DetailStyle = BoxButtonDetailStyle()
+struct BarButtonDetailStyleKey: EnvironmentKey {
+  static var defaultValue: any BarButtonDetailStyle = BoxButtonDetailStyle()
 }
 
 extension EnvironmentValues {
-  fileprivate var detailStyle : any DetailStyle {
-    get { self[DetailStyleKey.self] }
-    set { self[DetailStyleKey.self] = newValue }
+  fileprivate var barButtonDetailStyle: any BarButtonDetailStyle {
+    get { self[BarButtonDetailStyleKey.self] }
+    set { self[BarButtonDetailStyleKey.self] = newValue }
   }
 }
 
 extension View {
-  func detailStyle(_ style: some DetailStyle) -> some View {
-    environment(\.detailStyle, style)
+  func barButtonDetailStyle(_ style: some BarButtonDetailStyle) -> some View {
+    environment(\.barButtonDetailStyle, style)
   }
 }

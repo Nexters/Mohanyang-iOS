@@ -43,6 +43,12 @@ struct ContentView: View {
           }
           
           NavigationLink {
+            NavigationDetailView()
+          } label: {
+            Text("Navigation")
+          }
+          
+          NavigationLink {
             
           } label: {
             Text("Tooltip")
