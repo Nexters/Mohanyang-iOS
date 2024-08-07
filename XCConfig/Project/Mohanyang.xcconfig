@@ -2,7 +2,7 @@
 
 APP_NAME = 모하냥
 
-BASE_URL_DEV = dev //dev
+BASE_URL_DEV = dev.api.pomonyang.com //dev
 BASE_URL_PROD = prod //prod
 BASE_URL = $(BASE_URL_$(CONFIGURATION))
 MARKETING_VERSION = 0.0.1

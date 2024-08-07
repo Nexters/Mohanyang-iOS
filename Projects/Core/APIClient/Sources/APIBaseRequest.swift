@@ -12,7 +12,7 @@ import Shared
 
 extension APIBaseRequest {
   func asURLRequest() async throws -> URLRequest {
-    let baseURL = URL(string: self.baseURL)!
+    let baseURL = URL(string: "https://\(self.baseURL)")!
     var urlRequest = URLRequest(url: baseURL.appendingPathComponent(path))
     urlRequest.httpMethod = method.rawValue
     urlRequest.setValue(

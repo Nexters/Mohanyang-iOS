@@ -13,7 +13,7 @@ import APIClientInterface
 
 import Dependencies
 
-extension APIClient {
+extension APIClient: DependencyKey {
   public static let liveValue: APIClient = .live()
 
   public static func live() -> Self {
@@ -32,11 +32,17 @@ extension APIClient {
         self.tokenInterceptor = tokenInterceptor
       }
 
-      func sendRequest(request: APIBaseRequest, retryCnt: Int = 0) async throws -> (Data, URLResponse) {
+      func sendRequest(
+        _ request: APIBaseRequest,
+        isWithInterceptor: Bool,
+        retryCnt: Int = 0
+      ) async throws -> (Data, URLResponse) {
         guard retryCnt < 3 else { throw throwNetworkErr(.timeOutError) }
 
         var urlRequest = try await request.asURLRequest()
-        urlRequest = try await tokenInterceptor.adapt(urlRequest)
+        if isWithInterceptor {
+          urlRequest = try await tokenInterceptor.adapt(urlRequest)
+        }
         Logger.shared.log(category: .network, "API Request:\n\(dump(urlRequest))")
 
         let (data, response) = try await session.data(for: urlRequest)
@@ -52,7 +58,7 @@ extension APIClient {
           return (data, response)
         case 401:
           try await tokenInterceptor.retry(for: self.session)
-          return try await sendRequest(request: request, retryCnt: retryCnt + 1)
+          return try await sendRequest(request, isWithInterceptor: isWithInterceptor, retryCnt: retryCnt + 1)
         case 400..<500:
           throw throwNetworkErr(.requestError("bad request"))
         case 500..<600:
@@ -72,8 +78,8 @@ extension APIClient {
     let session = Session(tokenInterceptor: tokenInterceptor)
 
     return .init(
-      apiRequest: { request in
-        return try await session.sendRequest(request: request)
+      apiRequest: { request, isWithInterceptor in
+        return try await session.sendRequest(request, isWithInterceptor: isWithInterceptor)
       }
     )
   }
