@@ -20,7 +20,7 @@ extension HomeCore {
   public init() {
     @Dependency(UserNotificationClient.self) var userNotificationClient
     @Dependency(APIClient.self) var apiClient
-    @Dependency(AuthAPIClient.self) var authAPIClient
+    @Dependency(AuthService.self) var authAPIClient
 
     let reducer = Reduce<State, Action> { _, action  in
       switch action {

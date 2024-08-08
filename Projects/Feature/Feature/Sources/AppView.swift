@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+import SplashFeature
 import HomeFeature
 import HomeFeatureInterface
 import OnboardingFeature
@@ -24,7 +25,9 @@ public struct AppView: View {
   
   public var body: some View {
     Group {
-      if let homeStore = store.scope(state: \.home, action: \.home) {
+      if let splashStore = store.scope(state: \.splash, action: \.splash) {
+        SplashView(store: splashStore)
+      } else if let homeStore = store.scope(state: \.home, action: \.home) {
         HomeView(store: homeStore)
       } else if let onboardingStore = store.scope(state: \.onboarding, action: \.onboarding) {
         OnboardingView(store: onboardingStore)

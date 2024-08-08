@@ -16,14 +16,14 @@ import DependenciesMacros
 
 
 @DependencyClient
-public struct AuthAPIClient {
+public struct AuthService {
   public var login: @Sendable (
     _ deviceID: String,
     _ apiClient: APIClient
   ) async throws -> AuthDTO.Response.TokenResponseDTO
 }
 
-extension AuthAPIClient: TestDependencyKey {
+extension AuthService: TestDependencyKey {
   public static let previewValue = Self()
   public static let testValue = Self()
 }

@@ -16,7 +16,7 @@ extension AuthAPIClient: DependencyKey {
   private static func live() -> Self {
     return AuthAPIClient(
       login: { deviceID, apiClient in
-        let service = AuthAPIService.login(deviceID)
+        let service = AuthAPIRequest.login(deviceID)
         let response = try await apiClient.apiRequest(
           request: service,
           as: AuthDTO.Response.TokenResponseDTO.self,

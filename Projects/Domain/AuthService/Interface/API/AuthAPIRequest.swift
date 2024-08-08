@@ -9,11 +9,11 @@
 import Foundation
 import APIClientInterface
 
-public enum AuthAPIService {
+public enum AuthAPIRequest {
   case login(_ deviceId: String)
 }
 
-extension AuthAPIService: APIBaseRequest {
+extension AuthAPIRequest: APIBaseRequest {
   public var baseURL: String {
     return API.apiBaseURL
   }
