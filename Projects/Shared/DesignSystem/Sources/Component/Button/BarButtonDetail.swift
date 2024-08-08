@@ -33,7 +33,7 @@ public struct BarButtonDetail<Title: View, LeftIcon: View, RightIcon: View>: Vie
   private let leftIcon: LeftIcon
   private let rightIcon: RightIcon
   
-  init (
+  init(
     @ViewBuilder title: () -> Title,
     @ViewBuilder leftIcon: () -> LeftIcon,
     @ViewBuilder rightIcon: () -> RightIcon
