@@ -12,7 +12,7 @@ import APIClientInterface
 import Logger
 import Dependencies
 
-enum KeychainClientKeys: String {
+public enum KeychainClientKeys: String {
   case accessToken = "mohanyang_keychain_access_token"
   case refreshToken = "mohanyang_keychain_refresh_token"
 }

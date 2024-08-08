@@ -11,10 +11,10 @@ import KeychainClientInterface
 import AuthServiceInterface
 import Dependencies
 
-extension AuthAPIClient: DependencyKey {
-  public static let liveValue: AuthAPIClient = .live()
+extension AuthService: DependencyKey {
+  public static let liveValue: AuthService = .live()
   private static func live() -> Self {
-    return AuthAPIClient(
+    return AuthService(
       login: { deviceID, apiClient in
         let service = AuthAPIRequest.login(deviceID)
         let response = try await apiClient.apiRequest(

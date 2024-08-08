@@ -5,11 +5,13 @@
 //  Created by jihyun247 on 8/9/24.
 //
 
-import Foundation
+import UIKit
 
 import APIClientInterface
 import AuthServiceInterface
 import DatabaseClientInterface
+import KeychainClientInterface
+import UserDefaultsClientInterface
 import AppService
 
 import ComposableArchitecture
@@ -25,6 +27,9 @@ public struct SplashCore {
 
   public enum Action {
     case onAppear
+    case didFinishInitializeDatabase
+    case moveToHome
+    case moveToOnboarding
   }
 
   public init() { }
@@ -32,6 +37,8 @@ public struct SplashCore {
   @Dependency(APIClient.self) var apiClient
   @Dependency(AuthService.self) var authService
   @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(KeychainClient.self) var keychainClient
+  @Dependency(UserDefaultsClient.self) var userDefaultsClient
 
   public var body: some ReducerOf<Self> {
     Reduce(self.core)
@@ -41,10 +48,59 @@ public struct SplashCore {
     switch action {
     case .onAppear:
       return .run { send in
-        // TODO: - 임시로 현재 위치에 넣어논거고 Splash 개발시 SplashCore에 넣어서 작업이 완전히 끝났을때 메인화면으로 랜딩할 것.
         try await initilizeDatabaseSystem(databaseClient: databaseClient)
+        await send(.didFinishInitializeDatabase)
       }
+    case.didFinishInitializeDatabase:
+      return checkDeviceIDExist()
+    default:
+      return .none
+    }
+  }
+}
+
+extension SplashCore {
+  private func checkDeviceIDExist() -> Effect<Action> {
+    if keychainClient.read(key: KeychainKeys.deviceID.rawValue) != nil {
+      return checkAccessTokenExist()
+    } else {
+      let deviceID = getDeviceUUID()
+      return login(deviceID: deviceID)
     }
   }
 
+  private func checkAccessTokenExist() -> Effect<Action> {
+    if keychainClient.read(key: KeychainKeys.accessToken.rawValue) != nil {
+      return checkOnboardingDone()
+    } else {
+      let deviceID = keychainClient.read(key: KeychainKeys.deviceID.rawValue)!
+      return login(deviceID: deviceID)
+    }
+  }
+
+  private func checkOnboardingDone() -> Effect<Action> {
+    return .run { send in
+      try await Task.sleep(for: .seconds(3))
+      userDefaultsClient.boolForKey(UserDefaultsKeys.isOnboarded.rawValue) ?
+      await send(.moveToHome) : await send(.moveToOnboarding)
+    }
+  }
+
+  private func login(deviceID: String) -> Effect<Action> {
+    return .run { send in
+      let response = try await authService.login(deviceID: deviceID, apiClient: apiClient)
+      _ = keychainClient.create(key: KeychainKeys.accessToken.rawValue, data: response.accessToken)
+
+      try await Task.sleep(for: .seconds(3))
+      await send(.moveToOnboarding)
+    }
+  }
+
+  private func getDeviceUUID() -> String {
+    guard let uuid = UIDevice.current.identifierForVendor?.uuidString,
+          keychainClient.create(key: KeychainKeys.deviceID.rawValue, data: uuid) else {
+      return ""
+    }
+    return uuid
+  }
 }

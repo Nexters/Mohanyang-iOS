@@ -21,5 +21,8 @@ public struct SplashView: View {
   public var body: some View {
     Text("Splash")
       .font(Typography.time)
+      .onAppear {
+        store.send(.onAppear)
+      }
   }
 }

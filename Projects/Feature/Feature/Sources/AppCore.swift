@@ -82,13 +82,23 @@ public struct AppCore {
     case .didChangeScenePhase:
       return .none
 
-    case .splash:
+    case .splash(.moveToHome):
+      state.splash = nil
+      state.home = HomeCore.State()
+      return .none
+
+    case .splash(.moveToOnboarding):
+      state.splash = nil
+      state.onboarding = OnboardingCore.State()
       return .none
 
     case .home:
       return .none
       
     case .onboarding:
+      return .none
+
+    default:
       return .none
     }
   }
