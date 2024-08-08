@@ -21,6 +21,15 @@ struct TooltipView<Content: Tooltip>: View {
     }
   }
   
+  var arrowDirection: Triangle.Direction {
+    switch content.direction {
+    case .up:
+      return .up
+    case .down:
+      return .down
+    }
+  }
+  
   var body: some View {
     ZStack {
       content.title
@@ -32,7 +41,7 @@ struct TooltipView<Content: Tooltip>: View {
             .fill(content.color.backgroundColor)
             .frame(height: 46)
         )
-      Triangle(direction: content.direction == .down ? .down : .up, color: content.color.backgroundColor)
+      Triangle(direction: arrowDirection, color: content.color.backgroundColor)
         .frame(width: 14, height: 9)
         .padding(content.direction == .down ? .top : .bottom, 55)
     }
