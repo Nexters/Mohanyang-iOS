@@ -195,29 +195,19 @@ struct ButtonDetailView: View {
             .disabled(false)
           }
         }
-        
-//        VStack {
-//          Text("Secondary")
-//            .frame(maxWidth: .infinity)
-//            .foregroundStyle(Global.Color.white)
-//            .background(Global.Color.black)
-//          HStack(spacing: 10) {
-//            Button(
-//              icon: Image(systemName: "center"),
-//              action: { /*action*/ }
-//            )
-//            .buttonStyle(.round(color: .secondary))
-//            
-//            Button(
-//              icon: Image(systemName: "center"),
-//              action: { /*action*/ }
-//            )
-//            .buttonStyle(.round(color: .primary))
-//          }
-//        }
-        
-        
-        
+      }
+      
+      VStack(spacing: 40) {
+        Text("Bottom CTA")
+          .font(.title)
+        VStack {
+          Button(
+            title: "Button",
+            action: { /*action*/ }
+          )
+          .buttonStyle(.box(size: .large, color: .primary, width: .low))
+          .padding(.horizontal, 20)
+        }
       }
     }
   }
