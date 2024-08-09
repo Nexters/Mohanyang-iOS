@@ -22,7 +22,6 @@ public struct SplashCore {
   public struct State: Equatable {
     public init() { }
     var isLoggedIn: Bool = false
-    var why: String?
   }
 
   public enum Action {
@@ -80,7 +79,7 @@ extension SplashCore {
 
   private func checkOnboardingDone() -> Effect<Action> {
     return .run { send in
-      try await Task.sleep(for: .seconds(3))
+      try await Task.sleep(for: .seconds(1.5))
       userDefaultsClient.boolForKey(UserDefaultsKeys.isOnboarded.rawValue) ?
       await send(.moveToHome) : await send(.moveToOnboarding)
     }
@@ -88,10 +87,13 @@ extension SplashCore {
 
   private func login(deviceID: String) -> Effect<Action> {
     return .run { send in
-      let response = try await authService.login(deviceID: deviceID, apiClient: apiClient)
-      _ = keychainClient.create(key: KeychainKeys.accessToken.rawValue, data: response.accessToken)
+      _ = try await authService.login(
+        deviceID: deviceID,
+        apiClient: apiClient,
+        keychainCleint: keychainClient
+      )
 
-      try await Task.sleep(for: .seconds(3))
+      try await Task.sleep(for: .seconds(1.5))
       await send(.moveToOnboarding)
     }
   }

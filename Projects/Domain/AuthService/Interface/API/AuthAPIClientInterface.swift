@@ -19,7 +19,8 @@ import DependenciesMacros
 public struct AuthService {
   public var login: @Sendable (
     _ deviceID: String,
-    _ apiClient: APIClient
+    _ apiClient: APIClient,
+    _ keychainCleint: KeychainClient
   ) async throws -> AuthDTO.Response.TokenResponseDTO
 }
 
