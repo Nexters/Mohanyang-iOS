@@ -12,7 +12,6 @@ import SplashFeature
 import HomeFeature
 import HomeFeatureInterface
 import OnboardingFeature
-import OnboardingFeatureInterface
 import PushService
 
 import ComposableArchitecture
