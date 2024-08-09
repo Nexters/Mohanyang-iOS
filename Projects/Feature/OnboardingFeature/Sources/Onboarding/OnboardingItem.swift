@@ -31,4 +31,3 @@ let OnboardingItemsData: [OnboardingItem] = [
     title: "집중과 휴식 반복을 통해 몰입을 관리해요",
     subTitle: "일정 시간 집중과 휴식을 반복해 번아웃을 방지하고\n짧은 시간의 몰입을 경험해보세요.")
 ]
-

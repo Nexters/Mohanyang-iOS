@@ -122,7 +122,7 @@ public struct OnboardingCore {
       state.currentItemID = state.fakedData[1].id.uuidString
       return .none
 
-    default:
+    case .binding:
       return .none
     }
   }
