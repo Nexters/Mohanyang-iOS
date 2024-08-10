@@ -49,7 +49,7 @@ struct ContentView: View {
           }
           
           NavigationLink {
-            
+            TooltipDetailView()
           } label: {
             Text("Tooltip")
           }
@@ -70,18 +70,6 @@ struct ContentView: View {
             
           } label: {
             Text("Toast")
-          }
-          
-          NavigationLink {
-            
-          } label: {
-            Text("System")
-          }
-          
-          NavigationLink {
-            
-          } label: {
-            Text("List")
           }
         }
       }

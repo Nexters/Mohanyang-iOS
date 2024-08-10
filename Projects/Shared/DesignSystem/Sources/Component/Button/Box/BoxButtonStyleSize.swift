@@ -26,7 +26,7 @@ extension BoxButtonStyleSize {
     }
   }
   
-  var font: Font {
+  var font: Typography {
     switch self {
     case .large:
       Typography.header5

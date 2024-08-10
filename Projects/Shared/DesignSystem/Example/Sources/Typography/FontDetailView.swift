@@ -12,7 +12,7 @@ import DesignSystem
 
 struct FontDetailView: View {
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
+    VStack(alignment: .leading, spacing: .zero) {
       Text("Time")
         .font(Typography.time)
       Text("Header1")

@@ -12,18 +12,22 @@ public struct BoxButtonStyle: ButtonStyle {
   @Environment(\.isEnabled) var isEnabled
   let size: BoxButtonStyleSize
   let color: BoxButtonStyleColor
+  let width: ButtonHuggingPriorityHorizontal
   
   public init(
     size: BoxButtonStyleSize,
-    color: BoxButtonStyleColor
+    color: BoxButtonStyleColor,
+    width: ButtonHuggingPriorityHorizontal
   ) {
     self.size = size
     self.color = color
+    self.width = width
   }
   
   public func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .frame(height: size.buttonHeight)
+      .frame(maxWidth: width.width)
       .font(size.font)
       .padding(.horizontal, size.horizontalSideSpacing)
       .background(
@@ -65,9 +69,10 @@ public struct BoxButtonStyle: ButtonStyle {
 extension ButtonStyle where Self == BoxButtonStyle {
   public static func box(
     size: BoxButtonStyleSize,
-    color: BoxButtonStyleColor
+    color: BoxButtonStyleColor,
+    width: ButtonHuggingPriorityHorizontal = .high
   ) -> Self {
-    return BoxButtonStyle(size: size, color: color)
+    return BoxButtonStyle(size: size, color: color, width: width)
   }
 }
 

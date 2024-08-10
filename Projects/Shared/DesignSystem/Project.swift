@@ -20,8 +20,6 @@ let project: Project = .makeTMABasedProject(
   scripts: [],
   targets: [
     .sources,
-    .tests,
-    .testing,
     .example
   ],
   dependencies: [:],
