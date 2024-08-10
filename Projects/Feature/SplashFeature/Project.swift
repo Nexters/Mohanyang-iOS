@@ -9,10 +9,7 @@ let project: Project = .makeTMABasedProject(
   module: Feature.SplashFeature,
   scripts: [],
   targets: [
-    .sources,
-    .tests,
-    .testing,
-    .example
+    .sources
   ],
   dependencies: [
     .sources: [

@@ -60,41 +60,22 @@ public struct SplashCore {
 
 extension SplashCore {
   private func checkDeviceIDExist() -> Effect<Action> {
-    if keychainClient.read(key: KeychainKeys.deviceID.rawValue) != nil {
-      return checkAccessTokenExist()
-    } else {
-      let deviceID = getDeviceUUID()
-      return login(deviceID: deviceID)
-    }
-  }
-
-  private func checkAccessTokenExist() -> Effect<Action> {
-    if keychainClient.read(key: KeychainKeys.accessToken.rawValue) != nil {
-      return checkOnboardingDone()
-    } else {
-      let deviceID = keychainClient.read(key: KeychainKeys.deviceID.rawValue)!
-      return login(deviceID: deviceID)
-    }
-  }
-
-  private func checkOnboardingDone() -> Effect<Action> {
-    return .run { send in
-      try await Task.sleep(for: .seconds(1.5))
-      userDefaultsClient.boolForKey(UserDefaultsKeys.isOnboarded.rawValue) ?
-      await send(.moveToHome) : await send(.moveToOnboarding)
-    }
+    let deviceID = keychainClient.read(key: KeychainKeys.deviceID.rawValue) ?? getDeviceUUID()
+    return login(deviceID: deviceID)
   }
 
   private func login(deviceID: String) -> Effect<Action> {
     return .run { send in
-      _ = try await authService.login(
+      try await authService.login(
         deviceID: deviceID,
         apiClient: apiClient,
-        keychainCleint: keychainClient
+        keychainClient: keychainClient
       )
 
       try await Task.sleep(for: .seconds(1.5))
-      await send(.moveToOnboarding)
+
+      userDefaultsClient.boolForKey(UserDefaultsKeys.isOnboarded.rawValue) ?
+      await send(.moveToHome) : await send(.moveToOnboarding)
     }
   }
 
