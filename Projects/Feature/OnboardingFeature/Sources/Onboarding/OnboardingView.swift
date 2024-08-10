@@ -21,16 +21,21 @@ public struct OnboardingView: View {
   }
 
   public var body: some View {
-    VStack {
-      Spacer()
+    ZStack {
+      Alias.Color.Background.primary
+        .ignoresSafeArea()
       VStack {
-        OnboardingCarouselView(data: $currentData)
-        Button(title: "시작하기") {
-          // go to selectCatView
+        Spacer()
+        VStack {
+          OnboardingCarouselView(data: $currentData)
+          Button(title: "시작하기") {
+            // go to selectCatView
+          }
+          .buttonStyle(.box(size: .large, color: .primary))
         }
-        .buttonStyle(.box(size: .large, color: .primary))
+        .padding(.horizontal, 20)
+        Spacer()
       }
-      Spacer()
     }
   }
 }
@@ -39,17 +44,24 @@ struct OnboardingCarouselView: View {
   @Binding var data: OnboardingItem
 
   var body: some View {
-    VStack {
+    VStack(spacing: Alias.Spacing.xxxLarge) {
       ZStack {
         Rectangle()
           .foregroundStyle(Alias.Color.Background.secondary)
         data.image
       }
-      Text(data.title)
-      Text(data.subTitle)
+      .frame(width: 240, height: 240)
+
+      VStack(spacing: Alias.Spacing.small) {
+        Text(data.title)
+          .font(Typography.header4)
+          .foregroundStyle(Alias.Color.Text.primary)
+        Text(data.subTitle)
+          .font(Typography.bodyR)
+          .foregroundStyle(Alias.Color.Text.secondary)
+      }
+      .multilineTextAlignment(.center)
     }
-
-
   }
 }
 
