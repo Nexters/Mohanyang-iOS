@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+import SplashFeature
 import HomeFeature
 import HomeFeatureInterface
 import OnboardingFeature
@@ -21,6 +22,7 @@ public struct AppCore {
   @ObservableState
   public struct State: Equatable {
     public var appDelegate: AppDelegateCore.State = .init()
+    var splash: SplashCore.State?
     var home: HomeCore.State?
     var onboarding: OnboardingCore.State?
     
@@ -31,6 +33,7 @@ public struct AppCore {
     case onAppear
     case appDelegate(AppDelegateCore.Action)
     case didChangeScenePhase(ScenePhase)
+    case splash(SplashCore.Action)
     case home(HomeCore.Action)
     case onboarding(OnboardingCore.Action)
   }
@@ -42,6 +45,9 @@ public struct AppCore {
       AppDelegateCore()
     }
     Reduce(self.core)
+      .ifLet(\.splash, action: \.splash) {
+        SplashCore()
+      }
       .ifLet(\.home, action: \.home) {
         HomeCore()
       }
@@ -53,12 +59,7 @@ public struct AppCore {
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
-      let isLoggedIn = true
-      if isLoggedIn { // 로그인 판단
-        state.home = HomeCore.State()
-      } else {
-        state.onboarding = OnboardingCore.State()
-      }
+      state.splash = SplashCore.State()
       return .none
       
     case let .appDelegate(.userNotifications(.didReceiveResponse(response, completionHandler))):
@@ -80,11 +81,24 @@ public struct AppCore {
       
     case .didChangeScenePhase:
       return .none
-      
+
+    case .splash(.moveToHome):
+      state.splash = nil
+      state.home = HomeCore.State()
+      return .none
+
+    case .splash(.moveToOnboarding):
+      state.splash = nil
+      state.onboarding = OnboardingCore.State()
+      return .none
+
     case .home:
       return .none
       
     case .onboarding:
+      return .none
+
+    default:
       return .none
     }
   }

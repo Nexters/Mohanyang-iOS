@@ -32,7 +32,6 @@ public struct AppDelegateCore {
     case userNotifications(UserNotificationClient.DelegateEvent)
   }
   
-  @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(KeychainClient.self) var keychainClient
   @Dependency(UserNotificationClient.self) var userNotificationClient
   
@@ -56,9 +55,6 @@ public struct AppDelegateCore {
       Logger.shared.log("FCMToken: \(Messaging.messaging().fcmToken ?? "not generated")")
       
       return .run { send in
-        // TODO: - 임시로 현재 위치에 넣어논거고 Splash 개발시 SplashCore에 넣어서 작업이 완전히 끝났을때 메인화면으로 랜딩할 것.
-        try await initilizeDatabaseSystem(databaseClient: databaseClient)
-        
         await withThrowingTaskGroup(of: Void.self) { group in
           group.addTask {
             for await event in userNotificationEventStream {

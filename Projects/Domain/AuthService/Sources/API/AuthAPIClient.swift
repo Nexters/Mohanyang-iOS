@@ -8,22 +8,29 @@
 
 import Foundation
 import KeychainClientInterface
+import UserDefaultsClientInterface
 import AuthServiceInterface
 import Dependencies
 
-extension AuthAPIClient: DependencyKey {
-  public static let liveValue: AuthAPIClient = .live()
+extension AuthService: DependencyKey {
+  public static let liveValue: AuthService = .live()
   private static func live() -> Self {
-    return AuthAPIClient(
-      login: { deviceID, apiClient in
-        let service = AuthAPIService.login(deviceID)
+    return AuthService(
+      login: { deviceID, apiClient, keychainClient in
+        guard isTokenValid(keychainClient) else { return }
+        let service = AuthAPIRequest.login(deviceID)
         let response = try await apiClient.apiRequest(
           request: service,
           as: AuthDTO.Response.TokenResponseDTO.self,
           isWithInterceptor: false
         )
-        return response
+        _ = keychainClient.create(key: KeychainKeys.accessToken.rawValue, data: response.accessToken)
+        return
       }
     )
+  }
+
+  private static func isTokenValid(_ keychainClient: KeychainClient) -> Bool {
+    return keychainClient.read(key: KeychainKeys.accessToken.rawValue) != nil
   }
 }
