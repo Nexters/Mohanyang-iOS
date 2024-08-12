@@ -55,7 +55,7 @@ struct ContentView: View {
           }
           
           NavigationLink {
-            
+            BottomSheetDetailView()
           } label: {
             Text("BottomSheet")
           }

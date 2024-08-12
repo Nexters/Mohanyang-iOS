@@ -209,6 +209,52 @@ struct ButtonDetailView: View {
           .padding(.horizontal, 20)
         }
       }
+      
+      VStack(spacing: 40) {
+        Text("Icon")
+          .font(.title)
+        HStack {
+          Button(
+            icon: Image(systemName: "left"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.icon(isFilled: false, level: .primary))
+          Button(
+            icon: Image(systemName: "right"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.icon(isFilled: true, level: .primary))
+          Button(
+            icon: Image(systemName: "left"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.icon(isFilled: false, level: .primary))
+          .disabled(true)
+          Button(
+            icon: Image(systemName: "right"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.icon(isFilled: true, level: .primary))
+          .disabled(true)
+        }
+      }
+      
+      VStack(spacing: 40) {
+        Text("Round")
+          .font(.title)
+        HStack {
+          Button(
+            icon: Image(systemName: "left"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.round(level: .primary))
+          Button(
+            icon: Image(systemName: "right"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.round(level: .secondary))
+        }
+      }
     }
   }
 }
