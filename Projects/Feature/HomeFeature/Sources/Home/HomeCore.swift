@@ -19,6 +19,8 @@ public struct HomeCore {
   public struct State: Equatable {
     
     var homeCatTooltip: HomeCatDialogueTooltip?
+    var homeCategoryGuideTooltip: HomeCategoryGuideTooltip?
+    var homeTimeGuideTooltip: HomeTimeGuideTooltip?
     @Presents var categorySelect: CategorySelectCore.State?
     
     public init() {}
@@ -27,11 +29,19 @@ public struct HomeCore {
   public enum Action {
     case onAppear
     case setHomeCatTooltip(HomeCatDialogueTooltip?)
+    case setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip?)
+    case setHomeTimeGuideTooltip(HomeTimeGuideTooltip?)
     case categoryButtonTapped
     case mypageButtonTappd
     case playButtonTapped
     
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
+  }
+  
+  public enum Mode {
+    case normal
+    /// 가이드모드
+    case guide
   }
   
   @Dependency(UserNotificationClient.self) var userNotificationClient
@@ -49,10 +59,19 @@ public struct HomeCore {
     switch action {
     case .onAppear:
       state.homeCatTooltip = .init(title: "오랜만이다냥")
+      state.homeCategoryGuideTooltip = .init()
       return .none
       
     case let .setHomeCatTooltip(tooltip):
-//      state.homeCatTooltip = tooltip
+      return .none
+      
+    case let .setHomeCategoryGuideTooltip(tooltip):
+      state.homeCategoryGuideTooltip = tooltip
+      state.homeTimeGuideTooltip = .init()
+      return .none
+      
+    case let .setHomeTimeGuideTooltip(tooltip):
+      state.homeTimeGuideTooltip = tooltip
       return .none
       
     case .categoryButtonTapped:
