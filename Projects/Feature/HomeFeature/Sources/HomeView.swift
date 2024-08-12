@@ -81,16 +81,26 @@ public struct HomeView: View {
               .padding(Alias.Spacing.small)
             }
           }
-          Button {
-            
-          } label: {
-            Text("play")
-          }
+          Button(
+            icon: DesignSystemAsset.Image._32PlayPrimary.swiftUIImage,
+            action: {
+              store.send(.playButtonTapped)
+            }
+          )
+          .buttonStyle(.round(level: .primary))
         }
       }
     }
     .background(Global.Color.gray50)
     .tooltipDestination(tooltip: $store.homeCatTooltip.sending(\.setHomeCatTooltip))
+    .bottomSheet(
+      item: $store.scope(
+        state: \.categorySelect,
+        action: \.categorySelect
+      )
+    ) { store in
+      CategorySelectView(store: store)
+    }
     .onAppear {
       store.send(.onAppear)
     }

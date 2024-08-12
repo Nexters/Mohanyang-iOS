@@ -19,6 +19,7 @@ public struct HomeCore {
   public struct State: Equatable {
     
     var homeCatTooltip: HomeCatDialogueTooltip?
+    @Presents var categorySelect: CategorySelectCore.State?
     
     public init() {}
   }
@@ -28,6 +29,9 @@ public struct HomeCore {
     case setHomeCatTooltip(HomeCatDialogueTooltip?)
     case categoryButtonTapped
     case mypageButtonTappd
+    case playButtonTapped
+    
+    case categorySelect(PresentationAction<CategorySelectCore.Action>)
   }
   
   @Dependency(UserNotificationClient.self) var userNotificationClient
@@ -36,6 +40,9 @@ public struct HomeCore {
   
   public var body: some ReducerOf<Self> {
     Reduce(self.core)
+      .ifLet(\.$categorySelect, action: \.categorySelect) {
+        CategorySelectCore()
+      }
   }
   
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
@@ -54,6 +61,16 @@ public struct HomeCore {
     case .mypageButtonTappd:
       return .none
       
+    case .playButtonTapped:
+      state.categorySelect = .init()
+      return .none
+      
+//    case .categorySelect(.presented(.dismissButtonTapped)):
+//      state.categorySelect = nil
+//      return .none
+      
+    case .categorySelect:
+      return .none
 //    case .localPushButtonTapped:
 //      let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
 //      return .run { send in
