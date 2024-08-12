@@ -255,6 +255,67 @@ struct ButtonDetailView: View {
           .buttonStyle(.round(level: .secondary))
         }
       }
+      
+      VStack(spacing: 40) {
+        Text("Select")
+          .font(.title)
+        HStack {
+          Button(
+            title: "Title",
+            subtitle: "subTitle",
+            leftIcon: Image(systemName: "left"),
+            rightIcon: Image(systemName: "right"),
+            action: {
+              /*action*/
+            }
+          )
+          .buttonStyle(.select(isSelected: true))
+          Button(
+            title: "Title",
+            subtitle: "subTitle",
+            leftIcon: Image(systemName: "left"),
+            rightIcon: Image(systemName: "right"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.select(isSelected: false))
+          Button(
+            title: "Title",
+            subtitle: "subTitle",
+            leftIcon: Image(systemName: "left"),
+            rightIcon: Image(systemName: "right"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.select(isSelected: false))
+          .disabled(true)
+        }
+      }
+      .padding(.horizontal, 20)
+      
+      VStack(spacing: 40) {
+        Text("Select List")
+          .font(.title)
+        VStack {
+          Button(
+            title: "Title",
+            subtitle: "subTitle",
+            leftIcon: Image(systemName: "left"),
+            rightIcon: Image(systemName: "right"),
+            action: {
+              /*action*/
+            }
+          )
+          .buttonStyle(.selectList(isSelected: true))
+          Button(
+            title: "Title",
+            subtitle: "subTitle",
+            leftIcon: Image(systemName: "left"),
+            rightIcon: Image(systemName: "right"),
+            action: { /*action*/ }
+          )
+          .buttonStyle(.selectList(isSelected: false))
+        }
+      }
+      .padding(.horizontal, 20)
     }
   }
 }

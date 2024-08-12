@@ -33,7 +33,6 @@ public struct TextButtonStyle: ButtonStyle {
       .foregroundStyle(
         getForegroundColor(isPressed: configuration.isPressed)
       )
-      .labelStyle(DefaultBarButtonLabelStyle())
       .barButtonDetailStyle(DefaultBarButtonDetailStyle())
   }
   

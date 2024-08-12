@@ -31,7 +31,6 @@ public struct IconButtonStyle: ButtonStyle {
       .foregroundColor(
         getForegroundColor(isFilled: isFilled)
       )
-      .labelStyle(SingleIconButtonLabelStyle())
       .singleIconButtonDetailStyle(DefaultSingleIconButtonDetailStyle())
       .opacity(isEnabled ? 1 : 0.6)
   }
