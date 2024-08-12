@@ -48,4 +48,4 @@ graph:
 
 .PHONY: template
 template:
-	sh file_template/install_template.sh
+	sh FileTemplate/install_template.sh
