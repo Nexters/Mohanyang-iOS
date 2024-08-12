@@ -100,7 +100,7 @@ private struct ResolvedDetailStyle<Style: BarButtonDetailStyle>: View {
 }
 
 struct BarButtonDetailStyleKey: EnvironmentKey {
-  static var defaultValue: any BarButtonDetailStyle = BoxButtonDetailStyle()
+  static var defaultValue: any BarButtonDetailStyle = DefaultBarButtonDetailStyle()
 }
 
 extension EnvironmentValues {
@@ -113,5 +113,21 @@ extension EnvironmentValues {
 extension View {
   func barButtonDetailStyle(_ style: some BarButtonDetailStyle) -> some View {
     environment(\.barButtonDetailStyle, style)
+  }
+}
+
+struct DefaultBarButtonDetailStyle: BarButtonDetailStyle {
+  func makeBody(configuration: Configuration) -> some View {
+    HStack(spacing: Alias.Spacing.small) {
+      configuration.leftIcon
+      configuration.title
+      configuration.rightIcon
+    }
+  }
+}
+
+struct DefaultBarButtonLabelStyle: LabelStyle {
+  func makeBody(configuration: Configuration) -> some View {
+    configuration.title
   }
 }

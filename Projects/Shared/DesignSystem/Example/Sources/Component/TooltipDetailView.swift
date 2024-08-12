@@ -16,49 +16,43 @@ struct TooltipDetailView: View {
   @State var downDirectionWithDimTooltip: DownDirectionWithDimTooltip?
   @State var upDirectionWithDimTooltip: UpDirectionWithDimTooltip?
   
-  let downDirectionTooltip_ = DownDirectionTooltip()
-  let upDirectionTooltip_ = UpDirectionTooltip()
-  let downDirectionWithDimTooltip_ = DownDirectionWithDimTooltip()
-  let upDirectionWithDimTooltip_ = UpDirectionWithDimTooltip()
-  
-  
   var body: some View {
     VStack {
       Button(
         title: "Direction: .down, Color: .white, dim: false",
         action: {
-          downDirectionTooltip = downDirectionTooltip_
+          downDirectionTooltip = .init()
         }
       )
-      .buttonStyle(.box(size: .large, color: .primary))
-      .setTooltipTarget(tooltip: downDirectionTooltip_)
+      .buttonStyle(.box(level: .primary, size: .large))
+      .setTooltipTarget(tooltip: DownDirectionTooltip.self)
       
       Button(
         title: "Direction: .up, Color: .black, dim: false",
         action: {
-          upDirectionTooltip = upDirectionTooltip_
+          upDirectionTooltip = .init()
         }
       )
-      .buttonStyle(.box(size: .large, color: .primary))
-      .setTooltipTarget(tooltip: upDirectionTooltip_)
+      .buttonStyle(.box(level: .primary, size: .large))
+      .setTooltipTarget(tooltip: UpDirectionTooltip.self)
       
       Button(
         title: "Direction: .down, Color: .white, dim: true",
         action: {
-          downDirectionWithDimTooltip = downDirectionWithDimTooltip_
+          downDirectionWithDimTooltip = .init()
         }
       )
-      .buttonStyle(.box(size: .large, color: .primary))
-      .setTooltipTarget(tooltip: downDirectionWithDimTooltip_)
+      .buttonStyle(.box(level: .primary, size: .large))
+      .setTooltipTarget(tooltip: DownDirectionWithDimTooltip.self)
       
       Button(
         title: "Direction: .up, Color: .black, dim: true",
         action: {
-          upDirectionWithDimTooltip = upDirectionWithDimTooltip_
+          upDirectionWithDimTooltip = .init()
         }
       )
-      .buttonStyle(.box(size: .large, color: .primary))
-      .setTooltipTarget(tooltip: upDirectionWithDimTooltip_)
+      .buttonStyle(.box(level: .primary, size: .large))
+      .setTooltipTarget(tooltip: UpDirectionWithDimTooltip.self)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(.yellow)

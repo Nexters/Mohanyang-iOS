@@ -8,12 +8,12 @@
 
 import SwiftUI
 
-public enum TextButtonStyleColor {
+public enum TextButtonStyleLevel {
   case primary
   case secondary
 }
 
-extension TextButtonStyleColor {
+extension TextButtonStyleLevel {
   var defaultBackground: Color {
     return .clear
   }

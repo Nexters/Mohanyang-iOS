@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public protocol Tooltip: Hashable {
+public protocol Tooltip: Equatable {
   var title: Text { get }
   var color: TooltipColor { get }
   var direction: TooltipDirection { get }

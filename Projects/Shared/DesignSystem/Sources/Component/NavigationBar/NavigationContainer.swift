@@ -12,11 +12,18 @@ import SwiftUI
 
 /// 기본 NavigationBar
 /// - content는 기본적으로 VStack(spacing: .zero){} 를 적용받습니다
-public struct NavigationContainer<Content: View, Title: View, Trailing: View, Background: ShapeStyle>: View {
+public struct NavigationContainer<
+  Content: View,
+  Title: View,
+  Leading: View,
+  Trailing: View,
+  Background: ShapeStyle
+>: View {
   @Environment(\.dismiss) var _dismiss
   
   private let title: Title
-  private let trailing: Trailing
+  private let leading: () -> Leading
+  private let trailing: () -> Trailing
   private let style: NavigationBarStyle
   private let navBackground: Background
   private let navForegroundColor: Color
@@ -25,7 +32,8 @@ public struct NavigationContainer<Content: View, Title: View, Trailing: View, Ba
   
   public init(
     title: Title = EmptyView(),
-    trailing: Trailing = EmptyView(),
+    @ViewBuilder leading: @escaping () -> Leading = { EmptyView() },
+    @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() },
     style: NavigationBarStyle,
     navBackground: Background = Global.Color.gray50,
     navForegroundColor: Color = Alias.Color.Text.primary,
@@ -33,6 +41,7 @@ public struct NavigationContainer<Content: View, Title: View, Trailing: View, Ba
     @ViewBuilder content: @escaping () -> Content
   ) {
     self.title = title
+    self.leading = leading
     self.trailing = trailing
     self.style = style
     self.navBackground = navBackground
@@ -45,6 +54,7 @@ public struct NavigationContainer<Content: View, Title: View, Trailing: View, Ba
     VStack(spacing: .zero) {
       NavigationBar(
         title: self.title,
+        leading: self.leading,
         trailing: self.trailing,
         style: self.style,
         background: self.navBackground,
@@ -55,6 +65,7 @@ public struct NavigationContainer<Content: View, Title: View, Trailing: View, Ba
         }
       )
       self.content()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .navigationBarHidden(true)

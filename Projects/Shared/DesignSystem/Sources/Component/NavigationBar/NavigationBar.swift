@@ -8,9 +8,15 @@
 
 import SwiftUI
 
-struct NavigationBar<Title: View, Trailing: View, Background: ShapeStyle>: View {
+struct NavigationBar<
+  Title: View,
+  Leading: View,
+  Trailing: View,
+  Background: ShapeStyle
+>: View {
   let title: Title
-  let trailing: Trailing
+  let leading: () -> Leading
+  let trailing: () -> Trailing
   let style: NavigationBarStyle
   let background: Background
   let foregroundColor: Color
@@ -18,13 +24,15 @@ struct NavigationBar<Title: View, Trailing: View, Background: ShapeStyle>: View 
   
   init(
     title: Title,
-    trailing: Trailing,
+    @ViewBuilder leading: @escaping () -> Leading,
+    @ViewBuilder trailing: @escaping () ->  Trailing,
     style: NavigationBarStyle,
     background: Background,
     foregroundColor: Color,
     onDismiss: @escaping () -> Void
   ) {
     self.title = title
+    self.leading = leading
     self.trailing = trailing
     self.style = style
     self.background = background
@@ -33,7 +41,7 @@ struct NavigationBar<Title: View, Trailing: View, Background: ShapeStyle>: View 
   }
   
   var body: some View {
-    ZStack(alignment: style == .bottomSheet ? .leading : .center) {
+    ZStack(alignment: .center) {
       self.title
         .font(Typography.bodySB)
         .lineLimit(1)
@@ -41,35 +49,39 @@ struct NavigationBar<Title: View, Trailing: View, Background: ShapeStyle>: View 
       HStack {
         switch style {
         case .modal:
-          Button {
-            self.onDismiss()
-          } label: {
-            DesignSystemAsset.Image._24CancelPrimary.swiftUIImage
-              .renderingMode(.template)
-              .foregroundStyle(foregroundColor)
+          if Leading.self != EmptyView.self {
+            self.leading()
           }
           Spacer()
-          self.trailing
+          if Trailing.self == EmptyView.self {
+            Button(
+              icon: DesignSystemAsset.Image._24CancelPrimary.swiftUIImage,
+              action: {
+                self.onDismiss()
+              }
+            )
+            .buttonStyle(.icon(isFilled: false, level: .primary))
+            .foregroundStyle(foregroundColor)
+          } else {
+            self.trailing()
+          }
           
         case .navigation:
-          Button {
-            self.onDismiss()
-          } label: {
-            DesignSystemAsset.Image._24ArrowLeftPrimary.swiftUIImage
-              .renderingMode(.template)
-              .foregroundStyle(foregroundColor)
+          if Leading.self == EmptyView.self {
+            Button(
+              icon: DesignSystemAsset.Image._24ArrowLeftPrimary.swiftUIImage,
+              action: {
+                self.onDismiss()
+              }
+            )
+            .buttonStyle(.icon(isFilled: false, level: .primary))
+            .foregroundStyle(foregroundColor)
+          } else {
+            self.leading()
           }
           Spacer()
-          self.trailing
-          
-        case .bottomSheet:
-          Spacer()
-          Button {
-            self.onDismiss()
-          } label: {
-            DesignSystemAsset.Image._24CancelPrimary.swiftUIImage
-              .renderingMode(.template)
-              .foregroundStyle(foregroundColor)
+          if Leading.self != EmptyView.self {
+            self.trailing()
           }
         }
       }

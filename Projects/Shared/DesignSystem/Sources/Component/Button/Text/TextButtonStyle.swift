@@ -11,14 +11,14 @@ import SwiftUI
 public struct TextButtonStyle: ButtonStyle {
   @Environment(\.isEnabled) var isEnabled
   let size: TextButtonStyleSize
-  let color: TextButtonStyleColor
+  let level: TextButtonStyleLevel
   
   public init(
     size: TextButtonStyleSize,
-    color: TextButtonStyleColor
+    level: TextButtonStyleLevel
   ) {
     self.size = size
-    self.color = color
+    self.level = level
   }
   
   public func makeBody(configuration: Configuration) -> some View {
@@ -30,59 +30,43 @@ public struct TextButtonStyle: ButtonStyle {
         getBackgroundColor(isPressed: configuration.isPressed),
         in: RoundedRectangle(cornerRadius: size.radius)
       )
-      .foregroundColor(
+      .foregroundStyle(
         getForegroundColor(isPressed: configuration.isPressed)
       )
-      .labelStyle(TextButtonLabelStyle())
-      .barButtonDetailStyle(TextButtonDetailStyle())
+      .labelStyle(DefaultBarButtonLabelStyle())
+      .barButtonDetailStyle(DefaultBarButtonDetailStyle())
   }
   
   private func getBackgroundColor(isPressed: Bool) -> Color {
     if isEnabled {
       if isPressed {
-        return color.pressedBackground
+        return level.pressedBackground
       } else {
-        return color.defaultBackground
+        return level.defaultBackground
       }
     } else {
-      return color.disabledBackground
+      return level.disabledBackground
     }
   }
   
   private func getForegroundColor(isPressed: Bool) -> Color {
     if isEnabled {
       if isPressed {
-        return color.pressedForeground
+        return level.pressedForeground
       } else {
-        return color.defaultForeground
+        return level.defaultForeground
       }
     } else {
-      return color.disabledForeground
+      return level.disabledForeground
     }
   }
 }
 
 extension ButtonStyle where Self == TextButtonStyle {
   public static func text(
-    size: TextButtonStyleSize,
-    color: TextButtonStyleColor
+    level: TextButtonStyleLevel,
+    size: TextButtonStyleSize
   ) -> Self {
-    return TextButtonStyle(size: size, color: color)
-  }
-}
-
-struct TextButtonDetailStyle: BarButtonDetailStyle {
-  func makeBody(configuration: Configuration) -> some View {
-    HStack(spacing: Alias.Spacing.small) {
-      configuration.leftIcon
-      configuration.title
-      configuration.rightIcon
-    }
-  }
-}
-
-struct TextButtonLabelStyle: LabelStyle {
-  func makeBody(configuration: Configuration) -> some View {
-    configuration.title
+    return TextButtonStyle(size: size, level: level)
   }
 }
