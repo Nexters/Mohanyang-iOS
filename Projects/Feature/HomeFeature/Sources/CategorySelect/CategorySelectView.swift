@@ -40,6 +40,38 @@ public struct CategorySelectView: View {
       
       VStack(spacing: Alias.Spacing.small) {
         // TODO: - list select button 배치
+        
+        Button(
+          title: "기본",
+          subtitle: "집중 25분 | 휴식 10분",
+          leftIcon: DesignSystemAsset.Image._24DefaultCategoryPrimary.swiftUIImage,
+          action: {}
+        )
+        .buttonStyle(.selectList(isSelected: true))
+        
+        Button(
+          title: "독서",
+          subtitle: "집중 25분 | 휴식 10분",
+          leftIcon: DesignSystemAsset.Image._24DefaultCategoryPrimary.swiftUIImage,
+          action: {}
+        )
+        .buttonStyle(.selectList(isSelected: false))
+        
+        Button(
+          title: "공부",
+          subtitle: "집중 25분 | 휴식 10분",
+          leftIcon: DesignSystemAsset.Image._24DefaultCategoryPrimary.swiftUIImage,
+          action: {}
+        )
+        .buttonStyle(.selectList(isSelected: false))
+        
+        Button(
+          title: "작업",
+          subtitle: "집중 25분 | 휴식 10분",
+          leftIcon: DesignSystemAsset.Image._24DefaultCategoryPrimary.swiftUIImage,
+          action: {}
+        )
+        .buttonStyle(.selectList(isSelected: false))
       }
       .padding(.horizontal, Alias.Spacing.large)
       
