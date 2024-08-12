@@ -8,38 +8,65 @@
 
 import UserNotifications
 
-import HomeFeatureInterface
 import PushService
 import UserNotificationClientInterface
 
 import ComposableArchitecture
 
-extension HomeCore {
-  public init() {
-    @Dependency(UserNotificationClient.self) var userNotificationClient
-
-    let reducer = Reduce<State, Action> { _, action  in
-      switch action {
-      case .onAppear:
-        return .run { send in
-          _ = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
-        }
-        
-      case .localPushButtonTapped:
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
-        return .run { send in
-          do {
-            try await scheduleNotification(
-              userNotificationClient: userNotificationClient,
-              contentType: .test,
-              trigger: trigger
-            )
-          } catch {
-            print(error)
-          }
-        }
-      }
+@Reducer
+public struct HomeCore {
+  @ObservableState
+  public struct State: Equatable {
+    
+    var homeCatTooltip: HomeCatDialogueTooltip?
+    
+    public init() {}
+  }
+  
+  public enum Action {
+    case onAppear
+    case setHomeCatTooltip(HomeCatDialogueTooltip?)
+    case categoryButtonTapped
+    case mypageButtonTappd
+  }
+  
+  @Dependency(UserNotificationClient.self) var userNotificationClient
+  
+  public init() {}
+  
+  public var body: some ReducerOf<Self> {
+    Reduce(self.core)
+  }
+  
+  private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
+    switch action {
+    case .onAppear:
+      state.homeCatTooltip = .init(title: "오랜만이다냥")
+      return .none
+      
+    case let .setHomeCatTooltip(tooltip):
+//      state.homeCatTooltip = tooltip
+      return .none
+      
+    case .categoryButtonTapped:
+      return .none
+      
+    case .mypageButtonTappd:
+      return .none
+      
+//    case .localPushButtonTapped:
+//      let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
+//      return .run { send in
+//        do {
+//          try await scheduleNotification(
+//            userNotificationClient: userNotificationClient,
+//            contentType: .test,
+//            trigger: trigger
+//          )
+//        } catch {
+//          print(error)
+//        }
+//      }
     }
-    self.init(reducer: reducer)
   }
 }

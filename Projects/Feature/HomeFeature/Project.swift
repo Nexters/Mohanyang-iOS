@@ -10,13 +10,12 @@ let project: Project = .makeTMABasedProject(
   scripts: [],
   targets: [
     .sources,
-    .interface,
     .tests,
     .testing,
     .example
   ],
   dependencies: [
-    .interface: [
+    .sources: [
       .dependency(rootModule: Domain.self)
     ]
   ]
