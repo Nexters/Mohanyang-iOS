@@ -17,6 +17,8 @@ public struct CategorySelectCore {
   
   public enum Action {
     case onAppear
+    case dismissButtonTapped
+    case bottomCheckButtonTapped
   }
   
 //  <#@Dependency() var#>
@@ -30,6 +32,12 @@ public struct CategorySelectCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
+      return .none
+      
+    case .dismissButtonTapped:
+      return .none
+      
+    case .bottomCheckButtonTapped:
       return .none
     }
   }

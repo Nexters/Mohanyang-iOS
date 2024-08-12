@@ -27,7 +27,7 @@ public struct HomeView: View {
         },
         trailing: {
           Button(
-            icon: Image(systemName: "right"),
+            icon: DesignSystemAsset.Image._24MenuPrimary.swiftUIImage,
             action: {
               store.send(.mypageButtonTappd)
             }

@@ -56,34 +56,21 @@ public struct HomeCore {
       return .none
       
     case .categoryButtonTapped:
+      state.categorySelect = CategorySelectCore.State()
       return .none
       
     case .mypageButtonTappd:
       return .none
       
     case .playButtonTapped:
-      state.categorySelect = .init()
       return .none
       
-//    case .categorySelect(.presented(.dismissButtonTapped)):
-//      state.categorySelect = nil
-//      return .none
+    case .categorySelect(.presented(.dismissButtonTapped)):
+      state.categorySelect = nil
+      return .none
       
     case .categorySelect:
       return .none
-//    case .localPushButtonTapped:
-//      let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
-//      return .run { send in
-//        do {
-//          try await scheduleNotification(
-//            userNotificationClient: userNotificationClient,
-//            contentType: .test,
-//            trigger: trigger
-//          )
-//        } catch {
-//          print(error)
-//        }
-//      }
     }
   }
 }
