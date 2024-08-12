@@ -93,9 +93,3 @@ struct DefaultSingleIconButtonDetailStyle: SingleIconButtonDetailStyle {
     configuration.icon
   }
 }
-
-struct SingleIconButtonLabelStyle: LabelStyle {
-  func makeBody(configuration: Configuration) -> some View {
-    configuration.title
-  }
-}

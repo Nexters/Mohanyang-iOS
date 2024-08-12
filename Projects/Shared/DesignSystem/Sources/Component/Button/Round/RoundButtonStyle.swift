@@ -23,7 +23,6 @@ public struct RoundButtonStyle: ButtonStyle {
         in: RoundedRectangle(cornerRadius: 44)
       )
       .foregroundColor(Global.Color.white)
-      .labelStyle(SingleIconButtonLabelStyle())
       .singleIconButtonDetailStyle(DefaultSingleIconButtonDetailStyle())
   }
   

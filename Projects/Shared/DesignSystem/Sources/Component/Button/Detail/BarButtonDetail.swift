@@ -125,9 +125,3 @@ struct DefaultBarButtonDetailStyle: BarButtonDetailStyle {
     }
   }
 }
-
-struct DefaultBarButtonLabelStyle: LabelStyle {
-  func makeBody(configuration: Configuration) -> some View {
-    configuration.title
-  }
-}
