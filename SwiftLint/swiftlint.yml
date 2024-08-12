@@ -1,6 +1,6 @@
 excluded:
 - ${PWD}/DerivedData
-- ../file_template
+- ../FileTemplate
 - ../Tuist
 - ../Plugins
 - ../Workspace.swift
