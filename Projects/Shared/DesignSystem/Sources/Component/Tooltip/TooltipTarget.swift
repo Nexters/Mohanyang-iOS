@@ -23,17 +23,17 @@ struct TooltipTarget: View {
 }
 
 extension View {
-  public func setTooltipTarget(tooltip: some Tooltip) -> some View {
+  public func setTooltipTarget<T: Tooltip>(tooltip: T.Type) -> some View {
     return self
       .background(
-        TooltipTarget(identifier: tooltip)
+        TooltipTarget(identifier: ObjectIdentifier(tooltip))
       )
   }
   
-  public func tooltipDestination(tooltip: Binding<(some Tooltip)?>) -> some View {
+  public func tooltipDestination<T: Tooltip>(tooltip: Binding<T?>) -> some View {
     return self
       .overlayWithOnPreferenceChange(FrameMeasurePreferenceKey.self) { value in
-        if let content = tooltip.wrappedValue, let position = value[content] {
+        if let content = tooltip.wrappedValue, let position = value[ObjectIdentifier(type(of: content))] {
           TooltipView(content: content, position: position)
             .transition(.opacity.animation(.easeInOut))
             .onTapGesture {
