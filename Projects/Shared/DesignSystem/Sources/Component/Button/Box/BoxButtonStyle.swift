@@ -11,16 +11,16 @@ import SwiftUI
 public struct BoxButtonStyle: ButtonStyle {
   @Environment(\.isEnabled) var isEnabled
   let size: BoxButtonStyleSize
-  let color: BoxButtonStyleColor
+  let level: BoxButtonStyleLevel
   let width: ButtonHuggingPriorityHorizontal
   
   public init(
     size: BoxButtonStyleSize,
-    color: BoxButtonStyleColor,
+    level: BoxButtonStyleLevel,
     width: ButtonHuggingPriorityHorizontal
   ) {
     self.size = size
-    self.color = color
+    self.level = level
     self.width = width
   }
   
@@ -34,60 +34,44 @@ public struct BoxButtonStyle: ButtonStyle {
         getBackgroundColor(isPressed: configuration.isPressed),
         in: RoundedRectangle(cornerRadius: size.radius)
       )
-      .foregroundColor(
+      .foregroundStyle(
         getForegroundColor(isPressed: configuration.isPressed)
       )
-      .labelStyle(BoxButtonLabelStyle())
-      .barButtonDetailStyle(BoxButtonDetailStyle())
+      .labelStyle(DefaultBarButtonLabelStyle())
+      .barButtonDetailStyle(DefaultBarButtonDetailStyle())
   }
   
   private func getBackgroundColor(isPressed: Bool) -> Color {
     if isEnabled {
       if isPressed {
-        return color.pressedBackground
+        return level.pressedBackground
       } else {
-        return color.defaultBackground
+        return level.defaultBackground
       }
     } else {
-      return color.disabledBackground
+      return level.disabledBackground
     }
   }
   
   private func getForegroundColor(isPressed: Bool) -> Color {
     if isEnabled {
       if isPressed {
-        return color.pressedForeground
+        return level.pressedForeground
       } else {
-        return color.defaultForeground
+        return level.defaultForeground
       }
     } else {
-      return color.disabledForeground
+      return level.disabledForeground
     }
   }
 }
 
 extension ButtonStyle where Self == BoxButtonStyle {
   public static func box(
+    level: BoxButtonStyleLevel,
     size: BoxButtonStyleSize,
-    color: BoxButtonStyleColor,
     width: ButtonHuggingPriorityHorizontal = .high
   ) -> Self {
-    return BoxButtonStyle(size: size, color: color, width: width)
-  }
-}
-
-struct BoxButtonDetailStyle: BarButtonDetailStyle {
-  func makeBody(configuration: Configuration) -> some View {
-    HStack(spacing: Alias.Spacing.small) {
-      configuration.leftIcon
-      configuration.title
-      configuration.rightIcon
-    }
-  }
-}
-
-struct BoxButtonLabelStyle: LabelStyle {
-  func makeBody(configuration: Configuration) -> some View {
-    configuration.title
+    return BoxButtonStyle(size: size, level: level, width: width)
   }
 }

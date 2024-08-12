@@ -28,7 +28,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .large, color: .primary))
+            .buttonStyle(.box(level: .primary, size: .large))
             .disabled(false)
             
             Button(
@@ -37,7 +37,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .medium, color: .primary))
+            .buttonStyle(.box(level: .primary, size: .medium))
             .disabled(true)
             
             Button(
@@ -46,7 +46,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .small, color: .primary))
+            .buttonStyle(.box(level: .primary, size: .small))
             .disabled(false)
           }
         }
@@ -63,7 +63,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .large, color: .secondary))
+            .buttonStyle(.box(level: .secondary, size: .large))
             .disabled(false)
             
             Button(
@@ -72,7 +72,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .medium, color: .secondary))
+            .buttonStyle(.box(level: .secondary, size: .medium))
             .disabled(true)
             
             Button(
@@ -81,7 +81,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .small, color: .secondary))
+            .buttonStyle(.box(level: .secondary, size: .small))
             .disabled(false)
           }
         }
@@ -98,7 +98,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .large, color: .tertiary))
+            .buttonStyle(.box(level: .tertiary, size: .large))
             .disabled(false)
             
             Button(
@@ -107,7 +107,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .medium, color: .tertiary))
+            .buttonStyle(.box(level: .tertiary, size: .medium))
             .disabled(true)
             
             Button(
@@ -116,7 +116,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.box(size: .small, color: .tertiary))
+            .buttonStyle(.box(level: .tertiary, size: .small))
             .disabled(false)
           }
           
@@ -138,7 +138,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.text(size: .large, color: .primary))
+            .buttonStyle(.text(level: .primary, size: .large))
             .disabled(false)
             
             Button(
@@ -147,7 +147,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.text(size: .medium, color: .primary))
+            .buttonStyle(.text(level: .primary, size: .medium))
             .disabled(true)
             
             Button(
@@ -156,7 +156,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.text(size: .small, color: .primary))
+            .buttonStyle(.text(level: .primary, size: .small))
             .disabled(false)
           }
         }
@@ -173,7 +173,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.text(size: .large, color: .secondary))
+            .buttonStyle(.text(level: .secondary, size: .large))
             .disabled(false)
             
             Button(
@@ -182,7 +182,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.text(size: .medium, color: .secondary))
+            .buttonStyle(.text(level: .secondary, size: .medium))
             .disabled(true)
             
             Button(
@@ -191,7 +191,7 @@ struct ButtonDetailView: View {
               rightIcon: Image(systemName: "right"),
               action: { /*action*/ }
             )
-            .buttonStyle(.text(size: .small, color: .secondary))
+            .buttonStyle(.text(level: .secondary, size: .small))
             .disabled(false)
           }
         }
@@ -205,7 +205,7 @@ struct ButtonDetailView: View {
             title: "Button",
             action: { /*action*/ }
           )
-          .buttonStyle(.box(size: .large, color: .primary, width: .low))
+          .buttonStyle(.box(level: .primary, size: .large, width: .low))
           .padding(.horizontal, 20)
         }
       }

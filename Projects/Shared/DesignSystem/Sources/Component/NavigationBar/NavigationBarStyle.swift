@@ -11,5 +11,4 @@ import Foundation
 public enum NavigationBarStyle {
   case modal
   case navigation
-  case bottomSheet
 }

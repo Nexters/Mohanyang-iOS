@@ -24,8 +24,8 @@ struct TooltipDetailView: View {
           downDirectionTooltip = .init()
         }
       )
-      .buttonStyle(.box(size: .large, color: .primary))
-      .setTooltipTarget(tooltip: downDirectionTooltip_)
+      .buttonStyle(.box(level: .primary, size: .large))
+      .setTooltipTarget(tooltip: DownDirectionTooltip.self)
       
       Button(
         title: "Direction: .up, Color: .black, dim: false",
@@ -33,8 +33,8 @@ struct TooltipDetailView: View {
           upDirectionTooltip = .init()
         }
       )
-      .buttonStyle(.box(size: .large, color: .primary))
-      .setTooltipTarget(tooltip: upDirectionTooltip_)
+      .buttonStyle(.box(level: .primary, size: .large))
+      .setTooltipTarget(tooltip: UpDirectionTooltip.self)
       
       Button(
         title: "Direction: .down, Color: .white, dim: true",
@@ -42,8 +42,8 @@ struct TooltipDetailView: View {
           downDirectionWithDimTooltip = .init()
         }
       )
-      .buttonStyle(.box(size: .large, color: .primary))
-      .setTooltipTarget(tooltip: downDirectionWithDimTooltip_)
+      .buttonStyle(.box(level: .primary, size: .large))
+      .setTooltipTarget(tooltip: DownDirectionWithDimTooltip.self)
       
       Button(
         title: "Direction: .up, Color: .black, dim: true",
@@ -51,8 +51,8 @@ struct TooltipDetailView: View {
           upDirectionWithDimTooltip = .init()
         }
       )
-      .buttonStyle(.box(size: .large, color: .primary))
-      .setTooltipTarget(tooltip: upDirectionWithDimTooltip_)
+      .buttonStyle(.box(level: .primary, size: .large))
+      .setTooltipTarget(tooltip: UpDirectionWithDimTooltip.self)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(.yellow)

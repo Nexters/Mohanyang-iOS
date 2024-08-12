@@ -8,13 +8,13 @@
 
 import SwiftUI
 
-public enum BoxButtonStyleColor {
+public enum BoxButtonStyleLevel {
   case primary
   case secondary
   case tertiary
 }
 
-extension BoxButtonStyleColor {
+extension BoxButtonStyleLevel {
   var defaultBackground: Color {
     switch self {
     case .primary:
