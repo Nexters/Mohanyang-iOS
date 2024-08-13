@@ -14,17 +14,8 @@ import DesignSystem
 public struct OnboardingItem: Hashable, Identifiable {
   public var id: UUID = .init()
   let image: UIImage
-  let title: String
+  var title: String
   let subTitle: String
-}
-
-func getIndex(
-  item: OnboardingItem
-) -> Int {
-  let index = OnboardingItemsData.firstIndex { currentItem in
-    return currentItem.title == item.title
-  } ?? 0
-  return index
 }
 
 let OnboardingItemsData: [OnboardingItem] = [

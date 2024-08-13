@@ -26,6 +26,13 @@ public struct OnboardingCore {
     case onApear
     case setIndex(Int)
     case calculateOffset(CGFloat, OnboardingItem)
+    case dragStart
+    case dragEnd
+    case _timerStart
+    case _timerEnd
+    case _timerTicked
+    case _nextPage(Int)
+    case _resetTofront
     case binding(BindingAction<State>)
   }
 
@@ -50,7 +57,10 @@ public struct OnboardingCore {
       last.id = .init()
       state.fakedData.elements.append(first)
       state.fakedData.elements.insert(last, at: 0)
-      return .none
+      print(state.fakedData.map { $0.id.uuidString })
+      return .run { send in
+        await send(._timerStart)
+      }
 
     case .setIndex(let idx):
       state.currentIdx = idx
@@ -62,6 +72,7 @@ public struct OnboardingCore {
         item.id.uuidString == state.currentItemID
       } ?? 0
       let pageOffset = minX - state.width * CGFloat(fakeIndex)
+
       let pageProgress: CGFloat = pageOffset / state.width
       if  -pageProgress < 1.0 {
         if state.fakedData.elements.indices.contains(state.fakedData.count - 1) {
@@ -73,6 +84,48 @@ public struct OnboardingCore {
           state.currentItemID = state.fakedData[1].id.uuidString
         }
       }
+      return .none
+
+    case .dragStart:
+      return .run { send in
+        await send(._timerEnd)
+      }
+
+    case .dragEnd:
+      return .run { send in
+        await send(._timerStart)
+      }
+
+    case ._timerStart:
+      return .run { send in
+        for await _ in self.clock.timer(interval: .seconds(3)) {
+          await send(._timerTicked)
+        }
+      }
+      .cancellable(id: CancelID.timer)
+
+    case ._timerEnd:
+      return .cancel(id: CancelID.timer)
+
+    case ._timerTicked:
+      let index = state.fakedData.firstIndex { item in
+        item.id.uuidString == state.currentItemID
+      } ?? 0
+      return .run { [index = index] send in
+        if index == 4 {
+          await send(._resetTofront)
+          await send(._nextPage(2), animation: .easeInOut(duration: 0.3))
+        } else {
+          await send(._nextPage(index + 1), animation: .easeInOut(duration: 0.3))
+        }
+      }
+
+    case ._nextPage(let index):
+      state.currentItemID = state.fakedData[index].id.uuidString
+      return .none
+
+    case ._resetTofront:
+      state.currentItemID = state.fakedData[1].id.uuidString
       return .none
 
     default:

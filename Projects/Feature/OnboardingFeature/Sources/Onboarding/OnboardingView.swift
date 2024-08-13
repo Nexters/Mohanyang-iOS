@@ -35,6 +35,12 @@ public struct OnboardingView: View {
             }
           }
           .tabViewStyle(.page(indexDisplayMode: .never))
+          .gesture(
+            DragGesture()
+              .onChanged { _ in store.send(.dragStart) }
+              .onEnded { _ in store.send(.dragEnd) }
+          )
+          .frame(width: store.width, height: 350)
 
           HStack {
             ForEach(0..<3, id: \.self) { idx in
@@ -49,7 +55,7 @@ public struct OnboardingView: View {
           .padding(.vertical, 32)
 
           Button(title: "시작하기") {
-            // go to selectCatView
+            // 다음 뷰 이동
           }
           .buttonStyle(.box(size: .large, color: .primary))
           .padding(.top, 16)
@@ -89,7 +95,7 @@ struct OnboardingCarouselContentView: View {
       }
       .multilineTextAlignment(.center)
     }
-    .frame(width: width, height: 390)
+    .frame(width: width, height: 350)
   }
 }
 
