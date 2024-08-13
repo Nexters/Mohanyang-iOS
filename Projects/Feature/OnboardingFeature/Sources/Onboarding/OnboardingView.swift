@@ -57,7 +57,7 @@ public struct OnboardingView: View {
           Button(title: "시작하기") {
             // 다음 뷰 이동
           }
-          .buttonStyle(.box(size: .large, color: .primary))
+          .buttonStyle(.box(level: .primary, size: .large, width: .high))
           .padding(.top, 16)
         }
         Spacer()

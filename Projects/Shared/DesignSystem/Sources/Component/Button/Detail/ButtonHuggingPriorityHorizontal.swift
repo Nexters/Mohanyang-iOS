@@ -17,7 +17,7 @@ extension ButtonHuggingPriorityHorizontal {
   var width: CGFloat? {
     switch self {
     case .high:
-      return nil
+      return Alias.Size.ButtonWidth.fixed
     case .low:
       return .infinity
     }
