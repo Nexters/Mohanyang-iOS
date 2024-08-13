@@ -94,8 +94,8 @@ public struct AppCore {
     case .home:
       return .none
       
-    case .onboarding:
-      return .none
+//    case .onboarding:
+//      return .none
 
     default:
       return .none
