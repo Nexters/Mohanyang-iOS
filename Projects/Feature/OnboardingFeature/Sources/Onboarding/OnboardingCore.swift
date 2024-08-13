@@ -27,7 +27,6 @@ public struct OnboardingCore {
     case setIndex(Int)
     case calculateOffset(CGFloat, OnboardingItem)
     case dragStart
-    case dragEnd
     case _timerStart
     case _timerEnd
     case _timerTicked
@@ -57,7 +56,6 @@ public struct OnboardingCore {
       last.id = .init()
       state.fakedData.elements.append(first)
       state.fakedData.elements.insert(last, at: 0)
-      print(state.fakedData.map { $0.id.uuidString })
       return .run { send in
         await send(._timerStart)
       }
@@ -87,14 +85,13 @@ public struct OnboardingCore {
       return .none
 
     case .dragStart:
-      return .run { send in
-        await send(._timerEnd)
-      }
-
-    case .dragEnd:
-      return .run { send in
-        await send(._timerStart)
-      }
+      let timerEndAction: Effect<Action> = .send(._timerEnd)
+      let timerStartAction: Effect<Action> = .send(._timerStart)
+        .debounce(id: "timerStart", for: .seconds(2), scheduler: DispatchQueue.main)
+      return .merge(
+        timerEndAction,
+        timerStartAction
+      )
 
     case ._timerStart:
       return .run { send in

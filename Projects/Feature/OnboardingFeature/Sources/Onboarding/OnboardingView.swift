@@ -38,7 +38,6 @@ public struct OnboardingView: View {
           .gesture(
             DragGesture()
               .onChanged { _ in store.send(.dragStart) }
-              .onEnded { _ in store.send(.dragEnd) }
           )
           .frame(width: store.width, height: 350)
 
