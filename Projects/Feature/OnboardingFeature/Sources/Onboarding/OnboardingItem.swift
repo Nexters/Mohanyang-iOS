@@ -17,15 +17,6 @@ public struct OnboardingItem: Equatable, Identifiable {
   let subTitle: String
 }
 
-func getIndex(
-  item: OnboardingItem
-) -> Int {
-  let index = OnboardingItemsData.firstIndex { currentItem in
-    return currentItem.title == item.title
-  } ?? 0
-  return index
-}
-
 let OnboardingItemsData: [OnboardingItem] = [
   OnboardingItem(
     image: Image(systemName: "star"),
