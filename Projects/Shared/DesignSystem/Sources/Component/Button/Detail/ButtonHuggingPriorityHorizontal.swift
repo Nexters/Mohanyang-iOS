@@ -10,6 +10,7 @@ import Foundation
 
 public enum ButtonHuggingPriorityHorizontal {
   case high
+  case medium
   case low
 }
 
@@ -17,6 +18,8 @@ extension ButtonHuggingPriorityHorizontal {
   var width: CGFloat? {
     switch self {
     case .high:
+      return nil
+    case .medium:
       return Alias.Size.ButtonWidth.fixed
     case .low:
       return .infinity
