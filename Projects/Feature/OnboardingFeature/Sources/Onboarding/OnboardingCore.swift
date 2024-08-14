@@ -20,18 +20,21 @@ public struct OnboardingCore {
     var width: CGFloat = .zero
     var currentIdx: Int = 0
     var currentItemID: String = ""
+    @Presents var selectCat: SelectCatCore.State?
   }
 
   public enum Action: BindableAction {
     case onApear
     case calculateOffset(CGFloat, OnboardingItem)
     case dragStart
+    case tapStartButton
     case _timerStart
     case _timerEnd
     case _timerTicked
     case _nextPage(Int)
     case _resetTofront
     case binding(BindingAction<State>)
+    case selectCat(PresentationAction<SelectCatCore.Action>)
   }
 
   public init() { }
@@ -42,6 +45,9 @@ public struct OnboardingCore {
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce(self.core)
+      .ifLet(\.$selectCat, action: \.selectCat) {
+        SelectCatCore()
+      }
   }
 
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
@@ -89,6 +95,10 @@ public struct OnboardingCore {
         timerEndAction,
         timerStartAction
       )
+
+    case .tapStartButton:
+      state.selectCat = SelectCatCore.State()
+      return .run { send in await send(._timerEnd) }
 
     case ._timerStart:
       return .run { send in

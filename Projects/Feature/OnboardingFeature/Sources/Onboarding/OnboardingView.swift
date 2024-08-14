@@ -19,9 +19,7 @@ public struct OnboardingView: View {
   }
 
   public var body: some View {
-    ZStack {
-      Alias.Color.Background.primary
-        .ignoresSafeArea()
+    NavigationStack {
       VStack {
         Spacer()
         VStack(spacing: 0) {
@@ -54,15 +52,24 @@ public struct OnboardingView: View {
           .padding(.vertical, 32)
 
           Button(title: "시작하기") {
-            // 다음 뷰 이동
+            store.send(.tapStartButton)
           }
           .buttonStyle(.box(level: .primary, size: .large, width: .medium))
           .padding(.top, 16)
         }
         Spacer()
       }
+      .background {
+        Alias.Color.Background.primary
+          .ignoresSafeArea()
+      }
+      .onAppear { store.send(.onApear) }
+      .navigationDestination(
+        item: $store.scope(state: \.selectCat, action: \.selectCat)
+      ) { store in
+        SelectCatView(store: store)
+      }
     }
-    .onAppear { store.send(.onApear) }
     .background {
       GeometryReader { geometry in
         Color.clear
