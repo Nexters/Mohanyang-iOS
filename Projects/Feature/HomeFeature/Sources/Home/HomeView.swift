@@ -67,6 +67,9 @@ public struct HomeView: View {
                   .foregroundStyle(Alias.Color.Text.secondary)
               }
               .padding(Alias.Spacing.small)
+              .onTapGesture {
+                store.send(.focusTimeButtonTapped)
+              }
               
               Rectangle()
                 .fill(Global.Color.gray200)
@@ -81,6 +84,9 @@ public struct HomeView: View {
                   .foregroundStyle(Alias.Color.Text.secondary)
               }
               .padding(Alias.Spacing.small)
+              .onTapGesture {
+                store.send(.relaxTimeButtonTapped)
+              }
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
@@ -107,6 +113,14 @@ public struct HomeView: View {
       )
     ) { store in
       CategorySelectView(store: store)
+    }
+    .fullScreenCover(
+      item: $store.scope(
+        state: \.timeSelect,
+        action: \.timeSelect
+      )
+    ) { store in
+      TimeSelectView(store: store)
     }
     .onAppear {
       store.send(.onAppear)

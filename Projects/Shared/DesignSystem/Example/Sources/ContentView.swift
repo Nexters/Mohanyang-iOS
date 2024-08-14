@@ -61,6 +61,12 @@ struct ContentView: View {
           }
           
           NavigationLink {
+            TimeWheelPickerDetailView()
+          } label: {
+            Text("WheelPicker")
+          }
+          
+          NavigationLink {
             
           } label: {
             Text("Dialog")

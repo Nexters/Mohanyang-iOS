@@ -22,6 +22,7 @@ public struct HomeCore {
     var homeCategoryGuideTooltip: HomeCategoryGuideTooltip?
     var homeTimeGuideTooltip: HomeTimeGuideTooltip?
     @Presents var categorySelect: CategorySelectCore.State?
+    @Presents var timeSelect: TimeSelectCore.State?
     
     public init() {}
   }
@@ -32,10 +33,13 @@ public struct HomeCore {
     case setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip?)
     case setHomeTimeGuideTooltip(HomeTimeGuideTooltip?)
     case categoryButtonTapped
+    case focusTimeButtonTapped
+    case relaxTimeButtonTapped
     case mypageButtonTappd
     case playButtonTapped
     
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
+    case timeSelect(PresentationAction<TimeSelectCore.Action>)
   }
   
   public enum Mode {
@@ -52,6 +56,9 @@ public struct HomeCore {
     Reduce(self.core)
       .ifLet(\.$categorySelect, action: \.categorySelect) {
         CategorySelectCore()
+      }
+      .ifLet(\.$timeSelect, action: \.timeSelect) {
+        TimeSelectCore()
       }
   }
   
@@ -78,6 +85,14 @@ public struct HomeCore {
       state.categorySelect = CategorySelectCore.State()
       return .none
       
+    case .focusTimeButtonTapped:
+      state.timeSelect = TimeSelectCore.State()
+      return .none
+      
+    case .relaxTimeButtonTapped:
+      state.timeSelect = TimeSelectCore.State()
+      return .none
+      
     case .mypageButtonTappd:
       return .none
       
@@ -89,6 +104,9 @@ public struct HomeCore {
       return .none
       
     case .categorySelect:
+      return .none
+      
+    case .timeSelect:
       return .none
     }
   }
