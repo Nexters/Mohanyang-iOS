@@ -12,7 +12,6 @@ import SplashFeature
 import HomeFeature
 import HomeFeatureInterface
 import OnboardingFeature
-import OnboardingFeatureInterface
 import PushService
 
 import ComposableArchitecture
@@ -92,13 +91,13 @@ public struct AppCore {
       state.onboarding = OnboardingCore.State()
       return .none
 
+    case .splash:
+      return .none
+
     case .home:
       return .none
       
     case .onboarding:
-      return .none
-
-    default:
       return .none
     }
   }
