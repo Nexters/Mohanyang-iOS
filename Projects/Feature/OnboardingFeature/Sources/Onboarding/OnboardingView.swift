@@ -80,7 +80,7 @@ struct OnboardingCarouselContentView: View {
       ZStack {
         Rectangle()
           .foregroundStyle(Alias.Color.Background.secondary)
-        Image(uiImage: item.image)
+        item.image
       }
       .frame(width: 240, height: 240)
 
