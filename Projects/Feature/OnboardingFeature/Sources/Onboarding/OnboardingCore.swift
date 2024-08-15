@@ -15,8 +15,8 @@ public struct OnboardingCore {
   @ObservableState
   public struct State: Equatable {
     public init() { }
-    var data = RandomAccessEquatableItems<OnboardingItem>(elements: OnboardingItemsData)
-    var fakedData: RandomAccessEquatableItems<OnboardingItem> = .init(elements: [])
+    var data: [OnboardingItem] = OnboardingItemsData
+    var fakedData: [OnboardingItem] = []
     var width: CGFloat = .zero
     var currentIdx: Int = 0
     var currentItemID: String = ""
@@ -24,7 +24,6 @@ public struct OnboardingCore {
 
   public enum Action: BindableAction {
     case onApear
-    case setIndex(Int)
     case calculateOffset(CGFloat, OnboardingItem)
     case dragStart
     case _timerStart
@@ -37,8 +36,8 @@ public struct OnboardingCore {
 
   public init() { }
 
-  private enum CancelID { case timer }
   @Dependency(\.continuousClock) var clock
+  @Dependency(\.mainQueue) var mainQueue
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -46,23 +45,21 @@ public struct OnboardingCore {
   }
 
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
+    enum CancelID { case timer, timerDebounce }
+
     switch action {
     case .onApear:
       state.currentItemID = state.data.first!.id.uuidString
-      state.fakedData.elements = state.data.elements
+      state.fakedData = state.data
       guard var first = state.data.first,
             var last = state.data.last else { return .none }
       first.id = .init()
       last.id = .init()
-      state.fakedData.elements.append(first)
-      state.fakedData.elements.insert(last, at: 0)
+      state.fakedData.append(first)
+      state.fakedData.insert(last, at: 0)
       return .run { send in
         await send(._timerStart)
       }
-
-    case .setIndex(let idx):
-      state.currentIdx = idx
-      return .none
 
     case .calculateOffset(let minX, let item):
       let fakeIndex = state.fakedData.firstIndex(of: item) ?? 0
@@ -73,21 +70,21 @@ public struct OnboardingCore {
 
       let pageProgress: CGFloat = pageOffset / state.width
       if  -pageProgress < 1.0 {
-        if state.fakedData.elements.indices.contains(state.fakedData.count - 1) {
+        if state.fakedData.indices.contains(state.fakedData.count - 1) {
           state.currentItemID = state.fakedData[state.fakedData.count - 1].id.uuidString
         }
       }
       if -pageProgress > CGFloat(state.fakedData.count - 1) {
-        if state.fakedData.elements.indices.contains(1) {
+        if state.fakedData.indices.contains(1) {
           state.currentItemID = state.fakedData[1].id.uuidString
         }
       }
       return .none
 
     case .dragStart:
-      let timerEndAction: Effect<Action> = .send(._timerEnd)
-      let timerStartAction: Effect<Action> = .send(._timerStart)
-        .debounce(id: "timerStart", for: .seconds(2), scheduler: DispatchQueue.main)
+      let timerEndAction: Effect<Action> = .run { send in await send(._timerEnd) }
+      let timerStartAction: Effect<Action> = .run { send in await send(._timerStart) }
+        .debounce(id: CancelID.timerDebounce, for: .seconds(2), scheduler: self.mainQueue)
       return .merge(
         timerEndAction,
         timerStartAction

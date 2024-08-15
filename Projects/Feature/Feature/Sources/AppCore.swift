@@ -91,13 +91,13 @@ public struct AppCore {
       state.onboarding = OnboardingCore.State()
       return .none
 
+    case .splash:
+      return .none
+
     case .home:
       return .none
       
-//    case .onboarding:
-//      return .none
-
-    default:
+    case .onboarding:
       return .none
     }
   }

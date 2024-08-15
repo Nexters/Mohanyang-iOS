@@ -11,7 +11,7 @@ import SwiftUI
 
 import DesignSystem
 
-public struct OnboardingItem: Hashable, Identifiable {
+public struct OnboardingItem: Equatable, Identifiable {
   public var id: UUID = .init()
   let image: UIImage
   var title: String
@@ -32,28 +32,4 @@ let OnboardingItemsData: [OnboardingItem] = [
     title: "집중과 휴식 반복을 통해 몰입을 관리해요",
     subTitle: "일정 시간 집중과 휴식을 반복해 번아웃을 방지하고\n짧은 시간의 몰입을 경험해보세요.")
 ]
-
-public struct RandomAccessEquatableItems<Element>: RandomAccessCollection, Equatable where Element: Equatable {
-  var elements: [Element]
-  public init(elements: [Element]) {
-    self.elements = elements
-  }
-
-  public var startIndex: Int { elements.startIndex }
-  public var endIndex: Int { elements.endIndex }
-
-  public subscript(position: Int) -> Element {
-    return elements[position]
-  }
-
-  public static func == (lhs: RandomAccessEquatableItems, rhs: RandomAccessEquatableItems) -> Bool {
-    guard lhs.count == rhs.count else { return false }
-    for (index, element) in lhs.enumerated() {
-      if element != rhs[index] {
-        return false
-      }
-    }
-    return true
-  }
-}
 

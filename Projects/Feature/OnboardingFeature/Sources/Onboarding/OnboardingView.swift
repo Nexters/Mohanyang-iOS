@@ -26,7 +26,7 @@ public struct OnboardingView: View {
         Spacer()
         VStack(spacing: 0) {
           TabView(selection: $store.currentItemID) {
-            ForEach(store.fakedData, id: \.hashValue) { item in
+            ForEach(store.fakedData) { item in
               OnboardingCarouselContentView(width: $store.width, item: item)
                 .tag(item.id.uuidString)
                 .offsetX(store.currentItemID == item.id.uuidString) { minX in
