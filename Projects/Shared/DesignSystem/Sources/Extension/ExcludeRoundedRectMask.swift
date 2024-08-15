@@ -8,11 +8,19 @@
 
 import SwiftUI
 
-struct ExcludeRoundedRectMask: View {
+public struct ExcludeRoundedRectMask: View {
   let excludedRect: CGRect
   let cornerRadius: CGFloat
   
-  var body: some View {
+  public init(
+    excludedRect: CGRect,
+    cornerRadius: CGFloat
+  ) {
+    self.excludedRect = excludedRect
+    self.cornerRadius = cornerRadius
+  }
+  
+  public var body: some View {
     GeometryReader { geometry in
       let fullRect = geometry.frame(in: .local)
       

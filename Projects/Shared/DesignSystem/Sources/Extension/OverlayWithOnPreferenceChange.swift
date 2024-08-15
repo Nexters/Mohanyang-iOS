@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct OverlayWithOnPreferenceChange<
+public struct OverlayWithOnPreferenceChange<
   K, OverlayContent
 >: ViewModifier where K: PreferenceKey, K.Value: Equatable, OverlayContent: View {
   let preferenceKey: K.Type
@@ -23,7 +23,7 @@ struct OverlayWithOnPreferenceChange<
     self.contentForOverlay = contentForOverlay
   }
   
-  func body(content: Content) -> some View {
+  public func body(content: Content) -> some View {
     content
       .overlay {
         if let value {
@@ -37,7 +37,7 @@ struct OverlayWithOnPreferenceChange<
 }
 
 extension View {
-  func overlayWithOnPreferenceChange<K, Content>(
+  public func overlayWithOnPreferenceChange<K, Content>(
     _ key: K.Type,
     @ViewBuilder content: @escaping (K.Value) -> Content
   ) -> some View where K: PreferenceKey, K.Value: Equatable, Content: View {

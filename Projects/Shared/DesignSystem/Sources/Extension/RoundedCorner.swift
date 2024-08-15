@@ -1,18 +1,12 @@
 //
-//  View+Extension.swift
+//  RoundedCorner.swift
 //  DesignSystem
 //
-//  Created by devMinseok on 8/12/24.
+//  Created by devMinseok on 8/15/24.
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
 import SwiftUI
-
-extension View {
-  func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-    clipShape(RoundedCorner(radius: radius, corners: corners))
-  }
-}
 
 private struct RoundedCorner: Shape {
   var radius: CGFloat = .infinity
@@ -25,5 +19,11 @@ private struct RoundedCorner: Shape {
       cornerRadii: CGSize(width: radius, height: radius)
     )
     return Path(path.cgPath)
+  }
+}
+
+extension View {
+  public func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+    clipShape(RoundedCorner(radius: radius, corners: corners))
   }
 }

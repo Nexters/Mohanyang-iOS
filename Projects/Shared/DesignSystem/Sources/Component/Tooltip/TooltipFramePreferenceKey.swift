@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct FrameMeasurePreferenceKey: PreferenceKey {
+struct TooltipFramePreferenceKey: PreferenceKey {
   typealias Value = [AnyHashable: CGRect]
   
   static var defaultValue: Value = Value()
