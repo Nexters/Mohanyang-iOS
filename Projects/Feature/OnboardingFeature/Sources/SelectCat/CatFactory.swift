@@ -14,7 +14,7 @@ public enum CatType {
   case cheese, black, calico
 }
 
-public protocol CatFactoryProtocol {
+public protocol CatFactoryProtocol where Self: Equatable {
   var keyword: String { get }
   var keywordImage: Image { get }
   var typeName: String { get }
@@ -47,7 +47,7 @@ public struct CalicoCat: CatFactoryProtocol {
 }
 
 public struct CatFactory {
-  public static func makeCat(type: CatType) -> CatFactoryProtocol {
+  public static func makeCat(type: CatType) -> any CatFactoryProtocol {
     switch type {
     case .cheese:
       return CheeseCat()

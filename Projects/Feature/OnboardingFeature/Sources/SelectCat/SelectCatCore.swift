@@ -12,7 +12,14 @@ import ComposableArchitecture
 public struct SelectCatCore {
   @ObservableState
   public struct State: Equatable {
-    var cat: String = ""
+    var catType: CatType?
+    var cat: (any CatFactoryProtocol)? {
+      if let catType = catType {
+        return CatFactory.makeCat(type: catType)
+      } else {
+        return nil
+      }
+    }
   }
   
   public enum Action {
