@@ -17,20 +17,24 @@ extension AuthService: DependencyKey {
   private static func live() -> Self {
     return AuthService(
       login: { deviceID, apiClient, keychainClient in
-        guard isTokenValid(keychainClient) else { return }
+        guard !isTokenValid(keychainClient) else { return }
+
         let service = AuthAPIRequest.login(deviceID)
         let response = try await apiClient.apiRequest(
           request: service,
           as: AuthDTO.Response.TokenResponseDTO.self,
           isWithInterceptor: false
         )
-        _ = keychainClient.create(key: KeychainKeys.accessToken.rawValue, data: response.accessToken)
+
+        _ = keychainClient.create(key: "mohanyang_keychain_access_token", data: response.accessToken)
+        _ = keychainClient.create(key: "mohanyang_keychain_refresh_token", data: response.refreshToken)
         return
       }
     )
   }
 
   private static func isTokenValid(_ keychainClient: KeychainClient) -> Bool {
-    return keychainClient.read(key: KeychainKeys.accessToken.rawValue) != nil
+    let isTokenExist = keychainClient.read(key: "mohanyang_keychain_access_token")
+    return isTokenExist != nil
   }
 }

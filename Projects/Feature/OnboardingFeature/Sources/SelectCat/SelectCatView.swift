@@ -51,14 +51,14 @@ public struct SelectCatView: View {
           }
 
           HStack {
-            ForEach(CatType.allCases) { catType in
+            ForEach(store.catList, id: \.no) { cat in
               Button(
-                title: catType.typeName,
-                subtitle: catType.keyword,
-                rightIcon: catType.keywordImage,
-                action: { store.send(.selectCat(catType)) }
+                title: LocalizedStringKey(cat.name),
+                subtitle: LocalizedStringKey(cat.name),
+                rightIcon: DesignSystemAsset.Image._16Star.swiftUIImage,
+                action: { }//store.send(.selectCat(catType)) }
               )
-              .buttonStyle(.select(isSelected: store.catType == catType))
+              .buttonStyle(.select(isSelected: false))
             }
           }
           .padding(.top, 34)
@@ -73,6 +73,7 @@ public struct SelectCatView: View {
       }
       .padding(.horizontal, 20)
     }
+    .onAppear { store.send(.onAppear) }
     .background {
       Alias.Color.Background.primary
         .ignoresSafeArea()

@@ -12,4 +12,5 @@ public enum Domain: String, Modulable {
   case AppService
   case AuthService
   case PushService
+  case UserService
 }

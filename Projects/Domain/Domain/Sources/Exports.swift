@@ -10,3 +10,5 @@
 @_exported import PushService
 @_exported import AuthService
 @_exported import AuthServiceInterface
+@_exported import UserService
+@_exported import UserServiceInterface
