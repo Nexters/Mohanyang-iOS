@@ -134,6 +134,9 @@ public struct OnboardingCore {
 
     case .binding:
       return .none
+
+    case .selectCat:
+      return .none
     }
   }
 }

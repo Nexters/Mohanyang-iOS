@@ -10,51 +10,72 @@ import SwiftUI
 
 import DesignSystem
 
-public enum CatType {
-  case cheese, black, calico
-}
-
-public protocol CatFactoryProtocol where Self: Equatable {
-  var keyword: String { get }
+public protocol CatFactoryProtocol {
+  var keyword: LocalizedStringKey { get }
   var keywordImage: Image { get }
-  var typeName: String { get }
+  var typeName: LocalizedStringKey { get }
   var catImage: Image { get }
   var pushNotificationTitle: String { get }
 }
 
-public struct CheeseCat: CatFactoryProtocol {
-  public var keyword: String = "응원"
-  public var keywordImage: Image = DesignSystemAsset.Image._16Star.swiftUIImage
-  public var typeName: String = "치즈냥"
-  public var catImage: Image = Image(systemName: "star.fill")
-  public var pushNotificationTitle: String = "어디갔냐옹..."
+public enum CatType: String, CaseIterable, Identifiable {
+  public var id: String { self.rawValue }
+  case cheese, black, calico
 }
 
-public struct BlackCat: CatFactoryProtocol {
-  public var keyword: String = "긍정"
-  public var keywordImage: Image = DesignSystemAsset.Image._16Heart.swiftUIImage
-  public var typeName: String = "까만냥"
-  public var catImage: Image = Image(systemName: "star")
-  public var pushNotificationTitle: String = "어디갔냐옹..."
-}
-
-public struct CalicoCat: CatFactoryProtocol {
-  public var keyword: String = "자극"
-  public var keywordImage: Image = DesignSystemAsset.Image._16Focus.swiftUIImage
-  public var typeName: String = "삼색냥"
-  public var catImage: Image = Image(systemName: "star.fill")
-  public var pushNotificationTitle: String = "내가 여기있는데 어디갔냐옹!"
-}
-
-public struct CatFactory {
-  public static func makeCat(type: CatType) -> any CatFactoryProtocol {
-    switch type {
+extension CatType: CatFactoryProtocol {
+  public var keyword: LocalizedStringKey {
+    switch self {
     case .cheese:
-      return CheeseCat()
+      "응원"
     case .black:
-      return BlackCat()
+      "긍정"
     case .calico:
-      return CalicoCat()
+      "자극"
+    }
+  }
+  
+  public var keywordImage: Image {
+    switch self {
+    case .cheese:
+      DesignSystemAsset.Image._16Star.swiftUIImage
+    case .black:
+      DesignSystemAsset.Image._16Heart.swiftUIImage
+    case .calico:
+      DesignSystemAsset.Image._16Focus.swiftUIImage
+    }
+  }
+  
+  public var typeName: LocalizedStringKey {
+    switch self {
+    case .cheese:
+      "치즈냥"
+    case .black:
+      "까만냥"
+    case .calico:
+      "삼색냥"
+    }
+  }
+  
+  public var catImage: Image {
+    switch self {
+    case .cheese:
+      Image(systemName: "star.fill")
+    case .black:
+      Image(systemName: "star.fill")
+    case .calico:
+      Image(systemName: "star.fill")
+    }
+  }
+  
+  public var pushNotificationTitle: String {
+    switch self {
+    case .cheese:
+      "어디갔냐옹..."
+    case .black:
+      "어디갔냐옹..."
+    case .calico:
+      "내가 여기있는데 어디갔냐옹!"
     }
   }
 }
