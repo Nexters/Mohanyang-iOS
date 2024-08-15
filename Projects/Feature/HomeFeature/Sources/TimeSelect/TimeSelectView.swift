@@ -31,7 +31,11 @@ public struct TimeSelectView: View {
         )
         .buttonStyle(.text(level: .primary, size: .medium))
         
-        Spacer()
+        WheelPicker(
+          image: DesignSystemAsset.Image._24Focus.swiftUIImage,
+          sources: store.timeList,
+          selection: $store.selectedTime.sending(\.pickerSelection)
+        )
         
         Button(
           icon: DesignSystemAsset.Image._32PlayPrimary.swiftUIImage,
@@ -43,5 +47,24 @@ public struct TimeSelectView: View {
         .padding(.vertical, 40)
       }
     }
+    .background(Global.Color.gray50)
+    .onAppear {
+      store.send(.onAppear)
+    }
+  }
+}
+
+
+public struct TimeItem: WheelPickerData {
+  public let id: UUID = .init()
+  let title: String
+  let data: Int
+  
+  init(
+    title: String,
+    data: Int
+  ) {
+    self.title = title
+    self.data = data
   }
 }

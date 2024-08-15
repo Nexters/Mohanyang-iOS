@@ -101,8 +101,8 @@ public struct HomeView: View {
           .buttonStyle(.round(level: .primary))
         }
       }
+      .background(Global.Color.gray50)
     }
-    .background(Global.Color.gray50)
     .tooltipDestination(tooltip: $store.homeCatTooltip.sending(\.setHomeCatTooltip))
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
