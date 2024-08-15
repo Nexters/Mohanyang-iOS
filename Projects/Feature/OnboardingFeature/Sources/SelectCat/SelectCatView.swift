@@ -42,12 +42,12 @@ public struct SelectCatView: View {
         Spacer(minLength: Alias.Spacing.xLarge)
 
         VStack(spacing: Alias.Spacing.small) {
-          CatPushNotificationExampleView(catType: $store.catType)
+          CatPushNotificationExampleView(selectedCat: $store.selectedCat)
           ZStack {
             Rectangle()
               .foregroundStyle(Alias.Color.Background.secondary)
               .frame(height: 240)
-            store.catType?.catImage
+            // Cat Image
           }
 
           HStack {
@@ -56,9 +56,9 @@ public struct SelectCatView: View {
                 title: LocalizedStringKey(cat.name),
                 subtitle: LocalizedStringKey(cat.name),
                 rightIcon: DesignSystemAsset.Image._16Star.swiftUIImage,
-                action: { }//store.send(.selectCat(catType)) }
+                action: { store.send(.selectCat(cat.no)) }
               )
-              .buttonStyle(.select(isSelected: false))
+              .buttonStyle(.select(isSelected: cat.no == store.selectedCat))
             }
           }
           .padding(.top, 34)
@@ -70,6 +70,7 @@ public struct SelectCatView: View {
           store.send(.tapNextButton)
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .low))
+        .disabled(store.selectedCat == nil)
       }
       .padding(.horizontal, 20)
     }
@@ -82,14 +83,14 @@ public struct SelectCatView: View {
 }
 
 struct CatPushNotificationExampleView: View {
-  @Binding var catType: CatType?
+  @Binding var selectedCat: Int?
 
   var body: some View {
     ZStack {
       RoundedRectangle(cornerRadius: Alias.BorderRadius.xSmall,style: .circular)
         .foregroundStyle(Alias.Color.Background.secondary)
 
-      if let catType = catType {
+      if let selectedCat = selectedCat {
         HStack(spacing: 10){
           Image(systemName: "star.fill")
           VStack(spacing: 0) {
@@ -103,7 +104,7 @@ struct CatPushNotificationExampleView: View {
                 .foregroundStyle(Alias.Color.Text.secondary)
             }
             HStack {
-              Text(catType.pushNotificationTitle)
+              Text("흐으으음")
                 .font(Typography.subBodyR)
                 .foregroundStyle(Alias.Color.Text.primary)
               Spacer()

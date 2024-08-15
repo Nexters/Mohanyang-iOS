@@ -17,13 +17,20 @@ extension UserService: DependencyKey {
   public static let liveValue: UserService = .live()
   private static func live() -> Self {
     return UserService(
-      getCatLists: { apiClient in
-        let request = UserAPIrequest.getCatList
+      fetchCatLists: { apiClient in
+        let request = UserAPIrequest.fetchCatList
         return try await apiClient.apiRequest(
           request: request,
-          as: CatList.self,
-          isWithInterceptor: true
+          as: CatList.self
         )
+      },
+      selectCat: { no, apiClient in
+        let request = UserAPIrequest.selectCat(no)
+        _ = try await apiClient.apiRequest(
+          request: request,
+          as: EmptyResponse.self
+        )
+        return
       }
     )
   }

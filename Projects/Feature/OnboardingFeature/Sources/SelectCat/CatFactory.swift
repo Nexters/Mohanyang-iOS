@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-
 import DesignSystem
 
 public protocol CatFactoryProtocol {

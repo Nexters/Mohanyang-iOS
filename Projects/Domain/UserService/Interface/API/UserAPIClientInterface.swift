@@ -16,9 +16,13 @@ import DependenciesMacros
 
 @DependencyClient
 public struct UserService {
-  public var getCatLists: @Sendable (
+  public var fetchCatLists: @Sendable (
     _ apiClient: APIClient
   ) async throws -> CatList
+  public var selectCat: @Sendable (
+    _ no: Int,
+    _ apiClient: APIClient
+  ) async throws -> Void
 }
 
 extension UserService: TestDependencyKey {

@@ -22,10 +22,14 @@ public struct APIClient {
 
   public func apiRequest<T: Decodable>(
     request: APIBaseRequest,
-    as: T.Type,
+    as: T.Type = T.self,
     isWithInterceptor: Bool = true
   ) async throws -> T {
     let (data, _) = try await self.apiRequest(request, isWithInterceptor)
+
+    if T.self == EmptyResponse.self {
+      return EmptyResponse() as! T
+    }
 
     do {
       let decodedData = try JSONDecoder().decode(T.self, from: data)
@@ -40,3 +44,6 @@ extension APIClient: TestDependencyKey {
   public static let previewValue = Self()
   public static let testValue = Self()
 }
+
+// MARK: Empty Response 대응 논의 필요
+public struct EmptyResponse: Decodable {}

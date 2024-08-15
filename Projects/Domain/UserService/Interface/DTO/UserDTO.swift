@@ -16,6 +16,9 @@ public enum UserDTO {
 }
 
 public extension UserDTO.Request {
+  struct SelectCatRequestDTO: Encodable {
+    public var catNo: Int
+  }
 }
 
 public extension UserDTO.Response {
@@ -24,4 +27,6 @@ public extension UserDTO.Response {
     public var name: String
     public var type: String
   }
+
+  struct SelectCatResponseDTO: Decodable { }
 }
