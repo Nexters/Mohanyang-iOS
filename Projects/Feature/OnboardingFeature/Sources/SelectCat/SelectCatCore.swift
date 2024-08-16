@@ -62,7 +62,6 @@ public struct SelectCatCore {
       }
 
     case ._fetchCatListResponse(let catList):
-      print(CatType.cheese.rawValue, CatType.black.rawValue, CatType.threeColor.rawValue)
       state.catList = catList.map { cat in
         CatFactory.makeCat(
           type: CatType(rawValue: cat.type.camelCased()) ?? .cheese,

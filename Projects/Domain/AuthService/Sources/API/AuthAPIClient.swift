@@ -12,6 +12,11 @@ import UserDefaultsClientInterface
 import AuthServiceInterface
 import Dependencies
 
+enum KeychainClientKeys: String {
+  case accessToken = "mohanyang_keychain_access_token"
+  case refreshToken = "mohanyang_keychain_refresh_token"
+}
+
 extension AuthService: DependencyKey {
   public static let liveValue: AuthService = .live()
   private static func live() -> Self {
@@ -26,15 +31,15 @@ extension AuthService: DependencyKey {
           isWithInterceptor: false
         )
 
-        _ = keychainClient.create(key: "mohanyang_keychain_access_token", data: response.accessToken)
-        _ = keychainClient.create(key: "mohanyang_keychain_refresh_token", data: response.refreshToken)
+        _ = keychainClient.create(key: KeychainClientKeys.accessToken.rawValue, data: response.accessToken)
+        _ = keychainClient.create(key: KeychainClientKeys.refreshToken.rawValue, data: response.refreshToken)
         return
       }
     )
   }
 
   private static func isTokenValid(_ keychainClient: KeychainClient) -> Bool {
-    let isTokenExist = keychainClient.read(key: "mohanyang_keychain_access_token")
+    let isTokenExist = keychainClient.read(key: KeychainClientKeys.accessToken.rawValue)
     return isTokenExist != nil
   }
 }

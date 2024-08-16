@@ -22,8 +22,7 @@ public struct SelectCatView: View {
   public var body: some View {
     NavigationContainer(
       title: Text("고양이 선택"),
-      style: .navigation,
-      navBackground: .clear
+      style: .navigation
     ) {
       VStack(spacing: 0) {
         HStack {
