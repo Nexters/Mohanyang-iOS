@@ -77,6 +77,12 @@ struct ContentView: View {
           } label: {
             Text("TextField")
           }
+
+          NavigationLink {
+            InputFieldDetailView()
+          } label: {
+            Text("InputField")
+          }
         }
       }
       .navigationTitle("DesignSystem")
