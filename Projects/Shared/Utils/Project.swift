@@ -8,10 +8,7 @@ let project: Project = .makeTMABasedProject(
   module: Shared.Utils,
   scripts: [],
   targets: [
-    .sources,
-    .interface,
-    .tests,
-    .testing
+    .sources
   ],
   dependencies: [:]
 )

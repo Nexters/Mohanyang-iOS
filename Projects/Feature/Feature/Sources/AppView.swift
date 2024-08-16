@@ -10,7 +10,6 @@ import SwiftUI
 
 import SplashFeature
 import HomeFeature
-import HomeFeatureInterface
 import OnboardingFeature
 
 import ComposableArchitecture

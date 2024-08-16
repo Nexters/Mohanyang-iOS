@@ -8,6 +8,8 @@
 
 import SwiftUI
 
+import Utils
+
 struct TooltipTarget: View {
   let identifier: AnyHashable
   
@@ -15,7 +17,7 @@ struct TooltipTarget: View {
     GeometryReader { geometry in
       Color.clear
         .preference(
-          key: FrameMeasurePreferenceKey.self,
+          key: TooltipFramePreferenceKey.self,
           value: [identifier: geometry.frame(in: .global)]
         )
     }
@@ -32,7 +34,7 @@ extension View {
   
   public func tooltipDestination<T: Tooltip>(tooltip: Binding<T?>) -> some View {
     return self
-      .overlayWithOnPreferenceChange(FrameMeasurePreferenceKey.self) { value in
+      .overlayWithOnPreferenceChange(TooltipFramePreferenceKey.self) { value in
         if let content = tooltip.wrappedValue, let position = value[ObjectIdentifier(type(of: content))] {
           TooltipView(content: content, position: position)
             .transition(.opacity.animation(.easeInOut))
