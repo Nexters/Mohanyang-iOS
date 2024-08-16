@@ -47,18 +47,18 @@ public struct SelectCatView: View {
             Rectangle()
               .foregroundStyle(Alias.Color.Background.secondary)
               .frame(height: 240)
-            // Cat Image
+            store.selectedCat?.catImage
           }
 
           HStack {
-            ForEach(store.catList, id: \.no) { cat in
+            ForEach(store.catList) { cat in
               Button(
                 title: LocalizedStringKey(cat.name),
-                subtitle: LocalizedStringKey(cat.name),
-                rightIcon: DesignSystemAsset.Image._16Star.swiftUIImage,
-                action: { store.send(.selectCat(cat.no)) }
+                subtitle: LocalizedStringKey(cat.keyword),
+                rightIcon: cat.keywordImage,
+                action: { store.send(.selectCat(cat)) }
               )
-              .buttonStyle(.select(isSelected: cat.no == store.selectedCat))
+              .buttonStyle(.select(isSelected: cat == store.selectedCat))
             }
           }
           .padding(.top, 34)
@@ -83,7 +83,7 @@ public struct SelectCatView: View {
 }
 
 struct CatPushNotificationExampleView: View {
-  @Binding var selectedCat: Int?
+  @Binding var selectedCat: AnyCat?
 
   var body: some View {
     ZStack {
@@ -104,7 +104,7 @@ struct CatPushNotificationExampleView: View {
                 .foregroundStyle(Alias.Color.Text.secondary)
             }
             HStack {
-              Text("흐으으음")
+              Text(selectedCat.pushNotificationTitle)
                 .font(Typography.subBodyR)
                 .foregroundStyle(Alias.Color.Text.primary)
               Spacer()

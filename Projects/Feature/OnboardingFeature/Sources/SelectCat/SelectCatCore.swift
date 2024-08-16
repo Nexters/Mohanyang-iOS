@@ -8,6 +8,7 @@
 
 import APIClientInterface
 import UserServiceInterface
+import Shared
 
 import ComposableArchitecture
 
@@ -15,14 +16,14 @@ import ComposableArchitecture
 public struct SelectCatCore {
   @ObservableState
   public struct State: Equatable {
-    var catList: CatList = []
+    var catList: [AnyCat] = []
     //var catType: CatType? = nil
-    var selectedCat: Int? = nil
+    var selectedCat: AnyCat? = nil
   }
   
   public enum Action: BindableAction {
     case onAppear
-    case selectCat(Int)
+    case selectCat(AnyCat)
     case tapNextButton
     case _fetchCatListRequest
     case _fetchCatListResponse(CatList)
@@ -59,15 +60,22 @@ public struct SelectCatCore {
       }
 
     case ._fetchCatListResponse(let catList):
-      state.catList = catList
+      print(CatType.cheese.rawValue, CatType.black.rawValue, CatType.threeColor.rawValue)
+      state.catList = catList.map { cat in
+        CatFactory.makeCat(
+          type: CatType(rawValue: cat.type.camelCased()) ?? .cheese,
+          no: cat.no,
+          name: cat.name
+        )
+      }
       return .none
 
     case ._selectCatRequest:
       guard let selectedCat = state.selectedCat else { return .none }
       return .run { send in
-        _ = try await userService.selectCat(no: selectedCat, apiClient: apiClient)
+        _ = try await userService.selectCat(no: selectedCat.no, apiClient: apiClient)
+        // user notification 요청
         // go to naming cat
-        print("성공 !!!!! \(selectedCat)")
       }
 
     case .binding:
