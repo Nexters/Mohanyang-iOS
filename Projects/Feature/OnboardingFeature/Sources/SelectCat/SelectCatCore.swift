@@ -8,6 +8,7 @@
 
 import APIClientInterface
 import UserServiceInterface
+import UserNotificationClientInterface
 import Shared
 
 import ComposableArchitecture
@@ -35,6 +36,7 @@ public struct SelectCatCore {
 
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
+  @Dependency(UserNotificationClient.self) var userNotificationClient
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -75,6 +77,7 @@ public struct SelectCatCore {
       return .run { send in
         _ = try await userService.selectCat(no: selectedCat.no, apiClient: apiClient)
         // user notification 요청
+        _ = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
         // go to naming cat
       }
 
