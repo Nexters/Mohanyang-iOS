@@ -32,7 +32,7 @@ struct InputFieldStyle: TextFieldStyle {
       )
       .focused($isFocused)
       .onChange(of: isFocused) {
-        if isFocused { isBorderShowed = true }
+        isBorderShowed = isFocused
       }
       .onChange(of: text) {
         isBorderShowed = false
