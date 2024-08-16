@@ -14,4 +14,5 @@ public enum Core: String, Modulable {
   case UserNotificationClient
   case DatabaseClient
   case UserDefaultsClient
+  case FeedbackGeneratorClient
 }

@@ -1,6 +1,6 @@
 //
 //  Project.swift
-//  UserNotificationClientManifests
+//  FeedbackGeneratorClientManifests
 //
 //  Created by devMinseok on 8/16/24.
 //
@@ -13,11 +13,12 @@ import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Core.UserNotificationClient,
+  module: Core.FeedbackGeneratorClient,
   scripts: [],
   targets: [
     .sources,
-    .interface
+    .interface,
+    .example
   ],
   dependencies: [
     .interface: [
