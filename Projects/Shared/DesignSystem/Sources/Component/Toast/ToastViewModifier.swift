@@ -8,17 +8,18 @@
 
 import SwiftUI
 
-public struct ToastViewModifier<T: Toast>: ViewModifier {
+struct ToastViewModifier<T: Toast>: ViewModifier {
   @Binding var toast: T?
   
-  public init(toast: Binding<T?>) {
+  init(toast: Binding<T?>) {
     _toast = toast
   }
   
-  public func body(content: Content) -> some View {
+  func body(content: Content) -> some View {
     ZStack(alignment: .bottom ) {
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .zIndex(1)
       
       if let toast {
         HStack(alignment: .center, spacing: 8) {
@@ -45,7 +46,7 @@ public struct ToastViewModifier<T: Toast>: ViewModifier {
         .onAppear {
           if toast.hideAutomatically {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-              if self.toast != nil { 
+              if self.toast != nil {
                 self.toast = nil
               }
             }
@@ -54,6 +55,7 @@ public struct ToastViewModifier<T: Toast>: ViewModifier {
         .onTapGesture {
           self.toast = nil
         }
+        .zIndex(2)
       }
     }
     .animation(.spring(duration: 0.3), value: self.toast)
