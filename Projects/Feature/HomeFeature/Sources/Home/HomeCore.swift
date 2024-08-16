@@ -9,7 +9,7 @@
 import UserNotifications
 
 import PushService
-import UserNotificationClientInterface
+import UserDefaultsClientInterface
 
 import ComposableArchitecture
 
@@ -28,7 +28,7 @@ public struct HomeCore {
   }
   
   public enum Action {
-    case onAppear
+    case onLoad
     case setHomeCatTooltip(HomeCatDialogueTooltip?)
     case setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip?)
     case setHomeTimeGuideTooltip(HomeTimeGuideTooltip?)
@@ -48,7 +48,8 @@ public struct HomeCore {
     case guide
   }
   
-  @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  let isHomeGuideCompletedKey = "mohanyang_userdefaults_isHomeGuideCompleted"
   
   public init() {}
   
@@ -64,17 +65,24 @@ public struct HomeCore {
   
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
-    case .onAppear:
-      state.homeCatTooltip = .init(title: "오랜만이다냥")
-      state.homeCategoryGuideTooltip = .init()
-      return .none
+    case .onLoad:
+      return .run { send in
+        await send(.setHomeCatTooltip(nil))
+        if self.userDefaultsClient.boolForKey(isHomeGuideCompletedKey) == false {
+          await self.userDefaultsClient.setBool(true, key: isHomeGuideCompletedKey)
+          await send(.setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip()))
+        }
+      }
       
-    case let .setHomeCatTooltip(tooltip):
+    case .setHomeCatTooltip:
+      state.homeCatTooltip = .init(title: "오랜만이다냥") // TODO: - 문구 랜덤변경하기
       return .none
       
     case let .setHomeCategoryGuideTooltip(tooltip):
       state.homeCategoryGuideTooltip = tooltip
-      state.homeTimeGuideTooltip = .init()
+      if tooltip == nil {
+        state.homeTimeGuideTooltip = .init()
+      }
       return .none
       
     case let .setHomeTimeGuideTooltip(tooltip):

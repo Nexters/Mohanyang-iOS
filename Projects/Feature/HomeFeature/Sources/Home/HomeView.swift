@@ -9,6 +9,7 @@
 import SwiftUI
 
 import DesignSystem
+import Utils
 
 import ComposableArchitecture
 
@@ -122,8 +123,8 @@ public struct HomeView: View {
     ) { store in
       TimeSelectView(store: store)
     }
-    .onAppear {
-      store.send(.onAppear)
+    .onLoad {
+      store.send(.onLoad)
     }
   }
 }
