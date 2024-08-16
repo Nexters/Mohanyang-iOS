@@ -20,7 +20,7 @@ struct WheelPicker<D: WheelPickerData>: View {
   
   var itemHeight: CGFloat = 98
   var menuHeightMultiplier: CGFloat {
-    return round(backgroundRect.height / itemHeight)
+    return floor(backgroundRect.height / itemHeight)
   }
   
   init(
@@ -75,7 +75,9 @@ struct WheelPicker<D: WheelPickerData>: View {
         }
         .scrollPosition(id: $selectionID, anchor: .center)
         .frame(height: pickerHeight)
+        .scrollClipDisabled()
         .padding(.vertical, paddingAdjustment)
+        .clipShape(Rectangle())
         .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
         .scrollIndicators(.hidden)
         .onChange(of: selection) { _, value in

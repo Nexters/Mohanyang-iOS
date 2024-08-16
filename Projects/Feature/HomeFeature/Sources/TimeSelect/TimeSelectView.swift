@@ -23,7 +23,7 @@ public struct TimeSelectView: View {
     NavigationContainer(
       style: .modal
     ) {
-      VStack {
+      VStack(spacing: .zero) {
         Button(
           title: "작업",
           leftIcon: DesignSystemAsset.Image._24WorkPrimary.swiftUIImage,
@@ -44,7 +44,7 @@ public struct TimeSelectView: View {
           }
         )
         .buttonStyle(.round(level: .secondary))
-        .padding(.vertical, 40)
+        .padding(.bottom, 40)
       }
     }
     .background(Global.Color.gray50)
