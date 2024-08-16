@@ -42,12 +42,6 @@ public struct HomeCore {
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
   }
   
-  public enum Mode {
-    case normal
-    /// 가이드모드
-    case guide
-  }
-  
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   let isHomeGuideCompletedKey = "mohanyang_userdefaults_isHomeGuideCompleted"
   
