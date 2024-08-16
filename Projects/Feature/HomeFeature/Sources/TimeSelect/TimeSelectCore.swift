@@ -8,6 +8,8 @@
 
 import Foundation
 
+import FeedbackGeneratorClientInterface
+
 import ComposableArchitecture
 
 @Reducer
@@ -25,7 +27,7 @@ public struct TimeSelectCore {
     case pickerSelection(TimeItem?)
   }
   
-//  <#@Dependency() var#>
+  @Dependency(FeedbackGeneratorClient.self) var feedbackGeneratorClient
   
   public init() {}
   
@@ -42,8 +44,9 @@ public struct TimeSelectCore {
       
     case let .pickerSelection(selection):
       state.selectedTime = selection
-      print(selection?.title)
-      return .none
+      return .run { _ in
+        await self.feedbackGeneratorClient.impactOccurred(.soft)
+      }
     }
   }
   
