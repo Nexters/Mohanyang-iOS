@@ -33,6 +33,8 @@ public struct SplashCore {
 
   public init() { }
 
+  let deviceIDKey =  "mohanyang_keychain_device_id"
+
   @Dependency(APIClient.self) var apiClient
   @Dependency(AuthService.self) var authService
   @Dependency(DatabaseClient.self) var databaseClient
@@ -60,7 +62,7 @@ public struct SplashCore {
 
 extension SplashCore {
   private func checkDeviceIDExist() -> Effect<Action> {
-    let deviceID = keychainClient.read(key: KeychainKeys.deviceID.rawValue) ?? getDeviceUUID()
+    let deviceID = keychainClient.read(key: deviceIDKey) ?? getDeviceUUID()
     return login(deviceID: deviceID)
   }
 
@@ -81,7 +83,7 @@ extension SplashCore {
 
   private func getDeviceUUID() -> String {
     guard let uuid = UIDevice.current.identifierForVendor?.uuidString,
-          keychainClient.create(key: KeychainKeys.deviceID.rawValue, data: uuid) else {
+          keychainClient.create(key: "mohanyang_keychain_device_id", data: uuid) else {
       return ""
     }
     return uuid
