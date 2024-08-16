@@ -22,7 +22,11 @@ let project: Project = .makeTMABasedProject(
     .sources,
     .example
   ],
-  dependencies: [:],
+  dependencies: [
+    .sources: [
+      .dependency(module: Shared.Utils)
+    ]
+  ],
   resourceSynthesizers: [
     .fonts(), // for font
     .assets(), // for .xcassets,

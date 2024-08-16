@@ -8,8 +8,8 @@
 
 import SwiftUI
 
-public struct Triangle: View {
-  public enum Direction: Double {
+struct Triangle: View {
+  enum Direction: Double {
     case down = 180
     case left = -90
     case up = 0
@@ -19,12 +19,12 @@ public struct Triangle: View {
   private let direction: Direction
   private let color: Color
   
-  public init(direction: Direction, color: Color) {
+  init(direction: Direction, color: Color) {
     self.direction = direction
     self.color = color
   }
   
-  public var body: some View {
+  var body: some View {
     TriangleShape()
       .fill(color)
       .rotationEffect(Angle.degrees(direction.rawValue))
