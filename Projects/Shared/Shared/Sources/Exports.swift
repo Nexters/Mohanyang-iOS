@@ -9,7 +9,6 @@
 @_exported import Logger
 @_exported import DesignSystem
 @_exported import Utils
-@_exported import UtilsInterface
 
 @_exported import ThirdParty_SPM
 @_exported import ThirdParty_Firebase

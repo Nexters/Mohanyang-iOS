@@ -9,6 +9,7 @@
 import SwiftUI
 
 import DesignSystem
+import Utils
 
 struct WheelPicker<D: WheelPickerData>: View {
   @Namespace var backgroundFrameID
