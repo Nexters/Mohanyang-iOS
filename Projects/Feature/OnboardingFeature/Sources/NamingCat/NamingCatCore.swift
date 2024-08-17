@@ -30,6 +30,7 @@ public struct NamingCatCore {
     case onAppear
     case tapStartButton
     case moveToHome
+    case setTooltip(DownDirectionTooltip?)
     case binding(BindingAction<State>)
   }
   
@@ -62,6 +63,9 @@ public struct NamingCatCore {
       }
 
     case .moveToHome:
+      return .none
+      
+    case .setTooltip:
       return .none
 
     case .binding(\.text):
