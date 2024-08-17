@@ -87,7 +87,7 @@ extension DatabaseClient: DependencyKey {
 extension DatabaseClient.RealmActor {
   public func create<T: Object>(_ object: T) async throws {
     try await realm.asyncWrite {
-      realm.add(object, update: .error)
+      realm.add(object, update: .modified)
     }
   }
   
