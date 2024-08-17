@@ -64,8 +64,6 @@ public struct TimeSelectCore {
       case .rest:
         state.timeList = generateRestTimeByMinute().map { TimeItem(minute: $0) }
       }
-      
-      //      state.selectedTime = state.timeList.last
       return .run { send in
         let selectedCategory = try await self.pomodoroService.getSelectedCategory(
           userDefaultsClient: self.userDefaultsClient,
@@ -145,11 +143,14 @@ public struct TimeSelectCore {
 }
 
 public struct TimeItem: WheelPickerData {
-  public let id: UUID = .init()
   let minute: Int
   
   init(minute: Int) {
     self.minute = minute
+  }
+  
+  public var id: Int {
+    return minute
   }
   
   var title: String {
