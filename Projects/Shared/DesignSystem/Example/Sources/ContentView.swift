@@ -67,15 +67,9 @@ struct ContentView: View {
           }
           
           NavigationLink {
-            
+            DialogDetailView()
           } label: {
             Text("Dialog")
-          }
-          
-          NavigationLink {
-            
-          } label: {
-            Text("TextField")
           }
 
           NavigationLink {
