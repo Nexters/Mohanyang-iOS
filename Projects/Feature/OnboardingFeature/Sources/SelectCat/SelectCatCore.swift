@@ -8,6 +8,7 @@
 
 import APIClientInterface
 import UserServiceInterface
+import CatServiceInterface
 import UserNotificationClientInterface
 import Shared
 
@@ -36,6 +37,7 @@ public struct SelectCatCore {
 
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
+  @Dependency(CatService.self) var catService
   @Dependency(UserNotificationClient.self) var userNotificationClient
 
   public var body: some ReducerOf<Self> {
@@ -57,7 +59,7 @@ public struct SelectCatCore {
 
     case ._fetchCatListRequest:
       return .run { send in
-        let response = try await userService.fetchCatLists(apiClient: apiClient)
+        let response = try await catService.fetchCatLists(apiClient: apiClient)
         await send(._fetchCatListResponse(response))
       }
 
