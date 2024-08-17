@@ -11,64 +11,60 @@ import SwiftUI
 import DesignSystem
 
 struct DialogDetailView: View {
-  @State var titleSubTitleTwoButtonDialogIsPresented: Bool = false
-  @State var titleSubTitleOneButtonDialogIsPresented: Bool = false
-  @State var titleTwoButtonDialogIsPresented: Bool = false
-  @State var titleOneButtonDialogIsPresented: Bool = false
+  @State var titleSubTitleTwoButtonDialog: DefaultDialog?
+  @State var titleSubTitleOneButtonDialog: DefaultDialog?
+  @State var titleTwoButtonDialog: DefaultDialog?
+  @State var titleOneButtonDialog: DefaultDialog?
 
   var body: some View {
     VStack(spacing: 10) {
       Spacer()
 
       Button {
-        titleSubTitleTwoButtonDialogIsPresented = true
+        titleSubTitleTwoButtonDialog = DefaultDialog(
+          title: "Dialog Title",
+          subTitle: "Dialog Subtext를 입력해주세요.\n최대 2줄을 넘지 않도록 해요.",
+          firstButton: DialogButtonModel(title: "Button1"),
+          secondButton: DialogButtonModel(title: "Button2", action: { print(" PRINT !!") })
+        )
       } label: {
         Text("title SubTitle & Two Button")
       }
 
       Button {
-        titleSubTitleOneButtonDialogIsPresented = true
+        titleSubTitleOneButtonDialog = DefaultDialog(
+          title: "Dialog Title",
+          subTitle: "Dialog Subtext를 입력해주세요.\n최대 2줄을 넘지 않도록 해요.",
+          firstButton: DialogButtonModel(title: "Button1")
+        )
       } label: {
         Text("title SubTitle & One Button")
       }
 
       Button {
-        titleTwoButtonDialogIsPresented = true
+        titleTwoButtonDialog = DefaultDialog(
+          title: "Dialog Title",
+          firstButton: DialogButtonModel(title: "Button1"),
+          secondButton: DialogButtonModel(title: "Button2", action: { print(" PRINT !!") })
+        )
       } label: {
         Text("title & Two Button")
       }
 
       Button {
-        titleOneButtonDialogIsPresented = true
+        titleOneButtonDialog = DefaultDialog(
+          title: "Dialog Title",
+          firstButton: DialogButtonModel(title: "Button1")
+        )
       } label: {
         Text("title & One Button")
       }
 
       Spacer()
     }
-    .dialog(
-      title: "Dialog Title",
-      subTitle: "Dialog Subtext를 입력해주세요.\n최대 2줄을 넘지 않도록 해요.",
-      isPresented: $titleSubTitleTwoButtonDialogIsPresented,
-      firstButton: DialogButtonModel(title: "Button1"),
-      secondButton: DialogButtonModel(title: "Button2", action: { print(" PRINT !!") })
-    )
-    .dialog(
-      title: "Dialog Title",
-      subTitle: "Dialog Subtext를 입력해주세요.\n최대 2줄을 넘지 않도록 해요.",
-      isPresented: $titleSubTitleOneButtonDialogIsPresented,
-      firstButton: DialogButtonModel(title: "Button1")
-    )
-    .dialog(
-      title: "Dialog Title",
-      isPresented: $titleTwoButtonDialogIsPresented,
-      firstButton: DialogButtonModel(title: "Button1"),
-      secondButton: DialogButtonModel(title: "Button2", action: { print(" PRINT !!") })
-    )
-    .dialog(
-      title: "Dialog Title",
-      isPresented: $titleOneButtonDialogIsPresented,
-      firstButton: DialogButtonModel(title: "Button1")
-    )
+    .dialog(dialog: $titleSubTitleTwoButtonDialog)
+    .dialog(dialog: $titleSubTitleOneButtonDialog)
+    .dialog(dialog: $titleTwoButtonDialog)
+    .dialog(dialog: $titleOneButtonDialog)
   }
 }

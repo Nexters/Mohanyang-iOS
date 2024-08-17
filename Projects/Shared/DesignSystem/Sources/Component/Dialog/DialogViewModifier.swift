@@ -8,26 +8,8 @@
 
 import SwiftUI
 
-public struct DialogButtonModel {
-  let title: String
-  let leftIcon: Image?
-  let rightIcon: Image?
-  let action: (() -> Void)? // 버튼 액션을 Nil로 두면 자동으로 CancelButton이 됩니다
-
-  public init(title: String, leftIcon: Image? = nil, rightIcon: Image? = nil, action: (() -> Void)? = nil) {
-    self.title = title
-    self.leftIcon = leftIcon
-    self.rightIcon = rightIcon
-    self.action = action
-  }
-}
-
-struct DialogViewModifier: ViewModifier {
-  let title: String
-  let subTitle: String?
-  @Binding var isPresented: Bool
-  let firstButton: DialogButtonModel
-  let secondButton: DialogButtonModel?
+struct DialogViewModifier<T: Dialog>: ViewModifier {
+  @Binding var dialog: T?
 
   func body(content: Content) -> some View {
     ZStack(alignment: .center) {
@@ -35,7 +17,7 @@ struct DialogViewModifier: ViewModifier {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .zIndex(1)
 
-      if isPresented {
+      if let dialog {
         Global.Color.black.opacity(Global.Opacity._50d)
           .ignoresSafeArea()
           .zIndex(2)
@@ -45,19 +27,19 @@ struct DialogViewModifier: ViewModifier {
         VStack(spacing: Alias.Spacing.large) {
           VStack(spacing: Alias.Spacing.small) {
             HStack {
-              Text(title)
+              Text(dialog.title)
                 .font(Typography.header4)
                 .foregroundStyle(Alias.Color.Text.primary)
               Spacer()
               Button {
-                self.isPresented = false
+                self.dialog = nil
               } label: {
                 DesignSystemAsset.Image._24CancelPrimary.swiftUIImage
               }
             }
             .padding(.top, Alias.Spacing.small)
 
-            if let subTitle = subTitle {
+            if let subTitle = dialog.subTitle {
               HStack {
                 Text(subTitle)
                   .font(Typography.subBodyR)
@@ -68,24 +50,24 @@ struct DialogViewModifier: ViewModifier {
           }
 
           // MARK: Buttons
-          HStack {
+          HStack(spacing: 12) {
             Button(
-              title: LocalizedStringKey(firstButton.title),
-              leftIcon: firstButton.leftIcon,
-              rightIcon: firstButton.rightIcon,
+              title: LocalizedStringKey(dialog.firstButton.title),
+              leftIcon: dialog.firstButton.leftIcon,
+              rightIcon: dialog.firstButton.rightIcon,
               action: {
-                self.isPresented = false
-                firstButton.action?()
+                self.dialog = nil
+                dialog.firstButton.action?()
               }
             )
-            .buttonStyle(.box(level: firstButton.action == nil ? .tertiary : .primary, size: .medium, width: .low))
-            if let secondButton = secondButton {
+            .buttonStyle(.box(level: dialog.firstButton.action == nil ? .tertiary : .primary, size: .medium, width: .low))
+            if let secondButton = dialog.secondButton {
               Button(
                 title: LocalizedStringKey(secondButton.title),
                 leftIcon: secondButton.leftIcon,
                 rightIcon: secondButton.rightIcon,
                 action: {
-                  self.isPresented = false
+                  self.dialog = nil
                   secondButton.action?()
                 }
               )
@@ -94,32 +76,21 @@ struct DialogViewModifier: ViewModifier {
           }
         }
         .padding(.all, Alias.Spacing.xLarge)
-        .frame(width: 335)
         .background(Global.Color.white)
         .cornerRadius(Alias.BorderRadius.medium)
+        .padding(.horizontal, Alias.Spacing.xLarge)
         .zIndex(3)
       }
     }
-    .animation(.easeInOut(duration: 0.3), value: !self.isPresented)
+    .ignoresSafeArea()
+    .animation(.easeInOut(duration: 0.3), value: self.dialog == nil)
   }
 }
 
 extension View {
-  public func dialog(
-    title: String,
-    subTitle: String? = nil,
-    isPresented: Binding<Bool>,
-    firstButton: DialogButtonModel,
-    secondButton: DialogButtonModel? = nil
+  public func dialog<T: Dialog>(
+    dialog: Binding<T?>
   ) -> some View {
-    return self.modifier(
-      DialogViewModifier(
-        title: title,
-        subTitle: subTitle,
-        isPresented: isPresented,
-        firstButton: firstButton,
-        secondButton: secondButton
-      )
-    )
+    return self.modifier(DialogViewModifier(dialog: dialog))
   }
 }
