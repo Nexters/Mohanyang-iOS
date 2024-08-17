@@ -43,7 +43,7 @@ extension APIClient: DependencyKey {
         if isWithInterceptor {
           urlRequest = try await tokenInterceptor.adapt(urlRequest)
         }
-        Logger.shared.log(category: .network, "API Request:\n\(dump(urlRequest))")
+        Logger.shared.log(category: .network, urlRequest.asRequestLog())
 
         let (data, response) = try await session.data(for: urlRequest)
 
@@ -55,20 +55,21 @@ extension APIClient: DependencyKey {
 
         switch httpResponse.statusCode {
         case 200..<300:
+          Logger.shared.log(category: .network, urlRequest.asResponseLog(data, httpResponse))
           return (data, response)
         case 401:
           try await tokenInterceptor.retry(for: self.session)
           return try await sendRequest(request, isWithInterceptor: isWithInterceptor, retryCnt: retryCnt + 1)
         case 400..<500:
-          throw throwNetworkErr(.requestError("bad request"))
+          throw throwNetworkErr(.requestError("bad request"), statusCode: httpResponse.statusCode)
         case 500..<600:
-          throw throwNetworkErr(.serverError)
+          throw throwNetworkErr(.serverError, statusCode: httpResponse.statusCode)
         default:
-          throw throwNetworkErr(.unknownError)
+          throw throwNetworkErr(.unknownError, statusCode: httpResponse.statusCode)
         }
 
-        func throwNetworkErr(_ error: NetworkError) -> NetworkError {
-          Logger.shared.log(level: .error, category: .network, "\(error.localizedDescription):\n\(dump(error))")
+        func throwNetworkErr(_ error: NetworkError, statusCode: Int) -> NetworkError {
+          Logger.shared.log(level: .error, category: .network, "Description: \(error.localizedDescription)\nStatusCode: \(statusCode)")
           return error
         }
       }

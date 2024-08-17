@@ -8,8 +8,6 @@
 
 import Foundation
 
-import Logger
-
 import Dependencies
 import DependenciesMacros
 
