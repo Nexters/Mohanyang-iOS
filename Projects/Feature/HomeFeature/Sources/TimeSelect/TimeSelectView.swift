@@ -40,12 +40,9 @@ public struct TimeSelectView: View {
           selection: $store.selectedTime.sending(\.pickerSelection)
         )
         
-        Button(
-          icon: DesignSystemAsset.Image._32PlayPrimary.swiftUIImage,
-          action: {
-            
-          }
-        )
+        Button(icon: DesignSystemAsset.Image._32PlayPrimary.swiftUIImage) {
+          
+        }
         .buttonStyle(.round(level: .secondary))
         .padding(.bottom, 40)
       }

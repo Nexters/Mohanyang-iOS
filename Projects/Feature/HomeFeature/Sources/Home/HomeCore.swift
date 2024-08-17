@@ -116,7 +116,7 @@ public struct HomeCore {
     case .playButtonTapped:
       return .none
       
-    case .categorySelect(.presented(.dismissButtonTapped)):
+    case .categorySelect(.presented(.onDismiss)):
       state.categorySelect = nil
       return .none
       

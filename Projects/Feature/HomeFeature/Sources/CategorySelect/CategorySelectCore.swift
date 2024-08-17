@@ -8,6 +8,7 @@
 
 import PomodoroServiceInterface
 import DatabaseClientInterface
+import UserDefaultsClientInterface
 
 import ComposableArchitecture
 
@@ -22,17 +23,20 @@ public struct CategorySelectCore {
   }
   
   public enum Action {
+    case onDismiss
     case onAppear
     case dismissButtonTapped
     case bottomCheckButtonTapped
     
     case getCategoryListResponse(Result<[PomodoroCategory], Error>)
     
+    case setSelectedCategory(PomodoroCategory?)
     case selectCategory(PomodoroCategory)
   }
   
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(UserDefaultsClient.self) var userDefaultsClient
   
   public init() {}
   
@@ -42,6 +46,9 @@ public struct CategorySelectCore {
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
+    case .onDismiss:
+      return .none
+      
     case .onAppear:
       return .run { send in
         await send(
@@ -53,19 +60,38 @@ public struct CategorySelectCore {
             }
           )
         )
+        let selectedCategory = try await self.pomodoroService.getSelectedCategory(
+          userDefaultsClient: self.userDefaultsClient,
+          databaseClient: self.databaseClient
+        )
+        await send(.setSelectedCategory(selectedCategory))
       }
       
     case .dismissButtonTapped:
-      return .none
+      return .run { send in
+        await send(.onDismiss)
+      }
       
     case .bottomCheckButtonTapped:
-      return .none
+      return .run { [selectedCategory = state.selectedCategory] send in
+        if let selectedCategory {
+          await self.pomodoroService.changeSelectedCategory(
+            userDefaultsClient: self.userDefaultsClient,
+            categoryID: selectedCategory.id
+          )
+        }
+        await send(.onDismiss)
+      }
       
     case let .getCategoryListResponse(.success(response)):
       state.categoryList = response
       return .none
       
     case .getCategoryListResponse(.failure):
+      return .none
+      
+    case let .setSelectedCategory(category):
+      state.selectedCategory = category
       return .none
       
     case let .selectCategory(category):

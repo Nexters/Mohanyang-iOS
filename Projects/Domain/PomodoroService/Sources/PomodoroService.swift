@@ -32,7 +32,7 @@ extension PomodoroService: DependencyKey {
       },
       getSelectedCategory: { userDefaultsClient, databaseClient in
         let selectedCategoryID = userDefaultsClient.integerForKey(selectedCategoryKey)
-        let results = try await databaseClient.read(PomodoroCategory.self, predicateFormat: "no == %d", args: selectedCategoryID)
+        let results = try await databaseClient.read(PomodoroCategory.self, predicateFormat: "#no == %d", args: selectedCategoryID)
         return results.first
       }
     )
