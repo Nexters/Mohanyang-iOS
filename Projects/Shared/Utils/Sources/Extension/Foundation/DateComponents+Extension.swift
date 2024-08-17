@@ -119,3 +119,42 @@ extension DateComponents.DurationParsingError: LocalizedError {
     }
   }
 }
+
+extension DateComponents {
+  public func to8601String() -> String {
+    var components = "P"
+    
+    if let year = year, year > 0 {
+      components += "\(year)Y"
+    }
+    if let month = month, month > 0 {
+      components += "\(month)M"
+    }
+    if let day = day, day > 0 {
+      components += "\(day)D"
+    }
+    
+    var timeComponents = ""
+    
+    if let hour = hour, hour > 0 {
+      timeComponents += "\(hour)H"
+    }
+    if let minute = minute, minute > 0 {
+      timeComponents += "\(minute)M"
+    }
+    if let second = second, second > 0 {
+      timeComponents += "\(second)S"
+    }
+    
+    if !timeComponents.isEmpty {
+      components += "T" + timeComponents
+    }
+    
+    // ISO 8601 duration strings with only time components must start with 'PT'
+    if components == "P" && !timeComponents.isEmpty {
+      components = "PT" + timeComponents
+    }
+    
+    return components
+  }
+}
