@@ -63,13 +63,13 @@ public struct OnboardingView: View {
         Alias.Color.Background.primary
           .ignoresSafeArea()
       }
-      .onAppear { store.send(.onApear) }
       .navigationDestination(
         item: $store.scope(state: \.selectCat, action: \.selectCat)
       ) { store in
         SelectCatView(store: store)
       }
     }
+    .onAppear { store.send(.onApear) }
     .background {
       GeometryReader { geometry in
         Color.clear
