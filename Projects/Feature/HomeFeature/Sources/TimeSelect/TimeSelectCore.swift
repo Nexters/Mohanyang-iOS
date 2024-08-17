@@ -116,6 +116,11 @@ public struct TimeSelectCore {
             categoryID: selectedCategoryID,
             request: request
           )
+          
+          try await self.pomodoroService.syncCategoryList(
+            apiClient: self.apiClient,
+            databaseClient: self.databaseClient
+          )
         }
         
         await self.dismiss()
