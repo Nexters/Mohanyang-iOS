@@ -61,15 +61,15 @@ extension APIClient: DependencyKey {
           try await tokenInterceptor.retry(for: self.session)
           return try await sendRequest(request, isWithInterceptor: isWithInterceptor, retryCnt: retryCnt + 1)
         case 400..<500:
-          throw throwNetworkErr(.requestError("bad request"))
+          throw throwNetworkErr(.requestError("bad request"), statusCode: httpResponse.statusCode)
         case 500..<600:
-          throw throwNetworkErr(.serverError)
+          throw throwNetworkErr(.serverError, statusCode: httpResponse.statusCode)
         default:
-          throw throwNetworkErr(.unknownError)
+          throw throwNetworkErr(.unknownError, statusCode: httpResponse.statusCode)
         }
 
-        func throwNetworkErr(_ error: NetworkError) -> NetworkError {
-          Logger.shared.log(level: .error, category: .network, "\(error.localizedDescription):\n\(dump(error))")
+        func throwNetworkErr(_ error: NetworkError, statusCode: Int) -> NetworkError {
+          Logger.shared.log(level: .error, category: .network, "Description: \(error.localizedDescription)\nStatusCode: \(statusCode)")
           return error
         }
       }
