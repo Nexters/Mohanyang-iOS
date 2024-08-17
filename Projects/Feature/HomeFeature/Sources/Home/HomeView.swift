@@ -49,12 +49,11 @@ public struct HomeView: View {
           }
           VStack(spacing: Alias.Spacing.medium) {
             Button(
-              title: "\("기본")",
-              leftIcon: Image(systemName: "left"),
-              action: {
-                store.send(.categoryButtonTapped)
-              }
-            )
+              title: .init(store.selectedCategory?.title ?? ""),
+              leftIcon: store.selectedCategory?.image
+            ) {
+              store.send(.categoryButtonTapped)
+            }
             .buttonStyle(.box(level: .tertiary, size: .small))
             .setTooltipTarget(tooltip: HomeCategoryGuideTooltip.self)
             
@@ -63,7 +62,7 @@ public struct HomeView: View {
                 Text("집중")
                   .font(Typography.bodySB)
                   .foregroundStyle(Global.Color.gray500)
-                Text("\(0)분")
+                Text("\(store.selectedCategory?.focusTimeMinute ?? 0)분")
                   .font(Typography.header3)
                   .foregroundStyle(Alias.Color.Text.secondary)
               }
@@ -80,13 +79,13 @@ public struct HomeView: View {
                 Text("휴식")
                   .font(Typography.bodySB)
                   .foregroundStyle(Global.Color.gray500)
-                Text("\(0)분")
+                Text("\(store.selectedCategory?.restTimeMinute ?? 0)분")
                   .font(Typography.header3)
                   .foregroundStyle(Alias.Color.Text.secondary)
               }
               .padding(Alias.Spacing.small)
               .onTapGesture {
-                store.send(.relaxTimeButtonTapped)
+                store.send(.restTimeButtonTapped)
               }
             }
             .padding(.horizontal, 8)
@@ -125,6 +124,9 @@ public struct HomeView: View {
     }
     .onLoad {
       store.send(.onLoad)
+    }
+    .onAppear {
+      store.send(.onAppear)
     }
   }
 }

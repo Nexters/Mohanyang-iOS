@@ -121,7 +121,7 @@ extension DateComponents.DurationParsingError: LocalizedError {
 }
 
 extension DateComponents {
-  public func to8601String() -> String {
+  public func to8601DurationString() -> String {
     var components = "P"
     
     if let year = year, year > 0 {

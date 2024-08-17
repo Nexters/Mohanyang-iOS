@@ -100,8 +100,7 @@ public struct TimeSelectCore {
       ] send in
         if let selectedCategoryID = selectedCategory?.id,
            let selectedTime = selectedTime?.minute {
-          
-          let selectedTimeDuration = DateComponents(minute: selectedTime).to8601String()
+          let selectedTimeDuration = DateComponents(minute: selectedTime).to8601DurationString()
           var request: EditCategoryRequest
           
           switch mode {
@@ -115,11 +114,6 @@ public struct TimeSelectCore {
             apiClient: self.apiClient,
             categoryID: selectedCategoryID,
             request: request
-          )
-          
-          try await self.pomodoroService.syncCategoryList(
-            apiClient: self.apiClient,
-            databaseClient: self.databaseClient
           )
         }
         
