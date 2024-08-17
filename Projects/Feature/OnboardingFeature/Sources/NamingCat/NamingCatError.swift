@@ -10,7 +10,9 @@ import Foundation
 import DesignSystem
 
 enum NamingCatError {
-  case hasSpecialCharacter, exceedsMaxLength, startsWithWhiteSpace
+  case hasSpecialCharacter
+  case exceedsMaxLength
+  case startsWithWhiteSpace
 }
 
 extension NamingCatError: InputFieldErrorProtocol {

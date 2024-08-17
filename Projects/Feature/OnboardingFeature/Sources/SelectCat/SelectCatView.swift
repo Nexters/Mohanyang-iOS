@@ -73,7 +73,6 @@ public struct SelectCatView: View {
       }
       .padding(.horizontal, 20)
     }
-    .onAppear { store.send(.onAppear) }
     .background {
       Alias.Color.Background.primary
         .ignoresSafeArea()
@@ -83,6 +82,7 @@ public struct SelectCatView: View {
     ) { store in
       NamingCatView(store: store)
     }
+    .onAppear { store.send(.onAppear) }
   }
 }
 

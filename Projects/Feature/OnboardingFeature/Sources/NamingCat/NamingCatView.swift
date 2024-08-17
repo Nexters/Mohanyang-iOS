@@ -60,12 +60,12 @@ struct NamingCatView: View {
       }
       .padding(.horizontal, 20)
     }
-    .onAppear { store.send(.onAppear) }
     .background {
       Alias.Color.Background.primary
         .ignoresSafeArea()
     }
     .tooltipDestination(tooltip: $store.tooltip)
+    .onAppear { store.send(.onAppear) }
   }
 }
 

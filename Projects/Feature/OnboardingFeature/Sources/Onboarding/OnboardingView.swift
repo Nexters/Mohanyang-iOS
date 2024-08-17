@@ -69,13 +69,13 @@ public struct OnboardingView: View {
         SelectCatView(store: store)
       }
     }
-    .onAppear { store.send(.onApear) }
     .background {
       GeometryReader { geometry in
         Color.clear
           .onAppear { store.width = geometry.size.width }
       }
     }
+    .onAppear { store.send(.onApear) }
   }
 }
 

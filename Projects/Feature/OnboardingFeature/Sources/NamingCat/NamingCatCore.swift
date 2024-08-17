@@ -6,6 +6,7 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import UserDefaultsClientInterface
 import APIClientInterface
 import CatServiceInterface
 
@@ -32,6 +33,7 @@ public struct NamingCatCore {
     case binding(BindingAction<State>)
   }
   
+  @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(APIClient.self) var apiClient
   @Dependency(CatService.self) var catService
 
@@ -43,6 +45,8 @@ public struct NamingCatCore {
   }
 
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
+    let isOnboardedKey = "mohanyang_userdefaults_isOnboarded"
+
     switch action {
     case .onAppear:
       return .none
@@ -53,6 +57,7 @@ public struct NamingCatCore {
           apiClient: apiClient,
           name: text
         )
+        await userDefaultsClient.setBool(true, key: isOnboardedKey)
         await send(.moveToHome)
       }
 

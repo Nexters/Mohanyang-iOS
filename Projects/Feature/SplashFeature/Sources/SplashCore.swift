@@ -34,6 +34,7 @@ public struct SplashCore {
   public init() { }
 
   let deviceIDKey =  "mohanyang_keychain_device_id"
+  let isOnboardedKey = "mohanyang_userdefaults_isOnboarded"
 
   @Dependency(APIClient.self) var apiClient
   @Dependency(AuthService.self) var authService
@@ -75,15 +76,14 @@ extension SplashCore {
       )
 
       try await Task.sleep(for: .seconds(1.5))
-
-      userDefaultsClient.boolForKey(UserDefaultsKeys.isOnboarded.rawValue) ?
+      userDefaultsClient.boolForKey(isOnboardedKey) ?
       await send(.moveToHome) : await send(.moveToOnboarding)
     }
   }
 
   private func getDeviceUUID() -> String {
     guard let uuid = UIDevice.current.identifierForVendor?.uuidString,
-          keychainClient.create(key: "mohanyang_keychain_device_id", data: uuid) else {
+          keychainClient.create(key: deviceIDKey, data: uuid) else {
       return ""
     }
     return uuid
