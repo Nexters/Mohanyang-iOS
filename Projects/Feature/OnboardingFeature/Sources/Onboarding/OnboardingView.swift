@@ -104,9 +104,3 @@ struct OnboardingCarouselContentView: View {
     .frame(width: width, height: 350)
   }
 }
-
-struct OnboardingView_Previews: PreviewProvider {
-  static var previews: some View {
-    OnboardingView(store: Store(initialState: OnboardingCore.State()) { OnboardingCore() })
-  }
-}

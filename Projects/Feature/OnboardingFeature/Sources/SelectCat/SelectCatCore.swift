@@ -18,19 +18,22 @@ import ComposableArchitecture
 public struct SelectCatCore {
   @ObservableState
   public struct State: Equatable {
+    public init() { }
     var catList: [AnyCat] = []
-    //var catType: CatType? = nil
     var selectedCat: AnyCat? = nil
+    @Presents var namingCat: NamingCatCore.State?
   }
   
   public enum Action: BindableAction {
     case onAppear
     case selectCat(AnyCat)
     case tapNextButton
+    case moveToNamingCat
     case _fetchCatListRequest
     case _fetchCatListResponse(CatList)
     case _selectCatRequest
     case binding(BindingAction<State>)
+    case namingCat(PresentationAction<NamingCatCore.Action>)
   }
   
   public init() {}
@@ -43,6 +46,9 @@ public struct SelectCatCore {
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce(self.core)
+      .ifLet(\.$namingCat, action: \.namingCat) {
+        NamingCatCore()
+      }
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -56,6 +62,11 @@ public struct SelectCatCore {
 
     case .tapNextButton:
       return .run { send in await send(._selectCatRequest) }
+
+    case .moveToNamingCat:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.namingCat = NamingCatCore.State(selectedCat: selectedCat)
+      return .none
 
     case ._fetchCatListRequest:
       return .run { send in
@@ -79,10 +90,13 @@ public struct SelectCatCore {
         _ = try await userService.selectCat(no: selectedCat.no, apiClient: apiClient)
         // user notification 요청
         _ = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
-        // go to naming cat
+        await send(.moveToNamingCat)
       }
 
     case .binding:
+      return .none
+
+    case .namingCat:
       return .none
     }
   }

@@ -20,6 +20,60 @@ struct NamingCatView: View {
   }
   
   var body: some View {
-    Text("namingCat")
+    NavigationContainer(
+      title: Text("고양이 이름짓기"),
+      style: .navigation
+    ) {
+      VStack(spacing: 40) {
+        Spacer()
+
+        ZStack {
+          Rectangle()
+            .foregroundStyle(Alias.Color.Background.secondary)
+            .frame(height: 240)
+          store.selectedCat.catImage
+            .setTooltipTarget(tooltip: DownDirectionTooltip.self)
+        }
+
+        VStack(spacing: Alias.Spacing.small) {
+          HStack {
+            Text("내 고양이의 이름")
+              .font(Typography.subBodyR)
+              .foregroundStyle(Alias.Color.Text.secondary)
+              .padding(.leading, Alias.Spacing.xSmall)
+            Spacer()
+          }
+          InputField(
+            placeholder: store.selectedCat.name,
+            text: $store.text,
+            fieldError: $store.inputFieldError
+          )
+        }
+
+        Spacer()
+
+        Button(title: "시작하기") {
+          store.send(.tapStartButton)
+        }
+        .buttonStyle(.box(level: .primary, size: .large, width: .low))
+        .disabled(store.inputFieldError != nil || store.text == "")
+      }
+      .padding(.horizontal, 20)
+    }
+    .onAppear { store.send(.onAppear) }
+    .background {
+      Alias.Color.Background.primary
+        .ignoresSafeArea()
+    }
+    .tooltipDestination(tooltip: $store.tooltip)
   }
+}
+
+struct DownDirectionTooltip: Tooltip {
+  var title: Text { Text("반갑다냥! 내 이름을 지어줄래냥?") }
+  var color: TooltipColor { .white }
+  var direction: TooltipDirection { .down }
+  var targetCornerRadius: CGFloat? { Alias.BorderRadius.small }
+  var dimEnabled: Bool { false }
+  var padding: CGFloat { 12 }
 }
