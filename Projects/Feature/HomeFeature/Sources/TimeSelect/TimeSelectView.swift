@@ -24,12 +24,15 @@ public struct TimeSelectView: View {
       style: .modal
     ) {
       VStack(spacing: .zero) {
-        Button(
-          title: "작업",
-          leftIcon: DesignSystemAsset.Image._24WorkPrimary.swiftUIImage,
-          action: {}
-        )
-        .buttonStyle(.text(level: .primary, size: .medium))
+        if let selectedCategory = store.selectedCategory {
+          Button(
+            title: .init(selectedCategory.title),
+            leftIcon: selectedCategory.image
+          ) {
+            // no behavior
+          }
+          .buttonStyle(.text(level: .primary, size: .medium))
+        }
         
         WheelPicker(
           image: DesignSystemAsset.Image._24Focus.swiftUIImage,

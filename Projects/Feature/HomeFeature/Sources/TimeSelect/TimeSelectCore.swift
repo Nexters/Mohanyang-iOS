@@ -9,6 +9,7 @@
 import Foundation
 
 import FeedbackGeneratorClientInterface
+import PomodoroServiceInterface
 
 import ComposableArchitecture
 
@@ -18,6 +19,7 @@ public struct TimeSelectCore {
   public struct State: Equatable {
     var timeList: [TimeItem] = []
     var selectedTime: TimeItem?
+    var selectedCategory: PomodoroCategory?
     
     public init() {}
   }
