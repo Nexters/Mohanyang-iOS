@@ -65,6 +65,5 @@ struct NamingCatView: View {
         .ignoresSafeArea()
     }
     .tooltipDestination(tooltip: $store.tooltip.sending(\.setTooltip))
-    .onAppear { store.send(.onAppear) }
   }
 }
