@@ -73,11 +73,16 @@ public struct SelectCatView: View {
       }
       .padding(.horizontal, 20)
     }
-    .onAppear { store.send(.onAppear) }
     .background {
       Alias.Color.Background.primary
         .ignoresSafeArea()
     }
+    .navigationDestination(
+      item: $store.scope(state: \.namingCat, action: \.namingCat)
+    ) { store in
+      NamingCatView(store: store)
+    }
+    .onAppear { store.send(.onAppear) }
   }
 }
 

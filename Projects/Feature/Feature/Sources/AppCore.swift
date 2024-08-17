@@ -95,7 +95,12 @@ public struct AppCore {
 
     case .home:
       return .none
-      
+
+    case .onboarding(.selectCat(.presented(.namingCat(.presented(.moveToHome))))):
+      state.onboarding = nil
+      state.home = HomeCore.State()
+      return .none
+
     case .onboarding:
       return .none
     }

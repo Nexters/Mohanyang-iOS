@@ -33,6 +33,7 @@ public struct AppView: View {
         Color.red
       }
     }
+    .transition(.opacity)
     .onAppear {
       store.send(.onAppear)
     }

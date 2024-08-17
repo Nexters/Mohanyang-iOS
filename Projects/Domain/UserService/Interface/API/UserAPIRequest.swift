@@ -10,7 +10,7 @@ import Foundation
 import APIClientInterface
 
 public enum UserAPIrequest {
-  case fetchCatList, selectCat(Int)
+  case selectCat(Int)
 }
 
 extension UserAPIrequest: APIBaseRequest {
@@ -20,8 +20,6 @@ extension UserAPIrequest: APIBaseRequest {
 
   public var path: String {
     switch self {
-    case .fetchCatList:
-      return "/api/v1/cats"
     case .selectCat:
       return "/api/v1/users/cats"
     }
@@ -29,8 +27,6 @@ extension UserAPIrequest: APIBaseRequest {
 
   public var method: HTTPMethod {
     switch self {
-    case .fetchCatList:
-      return .get
     case .selectCat:
       return .put
     }
@@ -38,8 +34,6 @@ extension UserAPIrequest: APIBaseRequest {
 
   public var parameters: RequestParams {
     switch self {
-    case .fetchCatList:
-      return .requestPlain
     case .selectCat(let no):
       let dto = UserDTO.Request.SelectCatRequestDTO(catNo: no)
       return .body(dto)

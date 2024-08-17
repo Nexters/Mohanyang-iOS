@@ -63,7 +63,6 @@ public struct OnboardingView: View {
         Alias.Color.Background.primary
           .ignoresSafeArea()
       }
-      .onAppear { store.send(.onApear) }
       .navigationDestination(
         item: $store.scope(state: \.selectCat, action: \.selectCat)
       ) { store in
@@ -76,6 +75,7 @@ public struct OnboardingView: View {
           .onAppear { store.width = geometry.size.width }
       }
     }
+    .onAppear { store.send(.onApear) }
   }
 }
 
@@ -102,11 +102,5 @@ struct OnboardingCarouselContentView: View {
       .multilineTextAlignment(.center)
     }
     .frame(width: width, height: 350)
-  }
-}
-
-struct OnboardingView_Previews: PreviewProvider {
-  static var previews: some View {
-    OnboardingView(store: Store(initialState: OnboardingCore.State()) { OnboardingCore() })
   }
 }

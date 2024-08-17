@@ -27,7 +27,6 @@ public struct InputField<T: InputFieldErrorProtocol>: View {
     self._fieldError = fieldError
   }
 
-  // MARK: Placeholder Color를 TextFieldStyle 내부에서 변경하는 방법 Plz...
   public var body: some View {
     VStack(spacing: Alias.Spacing.small) {
       TextField(

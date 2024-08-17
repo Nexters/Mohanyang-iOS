@@ -8,8 +8,6 @@
 
 import Foundation
 
-public typealias CatList = [UserDTO.Response.GetCatListResponseDTO]
-
 public enum UserDTO {
   public enum Request { }
   public enum Response { }
@@ -22,11 +20,5 @@ public extension UserDTO.Request {
 }
 
 public extension UserDTO.Response {
-  struct GetCatListResponseDTO: Equatable, Decodable {
-    public var no: Int
-    public var name: String
-    public var type: String
-  }
 
-  struct SelectCatResponseDTO: Decodable { }
 }
