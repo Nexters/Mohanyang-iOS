@@ -19,4 +19,11 @@ extension String {
       .joined()
     return camelCased
   }
+
+  public func containsWhitespaceOrSpecialCharacters() -> Bool {
+    let pattern = "[^a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]"
+    let regex = try! NSRegularExpression(pattern: pattern)
+    let range = NSRange(location: 0, length: self.utf16.count)
+    return regex.firstMatch(in: self, options: [], range: range) != nil
+  }
 }

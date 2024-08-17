@@ -28,6 +28,7 @@ public struct NamingCatCore {
   public enum Action: BindableAction {
     case onAppear
     case tapStartButton
+    case moveToHome
     case binding(BindingAction<State>)
   }
   
@@ -40,17 +41,46 @@ public struct NamingCatCore {
     BindingReducer()
     Reduce(self.core)
   }
-  
+
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
       return .none
 
     case .tapStartButton:
+      return .run { [text = state.text] send in
+        _ = try await catService.changeCatName(
+          apiClient: apiClient,
+          name: text
+        )
+        await send(.moveToHome)
+      }
+
+    case .moveToHome:
+      return .none
+
+    case .binding(\.text):
+      state.inputFieldError = setError(state.text)
       return .none
 
     case .binding:
       return .none
     }
+  }
+
+  private func setError(_ text: String) -> NamingCatError? {
+    var error: NamingCatError? = nil
+
+    if text == " " {
+      error = .startsWithWhiteSpace
+    } else if text.count > 10 {
+      error = .exceedsMaxLength
+    } else if text.containsWhitespaceOrSpecialCharacters() {
+      error = .hasSpecialCharacter
+    } else {
+      error = nil
+    }
+
+    return error
   }
 }
