@@ -20,7 +20,7 @@ public struct APIClient {
 
   public func apiRequest<T: Decodable>(
     request: APIBaseRequest,
-    as: T.Type = T.self,
+    as: T.Type,
     isWithInterceptor: Bool = true
   ) async throws -> T {
     let (data, _) = try await self.apiRequest(request, isWithInterceptor)

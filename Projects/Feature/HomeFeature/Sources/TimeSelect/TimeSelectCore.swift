@@ -11,6 +11,7 @@ import Foundation
 import FeedbackGeneratorClientInterface
 import PomodoroServiceInterface
 import UserDefaultsClientInterface
+import APIClientInterface
 import DatabaseClientInterface
 
 import ComposableArchitecture
@@ -19,23 +20,34 @@ import ComposableArchitecture
 public struct TimeSelectCore {
   @ObservableState
   public struct State: Equatable {
+    let mode: Mode
     var timeList: [TimeItem] = []
     var selectedTime: TimeItem?
     var selectedCategory: PomodoroCategory?
     
-    public init() {}
+    public init(mode: Mode) {
+      self.mode = mode
+    }
   }
   
   public enum Action {
     case onAppear
     case pickerSelection(TimeItem?)
     case setSelectedCategory(PomodoroCategory?)
+    case bottomCheckButtonTapped
+  }
+  
+  public enum Mode {
+    case focus
+    case rest
   }
   
   @Dependency(FeedbackGeneratorClient.self) var feedbackGeneratorClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(APIClient.self) var apiClient
   @Dependency(PomodoroService.self) var pomodoroService
+  @Dependency(\.dismiss) var dismiss
   
   public init() {}
   
@@ -46,8 +58,14 @@ public struct TimeSelectCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
-      state.timeList = generateFocusTimeByMinute().map { .init(title: "\($0):00", data: $0) }
-      state.selectedTime = state.timeList.last
+      switch state.mode {
+      case .focus:
+        state.timeList = generateFocusTimeByMinute().map { TimeItem(minute: $0) }
+      case .rest:
+        state.timeList = generateRestTimeByMinute().map { TimeItem(minute: $0) }
+      }
+      
+      //      state.selectedTime = state.timeList.last
       return .run { send in
         let selectedCategory = try await self.pomodoroService.getSelectedCategory(
           userDefaultsClient: self.userDefaultsClient,
@@ -64,7 +82,46 @@ public struct TimeSelectCore {
       
     case let .setSelectedCategory(category):
       state.selectedCategory = category
+      if let category {
+        switch state.mode {
+        case .focus:
+          state.selectedTime = TimeItem(minute: category.focusTimeMinute)
+        case .rest:
+          state.selectedTime = TimeItem(minute: category.restTimeMinute)
+        }
+      } else {
+        state.selectedTime = state.timeList.last
+      }
       return .none
+      
+    case .bottomCheckButtonTapped:
+      return .run { [
+        mode = state.mode,
+        selectedTime = state.selectedTime,
+        selectedCategory = state.selectedCategory
+      ] send in
+        if let selectedCategoryID = selectedCategory?.id,
+           let selectedTime = selectedTime?.minute {
+          
+          let selectedTimeDuration = DateComponents(minute: selectedTime).to8601String()
+          var request: EditCategoryRequest
+          
+          switch mode {
+          case .focus:
+            request = EditCategoryRequest(focusTime: selectedTimeDuration, restTime: nil)
+          case .rest:
+            request = EditCategoryRequest(focusTime: nil, restTime: selectedTimeDuration)
+          }
+          
+          try await self.pomodoroService.changeCategoryTime(
+            apiClient: self.apiClient,
+            categoryID: selectedCategoryID,
+            request: request
+          )
+        }
+        
+        await self.dismiss()
+      }
     }
   }
   
@@ -78,11 +135,28 @@ public struct TimeSelectCore {
   }
   
   /// 휴식시간 리스트 생성 (분)
-  private func generateRelaxTimeByMinute() -> [Int] {
+  private func generateRestTimeByMinute() -> [Int] {
     var result: [Int] = []
     for i in stride(from: 5, through: 30, by: 5) {
       result.append(i)
     }
     return result.reversed()
+  }
+}
+
+public struct TimeItem: WheelPickerData {
+  public let id: UUID = .init()
+  let minute: Int
+  
+  init(minute: Int) {
+    self.minute = minute
+  }
+  
+  var title: String {
+    return "\(minute):00"
+  }
+  
+  var data: Int {
+    return minute
   }
 }

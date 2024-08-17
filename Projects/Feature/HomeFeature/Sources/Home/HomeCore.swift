@@ -103,11 +103,11 @@ public struct HomeCore {
       return .none
       
     case .focusTimeButtonTapped:
-      state.timeSelect = TimeSelectCore.State()
+      state.timeSelect = TimeSelectCore.State(mode: .focus)
       return .none
       
     case .relaxTimeButtonTapped:
-      state.timeSelect = TimeSelectCore.State()
+      state.timeSelect = TimeSelectCore.State(mode: .rest)
       return .none
       
     case .mypageButtonTappd:

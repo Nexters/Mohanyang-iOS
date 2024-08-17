@@ -7,6 +7,7 @@
 
 @_spi(Internal)
 import PomodoroServiceInterface
+import APIClientInterface
 
 import Dependencies
 
@@ -17,7 +18,8 @@ extension PomodoroService: DependencyKey {
   
   private static func live() -> PomodoroService {
     return .init(
-      syncCategoryList: { apiClient, databaseClient in
+      syncCategoryList: {
+        apiClient, databaseClient in
         let api = CategoryAPI.getCategoryList
         let categoryList = try await apiClient.apiRequest(request: api, as: [PomodoroCategory].self)
         for category in categoryList {
@@ -34,6 +36,10 @@ extension PomodoroService: DependencyKey {
         let selectedCategoryID = userDefaultsClient.integerForKey(selectedCategoryKey)
         let results = try await databaseClient.read(PomodoroCategory.self, predicateFormat: "#no == %d", args: selectedCategoryID)
         return results.first
+      },
+      changeCategoryTime: { apiClient, categoryID, request in
+        let api = CategoryAPI.editCategory(id: categoryID, request: request)
+        _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
       }
     )
   }

@@ -9,12 +9,12 @@
 import Foundation
 
 public struct EditCategoryRequest: Encodable {
-  let focusTime: String
-  let restTime: String
+  let focusTime: String?
+  let restTime: String?
   
   public init(
-    focusTime: String,
-    restTime: String
+    focusTime: String?,
+    restTime: String?
   ) {
     self.focusTime = focusTime
     self.restTime = restTime
