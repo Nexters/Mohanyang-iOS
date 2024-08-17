@@ -27,9 +27,9 @@ public struct NamingCatCore {
   }
   
   public enum Action: BindableAction {
-    case onAppear
     case tapStartButton
     case moveToHome
+    case setTooltip(DownDirectionTooltip?)
     case binding(BindingAction<State>)
   }
   
@@ -48,9 +48,6 @@ public struct NamingCatCore {
     let isOnboardedKey = "mohanyang_userdefaults_isOnboarded"
 
     switch action {
-    case .onAppear:
-      return .none
-
     case .tapStartButton:
       return .run { [text = state.text] send in
         _ = try await catService.changeCatName(
@@ -62,6 +59,9 @@ public struct NamingCatCore {
       }
 
     case .moveToHome:
+      return .none
+      
+    case .setTooltip:
       return .none
 
     case .binding(\.text):

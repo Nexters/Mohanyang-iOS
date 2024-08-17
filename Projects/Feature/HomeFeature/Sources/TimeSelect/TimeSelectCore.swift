@@ -9,6 +9,9 @@
 import Foundation
 
 import FeedbackGeneratorClientInterface
+import PomodoroServiceInterface
+import UserDefaultsClientInterface
+import DatabaseClientInterface
 
 import ComposableArchitecture
 
@@ -18,6 +21,7 @@ public struct TimeSelectCore {
   public struct State: Equatable {
     var timeList: [TimeItem] = []
     var selectedTime: TimeItem?
+    var selectedCategory: PomodoroCategory?
     
     public init() {}
   }
@@ -25,9 +29,13 @@ public struct TimeSelectCore {
   public enum Action {
     case onAppear
     case pickerSelection(TimeItem?)
+    case setSelectedCategory(PomodoroCategory?)
   }
   
   @Dependency(FeedbackGeneratorClient.self) var feedbackGeneratorClient
+  @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(PomodoroService.self) var pomodoroService
   
   public init() {}
   
@@ -40,13 +48,23 @@ public struct TimeSelectCore {
     case .onAppear:
       state.timeList = generateFocusTimeByMinute().map { .init(title: "\($0):00", data: $0) }
       state.selectedTime = state.timeList.last
-      return .none
+      return .run { send in
+        let selectedCategory = try await self.pomodoroService.getSelectedCategory(
+          userDefaultsClient: self.userDefaultsClient,
+          databaseClient: self.databaseClient
+        )
+        await send(.setSelectedCategory(selectedCategory))
+      }
       
     case let .pickerSelection(selection):
       state.selectedTime = selection
       return .run { _ in
         await self.feedbackGeneratorClient.impactOccurred(.soft)
       }
+      
+    case let .setSelectedCategory(category):
+      state.selectedCategory = category
+      return .none
     }
   }
   

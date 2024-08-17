@@ -13,7 +13,6 @@ import RealmSwift
 public protocol Persistable where Self: Decodable {
   associatedtype ManagedObject: Object
   
-  var id: UUID { get set }
   init(managedObject: ManagedObject)
   func managedObject() -> ManagedObject
 }

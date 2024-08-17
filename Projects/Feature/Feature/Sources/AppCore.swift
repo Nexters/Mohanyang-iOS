@@ -28,7 +28,7 @@ public struct AppCore {
   }
   
   public enum Action {
-    case onAppear
+    case onLoad
     case appDelegate(AppDelegateCore.Action)
     case didChangeScenePhase(ScenePhase)
     case splash(SplashCore.Action)
@@ -56,7 +56,7 @@ public struct AppCore {
   
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
-    case .onAppear:
+    case .onLoad:
       state.splash = SplashCore.State()
       return .none
       

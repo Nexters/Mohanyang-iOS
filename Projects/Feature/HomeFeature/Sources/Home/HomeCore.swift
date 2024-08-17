@@ -10,6 +10,9 @@ import UserNotifications
 
 import PushService
 import UserDefaultsClientInterface
+import DatabaseClientInterface
+import PomodoroServiceInterface
+import APIClientInterface
 
 import ComposableArchitecture
 
@@ -43,6 +46,9 @@ public struct HomeCore {
   }
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(APIClient.self) var apiClient
+  @Dependency(PomodoroService.self) var pomodoroService
   let isHomeGuideCompletedKey = "mohanyang_userdefaults_isHomeGuideCompleted"
   
   public init() {}
@@ -60,13 +66,22 @@ public struct HomeCore {
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
     case .onLoad:
-      return .run { send in
-        await send(.setHomeCatTooltip(nil))
-        if self.userDefaultsClient.boolForKey(isHomeGuideCompletedKey) == false {
-          await self.userDefaultsClient.setBool(true, key: isHomeGuideCompletedKey)
-          await send(.setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip()))
+      return .merge(
+        .run {
+          send in
+          await send(.setHomeCatTooltip(nil))
+          if self.userDefaultsClient.boolForKey(isHomeGuideCompletedKey) == false {
+            await self.userDefaultsClient.setBool(true, key: isHomeGuideCompletedKey)
+            await send(.setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip()))
+          }
+        },
+        .run { _ in
+          try await self.pomodoroService.syncCategoryList(
+            apiClient: self.apiClient,
+            databaseClient: self.databaseClient
+          )
         }
-      }
+      )
       
     case .setHomeCatTooltip:
       state.homeCatTooltip = .init(title: "오랜만이다냥") // TODO: - 문구 랜덤변경하기
@@ -101,7 +116,7 @@ public struct HomeCore {
     case .playButtonTapped:
       return .none
       
-    case .categorySelect(.presented(.dismissButtonTapped)):
+    case .categorySelect(.presented(.onDismiss)):
       state.categorySelect = nil
       return .none
       

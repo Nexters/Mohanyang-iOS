@@ -64,16 +64,6 @@ struct NamingCatView: View {
       Alias.Color.Background.primary
         .ignoresSafeArea()
     }
-    .tooltipDestination(tooltip: $store.tooltip)
-    .onAppear { store.send(.onAppear) }
+    .tooltipDestination(tooltip: $store.tooltip.sending(\.setTooltip))
   }
-}
-
-struct DownDirectionTooltip: Tooltip {
-  var title: Text { Text("반갑다냥! 내 이름을 지어줄래냥?") }
-  var color: TooltipColor { .white }
-  var direction: TooltipDirection { .down }
-  var targetCornerRadius: CGFloat? { Alias.BorderRadius.small }
-  var dimEnabled: Bool { false }
-  var padding: CGFloat { 12 }
 }

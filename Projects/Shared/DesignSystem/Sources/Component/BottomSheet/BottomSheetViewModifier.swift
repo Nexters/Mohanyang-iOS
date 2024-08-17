@@ -19,6 +19,9 @@ struct BottomSheetViewModifier<
     ZStack(alignment: .bottom) {
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .transaction { transaction in
+          transaction.disablesAnimations = true
+        }
         .zIndex(1)
       
       if let item {
