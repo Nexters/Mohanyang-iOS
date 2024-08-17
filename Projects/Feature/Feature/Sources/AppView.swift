@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+import DesignSystem
 import SplashFeature
 import HomeFeature
 import OnboardingFeature
@@ -25,17 +26,18 @@ public struct AppView: View {
     Group {
       if let splashStore = store.scope(state: \.splash, action: \.splash) {
         SplashView(store: splashStore)
-      } else if let homeStore = store.scope(state: \.home, action: \.home) {
-        HomeView(store: homeStore)
       } else if let onboardingStore = store.scope(state: \.onboarding, action: \.onboarding) {
         OnboardingView(store: onboardingStore)
+      } else if let homeStore = store.scope(state: \.home, action: \.home) {
+        HomeView(store: homeStore)
       } else {
-        Color.red
+        Global.Color.black // MARK: - DB정보 없고 오프라인일때 Dialog 띄우기
       }
     }
     .transition(.opacity)
-    .onAppear {
-      store.send(.onAppear)
+    .animation(.easeInOut, value: store.home == nil)
+    .onLoad {
+      store.send(.onLoad)
     }
   }
 }
