@@ -43,7 +43,7 @@ extension APIClient: DependencyKey {
         if isWithInterceptor {
           urlRequest = try await tokenInterceptor.adapt(urlRequest)
         }
-        Logger.shared.log(category: .network, "API Request:\n\(dump(urlRequest))")
+        Logger.shared.log(category: .network, urlRequest.asRequestLog())
 
         let (data, response) = try await session.data(for: urlRequest)
 
@@ -55,6 +55,7 @@ extension APIClient: DependencyKey {
 
         switch httpResponse.statusCode {
         case 200..<300:
+          Logger.shared.log(category: .network, urlRequest.asResponseLog(data, httpResponse))
           return (data, response)
         case 401:
           try await tokenInterceptor.retry(for: self.session)
