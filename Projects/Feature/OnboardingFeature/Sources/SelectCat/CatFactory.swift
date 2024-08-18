@@ -26,6 +26,7 @@ public struct AnyCat: CatFactoryProtocol, Identifiable, Equatable {
   public var keywordImage: Image { base.keywordImage }
   public var name: String { base.name }
   public var catImage: Image { base.catImage }
+  public var selectCatRivTrigger: String { base.selectCatRivTrigger }
   public var pushNotificationTitle: String { base.pushNotificationTitle }
 
   public static func == (lhs: AnyCat, rhs: AnyCat) -> Bool {
@@ -46,6 +47,7 @@ public struct CheeseCat: CatFactoryProtocol {
   public var keyword: String = "응원"
   public var keywordImage: Image = DesignSystemAsset.Image._16Star.swiftUIImage
   public var catImage: Image = Image(systemName: "star.fill")
+  public var selectCatRivTrigger: String = "Click_Cheese Cat"
   public var pushNotificationTitle: String = "어디갔냐옹..."
 }
 
@@ -62,6 +64,7 @@ public struct BlackCat: CatFactoryProtocol {
   public var keyword: String = "긍정"
   public var keywordImage: Image = DesignSystemAsset.Image._16Heart.swiftUIImage
   public var catImage: Image = Image(systemName: "star")
+  public var selectCatRivTrigger: String = "Click_Black Cat"
   public var pushNotificationTitle: String = "어디갔냐옹..."
 }
 
@@ -78,6 +81,7 @@ public struct ThreeColorCat: CatFactoryProtocol {
   public var keyword: String = "자극"
   public var keywordImage: Image = DesignSystemAsset.Image._16Focus.swiftUIImage
   public var catImage: Image = Image(systemName: "star.fill")
+  public var selectCatRivTrigger: String = "Click_Calico Cat"
   public var pushNotificationTitle: String = "내가 여기있는데 어디갔냐옹!"
 }
 

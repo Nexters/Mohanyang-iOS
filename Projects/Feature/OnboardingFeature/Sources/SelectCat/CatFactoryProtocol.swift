@@ -15,5 +15,6 @@ public protocol CatFactoryProtocol {
   var keyword: String { get }
   var keywordImage: Image { get } // 키워드에 따른 아이콘 이미지
   var catImage: Image { get }
+  var selectCatRivTrigger: String { get }
   var pushNotificationTitle: String { get } // 푸시알림 예시 글귀
 }

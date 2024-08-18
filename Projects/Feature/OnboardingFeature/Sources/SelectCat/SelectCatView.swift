@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import RiveRuntime
 
 public struct SelectCatView: View {
   @Bindable var store: StoreOf<SelectCatCore>
@@ -25,6 +26,8 @@ public struct SelectCatView: View {
       style: .navigation
     ) {
       VStack(spacing: 0) {
+        Spacer(minLength: Alias.Spacing.xLarge)
+
         HStack {
           VStack(spacing: Alias.Spacing.xSmall) {
             Text("어떤 고양이와 함께할까요?")
@@ -36,7 +39,6 @@ public struct SelectCatView: View {
           }
           Spacer()
         }
-        .padding(.top, Alias.Spacing.xLarge)
 
         Spacer(minLength: Alias.Spacing.xLarge)
 
@@ -46,8 +48,10 @@ public struct SelectCatView: View {
             Rectangle()
               .foregroundStyle(Alias.Color.Background.secondary)
               .frame(maxHeight: .infinity)
-            store.selectedCat?.catImage
+            store.catRiv.view()
           }
+
+          Spacer()
 
           HStack {
             ForEach(store.catList) { cat in
@@ -60,7 +64,6 @@ public struct SelectCatView: View {
               .buttonStyle(.select(isSelected: cat == store.selectedCat))
             }
           }
-          .padding(.top, 34)
         }
 
         Spacer(minLength: Alias.Spacing.large)
