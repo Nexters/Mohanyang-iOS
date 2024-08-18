@@ -75,7 +75,7 @@ public struct TimeSelectCore {
     case let .pickerSelection(selection):
       state.selectedTime = selection
       return .run { _ in
-        await self.feedbackGeneratorClient.impactOccurred(.soft)
+        await self.feedbackGeneratorClient.impactOccurred(.light)
       }
       
     case let .setSelectedCategory(category):
