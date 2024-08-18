@@ -1,3 +1,10 @@
+//
+//  Project.swift
+//  PomodoroFeatureManifests
+//
+//  Created by devMinseok on 8/18/24.
+//
+
 import ProjectDescription
 import ProjectDescriptionHelpers
 
@@ -6,7 +13,7 @@ import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Feature.HomeFeature,
+  module: Feature.PomodoroFeature,
   scripts: [],
   targets: [
     .sources,
@@ -16,9 +23,7 @@ let project: Project = .makeTMABasedProject(
   ],
   dependencies: [
     .sources: [
-      .dependency(rootModule: Domain.self),
-      .dependency(module: Feature.MyPageFeature),
-      .dependency(module: Feature.PomodoroFeature)
+      .dependency(rootModule: Domain.self)
     ]
   ]
 )
