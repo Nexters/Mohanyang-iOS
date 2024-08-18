@@ -23,7 +23,6 @@ public struct CategorySelectCore {
   }
   
   public enum Action {
-    case onDismiss
     case onAppear
     case dismissButtonTapped
     case bottomCheckButtonTapped
@@ -37,6 +36,7 @@ public struct CategorySelectCore {
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(\.dismiss) var dismiss
   
   public init() {}
   
@@ -46,9 +46,6 @@ public struct CategorySelectCore {
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
-    case .onDismiss:
-      return .none
-      
     case .onAppear:
       return .run { send in
         await send(
@@ -68,8 +65,8 @@ public struct CategorySelectCore {
       }
       
     case .dismissButtonTapped:
-      return .run { send in
-        await send(.onDismiss)
+      return .run { _ in
+        await self.dismiss()
       }
       
     case .bottomCheckButtonTapped:
@@ -80,7 +77,7 @@ public struct CategorySelectCore {
             categoryID: selectedCategory.id
           )
         }
-        await send(.onDismiss)
+        await self.dismiss()
       }
       
     case let .getCategoryListResponse(.success(response)):

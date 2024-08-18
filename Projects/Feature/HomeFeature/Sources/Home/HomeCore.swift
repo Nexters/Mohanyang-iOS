@@ -146,9 +146,10 @@ public struct HomeCore {
         }
       }
       
-    case .categorySelect(.presented(.onDismiss)):
-      state.categorySelect = nil
-      return .none
+    case .categorySelect(.dismiss):
+      return .run { send in
+        await send(.syncCategory)
+      }
       
     case .categorySelect:
       return .none
