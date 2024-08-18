@@ -55,7 +55,7 @@ struct NavigationBar<
           Spacer()
           if Trailing.self == EmptyView.self {
             Button(
-              icon: DesignSystemAsset.Image._24CancelPrimary.swiftUIImage,
+              icon: DesignSystemAsset.Image._24ClosePrimary.swiftUIImage,
               action: {
                 self.onDismiss()
               }
@@ -69,7 +69,7 @@ struct NavigationBar<
         case .navigation:
           if Leading.self == EmptyView.self {
             Button(
-              icon: DesignSystemAsset.Image._24ArrowLeftPrimary.swiftUIImage,
+              icon: DesignSystemAsset.Image._24ChevronLeftPrimary.swiftUIImage,
               action: {
                 self.onDismiss()
               }

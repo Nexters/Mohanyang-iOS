@@ -26,7 +26,7 @@ public struct CategorySelectView: View {
           .font(Typography.header3)
           .foregroundStyle(Alias.Color.Text.primary)
         Spacer()
-        Button(icon: DesignSystemAsset.Image._24CancelPrimary.swiftUIImage) {
+        Button(icon: DesignSystemAsset.Image._24ClosePrimary.swiftUIImage) {
           store.send(.dismissButtonTapped)
         }
         .buttonStyle(.icon(isFilled: false, level: .primary))

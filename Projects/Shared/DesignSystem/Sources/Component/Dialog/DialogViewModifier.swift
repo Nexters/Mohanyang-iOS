@@ -34,7 +34,7 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
               Button {
                 self.dialog = nil
               } label: {
-                DesignSystemAsset.Image._24CancelPrimary.swiftUIImage
+                DesignSystemAsset.Image._24ClosePrimary.swiftUIImage
               }
             }
             .padding(.top, Alias.Spacing.small)
