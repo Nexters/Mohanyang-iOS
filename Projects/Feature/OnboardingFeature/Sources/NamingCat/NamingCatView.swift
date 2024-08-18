@@ -57,8 +57,9 @@ struct NamingCatView: View {
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .low))
         .disabled(store.inputFieldError != nil || store.text == "")
+        .padding(.bottom, Alias.Spacing.small)
       }
-      .padding(.horizontal, 20)
+      .padding(.horizontal, Alias.Spacing.xLarge)
     }
     .background {
       Alias.Color.Background.primary
