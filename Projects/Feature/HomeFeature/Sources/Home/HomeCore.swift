@@ -24,22 +24,29 @@ public struct HomeCore {
     var homeCatTooltip: HomeCatDialogueTooltip?
     var homeCategoryGuideTooltip: HomeCategoryGuideTooltip?
     var homeTimeGuideTooltip: HomeTimeGuideTooltip?
+    
+    var selectedCategory: PomodoroCategory?
+    
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
     
     public init() {}
   }
   
-  public enum Action {
+  public enum Action: BindableAction {
+    case binding(BindingAction<State>)
     case onLoad
+    case onAppear
     case setHomeCatTooltip(HomeCatDialogueTooltip?)
     case setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip?)
     case setHomeTimeGuideTooltip(HomeTimeGuideTooltip?)
     case categoryButtonTapped
     case focusTimeButtonTapped
-    case relaxTimeButtonTapped
+    case restTimeButtonTapped
     case mypageButtonTappd
     case playButtonTapped
+    
+    case syncCategory
     
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
@@ -54,6 +61,7 @@ public struct HomeCore {
   public init() {}
   
   public var body: some ReducerOf<Self> {
+    BindingReducer()
     Reduce(self.core)
       .ifLet(\.$categorySelect, action: \.categorySelect) {
         CategorySelectCore()
@@ -65,23 +73,22 @@ public struct HomeCore {
   
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
+    case .binding:
+      return .none
+      
     case .onLoad:
-      return .merge(
-        .run {
-          send in
-          await send(.setHomeCatTooltip(nil))
-          if self.userDefaultsClient.boolForKey(isHomeGuideCompletedKey) == false {
-            await self.userDefaultsClient.setBool(true, key: isHomeGuideCompletedKey)
-            await send(.setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip()))
-          }
-        },
-        .run { _ in
-          try await self.pomodoroService.syncCategoryList(
-            apiClient: self.apiClient,
-            databaseClient: self.databaseClient
-          )
+      return .run { send in
+        await send(.setHomeCatTooltip(nil))
+        if self.userDefaultsClient.boolForKey(isHomeGuideCompletedKey) == false {
+          await self.userDefaultsClient.setBool(true, key: isHomeGuideCompletedKey)
+          await send(.setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip()))
         }
-      )
+      }
+      
+    case .onAppear:
+      return .run { send in
+        await send(.syncCategory)
+      }
       
     case .setHomeCatTooltip:
       state.homeCatTooltip = .init(title: "오랜만이다냥") // TODO: - 문구 랜덤변경하기
@@ -103,11 +110,11 @@ public struct HomeCore {
       return .none
       
     case .focusTimeButtonTapped:
-      state.timeSelect = TimeSelectCore.State()
+      state.timeSelect = TimeSelectCore.State(mode: .focus)
       return .none
       
-    case .relaxTimeButtonTapped:
-      state.timeSelect = TimeSelectCore.State()
+    case .restTimeButtonTapped:
+      state.timeSelect = TimeSelectCore.State(mode: .rest)
       return .none
       
     case .mypageButtonTappd:
@@ -116,12 +123,41 @@ public struct HomeCore {
     case .playButtonTapped:
       return .none
       
-    case .categorySelect(.presented(.onDismiss)):
-      state.categorySelect = nil
-      return .none
+    case .syncCategory:
+      return .run { send in
+        try await self.pomodoroService.syncCategoryList(
+          apiClient: self.apiClient,
+          databaseClient: self.databaseClient
+        )
+        if let selectedCategory = try await self.pomodoroService.getSelectedCategory(
+          userDefaultsClient: self.userDefaultsClient,
+          databaseClient: self.databaseClient
+        ) {
+          await send(.set(\.selectedCategory, selectedCategory))
+        } else {
+          let categoryList = try await self.pomodoroService.getCategoryList(databaseClient: self.databaseClient)
+          if let basicCategory = categoryList.first(where: { $0.baseCategoryCode == .basic }) {
+            await self.pomodoroService.changeSelectedCategory(
+              userDefaultsClient: self.userDefaultsClient,
+              categoryID: basicCategory.id
+            )
+            await send(.set(\.selectedCategory, basicCategory))
+          }
+        }
+      }
+      
+    case .categorySelect(.dismiss):
+      return .run { send in
+        await send(.syncCategory)
+      }
       
     case .categorySelect:
       return .none
+      
+    case .timeSelect(.dismiss):
+      return .run { send in
+        await send(.syncCategory)
+      }
       
     case .timeSelect:
       return .none

@@ -26,7 +26,7 @@ struct NamingCatView: View {
     ) {
       VStack(spacing: 40) {
         Spacer()
-
+        
         ZStack {
           Rectangle()
             .foregroundStyle(Alias.Color.Background.secondary)
@@ -34,7 +34,7 @@ struct NamingCatView: View {
           store.selectedCat.catImage
             .setTooltipTarget(tooltip: DownDirectionTooltip.self)
         }
-
+        
         VStack(spacing: Alias.Spacing.small) {
           HStack {
             Text("내 고양이의 이름")
@@ -49,16 +49,17 @@ struct NamingCatView: View {
             fieldError: $store.inputFieldError
           )
         }
-
+        
         Spacer()
-
+        
         Button(title: "시작하기") {
           store.send(.tapStartButton)
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .low))
         .disabled(store.inputFieldError != nil || store.text == "")
+        .padding(.bottom, Alias.Spacing.small)
       }
-      .padding(.horizontal, 20)
+      .padding(.horizontal, Alias.Spacing.xLarge)
     }
     .background {
       Alias.Color.Background.primary

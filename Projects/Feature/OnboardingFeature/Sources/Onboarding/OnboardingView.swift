@@ -12,17 +12,20 @@ import DesignSystem
 import ComposableArchitecture
 
 public struct OnboardingView: View {
+  @Namespace var backgroundFrame
   @Bindable var store: StoreOf<OnboardingCore>
-
+  
   public init(store: StoreOf<OnboardingCore>) {
     self.store = store
   }
-
+  
   public var body: some View {
-    NavigationStack {
-      VStack {
-        Spacer()
-        VStack(spacing: 0) {
+    NavigationContainer(
+      leading: { Spacer() },
+      style: .navigation
+    ) {
+      VStack(spacing: 48) {
+        VStack(spacing: Alias.Spacing.xxxLarge) {
           TabView(selection: $store.currentItemID) {
             ForEach(store.fakedData) { item in
               OnboardingCarouselContentView(width: $store.width, item: item)
@@ -33,14 +36,14 @@ public struct OnboardingView: View {
             }
           }
           .tabViewStyle(.page(indexDisplayMode: .never))
+          .frame(width: store.width, height: 350)
           .gesture(
             DragGesture()
               .onChanged { _ in store.send(.dragStart) }
           )
-          .frame(width: store.width, height: 350)
-
-          HStack {
-            ForEach(0..<3, id: \.self) { idx in
+          
+          HStack(spacing: 8) {
+            ForEach(0..<store.data.count, id: \.self) { idx in
               Circle()
                 .frame(width: 8, height: 8)
                 .foregroundStyle(
@@ -49,33 +52,28 @@ public struct OnboardingView: View {
                 )
             }
           }
-          .padding(.vertical, 32)
-
-          Button(title: "시작하기") {
-            store.send(.tapStartButton)
-          }
-          .buttonStyle(.box(level: .primary, size: .large, width: .medium))
-          .padding(.top, 16)
         }
-        Spacer()
-      }
-      .background {
-        Alias.Color.Background.primary
-          .ignoresSafeArea()
-      }
-      .navigationDestination(
-        item: $store.scope(state: \.selectCat, action: \.selectCat)
-      ) { store in
-        SelectCatView(store: store)
+        
+        Button(title: "시작하기") {
+          store.send(.tapStartButton)
+        }
+        .buttonStyle(.box(level: .primary, size: .large, width: .medium))
       }
     }
-    .background {
-      GeometryReader { geometry in
-        Color.clear
-          .onAppear { store.width = geometry.size.width }
-      }
+    .background(Alias.Color.Background.primary)
+    .setFrameMeasure(space: .global, identifier: backgroundFrame)
+    .getFrameMeasure { value in
+      guard let background = value[backgroundFrame] else { return }
+      store.width = background.width
     }
-    .onAppear { store.send(.onApear) }
+    .navigationDestination(
+      item: $store.scope(state: \.selectCat, action: \.selectCat)
+    ) { store in
+      SelectCatView(store: store)
+    }
+    .onAppear {
+      store.send(.onApear)
+    }
   }
 }
 
@@ -90,7 +88,7 @@ struct OnboardingCarouselContentView: View {
         item.image
       }
       .frame(width: 240, height: 240)
-
+      
       VStack(spacing: Alias.Spacing.small) {
         Text(item.title)
           .font(Typography.header4)

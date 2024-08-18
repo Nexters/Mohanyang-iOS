@@ -35,7 +35,7 @@ public struct NavigationContainer<
     @ViewBuilder leading: @escaping () -> Leading = { EmptyView() },
     @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() },
     style: NavigationBarStyle,
-    navBackground: Background = Global.Color.gray50,
+    navBackground: Background = Alias.Color.Background.primary,
     navForegroundColor: Color = Alias.Color.Text.primary,
     onDismiss: @escaping () -> Void = {},
     @ViewBuilder content: @escaping () -> Content

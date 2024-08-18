@@ -10,47 +10,43 @@ import SwiftUI
 
 struct DialogViewModifier<T: Dialog>: ViewModifier {
   @Binding var dialog: T?
-
+  
   func body(content: Content) -> some View {
     ZStack(alignment: .center) {
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .zIndex(1)
-
+      
       if let dialog {
         Global.Color.black.opacity(Global.Opacity._50d)
           .ignoresSafeArea()
           .zIndex(2)
-
-
+        
         // MARK: Title & SubTitle
         VStack(spacing: Alias.Spacing.large) {
-          VStack(spacing: Alias.Spacing.small) {
-            HStack {
+          VStack(spacing: .zero) {
+            HStack(alignment: .center, spacing: 8) {
               Text(dialog.title)
                 .font(Typography.header4)
                 .foregroundStyle(Alias.Color.Text.primary)
-              Spacer()
-              Button {
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+              Button(icon: DesignSystemAsset.Image._24ClosePrimary.swiftUIImage) {
                 self.dialog = nil
-              } label: {
-                DesignSystemAsset.Image._24CancelPrimary.swiftUIImage
               }
+              .buttonStyle(.icon(isFilled: false, level: .primary))
             }
-            .padding(.top, Alias.Spacing.small)
-
             if let subTitle = dialog.subTitle {
-              HStack {
-                Text(subTitle)
-                  .font(Typography.subBodyR)
-                  .foregroundStyle(Alias.Color.Text.secondary)
-                Spacer()
-              }
+              Text(subTitle)
+                .font(Typography.subBodyR)
+                .foregroundStyle(Alias.Color.Text.secondary)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
           }
-
+          
           // MARK: Buttons
-          HStack(spacing: 12) {
+          HStack(spacing: Alias.Spacing.medium) {
             Button(
               title: LocalizedStringKey(dialog.firstButton.title),
               leftIcon: dialog.firstButton.leftIcon,
@@ -60,7 +56,13 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
                 dialog.firstButton.action?()
               }
             )
-            .buttonStyle(.box(level: dialog.firstButton.action == nil ? .tertiary : .primary, size: .medium, width: .low))
+            .buttonStyle(
+              .box(
+                level: dialog.firstButton.action == nil ? .tertiary : .primary,
+                size: .medium,
+                width: .low
+              )
+            )
             if let secondButton = dialog.secondButton {
               Button(
                 title: LocalizedStringKey(secondButton.title),
@@ -71,7 +73,13 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
                   secondButton.action?()
                 }
               )
-              .buttonStyle(.box(level: secondButton.action == nil ? .tertiary : .primary, size: .medium, width: .low))
+              .buttonStyle(
+                .box(
+                  level: secondButton.action == nil ? .tertiary : .primary,
+                  size: .medium,
+                  width: .low
+                )
+              )
             }
           }
         }

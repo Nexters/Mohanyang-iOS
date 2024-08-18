@@ -9,73 +9,77 @@
 import SwiftUI
 
 struct BottomSheetViewModifier<
-  Item: Identifiable,
+  Item: Identifiable & Equatable,
   BottomSheetContent: View
 >: ViewModifier {
   @Binding var item: Item?
   let bottomSheetContent: (Item) -> BottomSheetContent
+  @State var yOffset: CGFloat = 0
   
   func body(content: Content) -> some View {
-    ZStack(alignment: .bottom) {
-      content
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .transaction { transaction in
-          transaction.disablesAnimations = true
-        }
-        .zIndex(1)
-      
-      if let item {
-        Global.Color.black.opacity(Global.Opacity._50d)
-          .ignoresSafeArea()
-          .onTapGesture {
-            self.item = nil
-          }
-          .transition(
-            .opacity.animation(.easeInOut)
-          )
-          .zIndex(2)
+    content
+      .fullScreenCover(item: $item) { item in
         VStack(spacing: .zero) {
-          HStack(alignment: .center) {
-            RoundedRectangle(cornerRadius: 2)
-              .fill(Global.Color.gray400)
-              .frame(width: 50, height: 4)
-          }
-          .frame(height: 30)
-          .frame(maxWidth: .infinity)
-          .background(Global.Color.white)
-          .cornerRadius(24, corners: [.topLeft, .topRight])
-          .gesture(
-            DragGesture(minimumDistance: 20)
-              .onEnded { value in
-                if value.translation.height > 100 {
-                  self.item = nil
-                }
-              }
-          )
-          
+          Color.black.opacity(0.001)
+            .onTapGesture {
+              self.item = nil
+            }
           bottomSheetContent(item)
-            .frame(maxWidth: .infinity)
-            .fixedSize(horizontal: false, vertical: true)
-            .background(Global.Color.white)
+            .padding(.top, 30)
+            .background(
+              Global.Color.white
+                .cornerRadius(24, corners: [.topLeft, .topRight])
+                .ignoresSafeArea()
+            )
+            .overlay(alignment: .top) {
+              HStack(alignment: .center) {
+                RoundedRectangle(cornerRadius: 2)
+                  .fill(Global.Color.gray400)
+                  .frame(width: 50, height: 4)
+              }
+              .frame(maxWidth: .infinity)
+              .frame(height: 30)
+            }
         }
-        .frame(maxWidth: .infinity)
-        .frame(maxHeight: UIScreen.main.bounds.height * 0.9, alignment: .bottom)
-        .transition(.move(edge: .bottom))
-        .zIndex(3)
+        .presentationBackground(.clear)
       }
-    }
-    .animation(.spring(duration: 0.4), value: self.item == nil)
+      .updateBottomSheetBackground($item)
   }
 }
 
 extension View {
   public func bottomSheet<
-    Item: Identifiable,
+    Item: Identifiable & Equatable,
     Content: View
   >(
     item: Binding<Item?>,
     @ViewBuilder content: @escaping (Item) -> Content
   ) -> some View {
     return self.modifier(BottomSheetViewModifier(item: item, bottomSheetContent: content))
+  }
+}
+
+
+extension View {
+  func updateBottomSheetBackground<Item: Identifiable>(_ item: Binding<Item?>) -> some View {
+    self.modifier(BottomSheetBackgroundModifier(item: item))
+  }
+}
+
+struct BottomSheetBackgroundModifier<Item: Identifiable>: ViewModifier {
+  @Binding var item: Item?
+  @State var opacity: Double = 0
+  
+  func body(content: Content) -> some View {
+    ZStack {
+      content
+      Global.Color.black.opacity(opacity)
+        .ignoresSafeArea()
+    }
+    .onChange(of: item == nil) { _, value in
+      withAnimation(.easeInOut) {
+        opacity = value ? 0 : Global.Opacity._50d
+      }
+    }
   }
 }

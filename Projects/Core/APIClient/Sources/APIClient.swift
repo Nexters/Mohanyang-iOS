@@ -37,7 +37,9 @@ extension APIClient: DependencyKey {
         isWithInterceptor: Bool,
         retryCnt: Int = 0
       ) async throws -> (Data, URLResponse) {
-        guard retryCnt < 3 else { throw throwNetworkErr(.timeOutError) }
+        guard retryCnt < 3 else {
+          throw throwNetworkErr(.timeOutError, statusCode: -1)
+        }
 
         var urlRequest = try await request.asURLRequest()
         if isWithInterceptor {
@@ -67,11 +69,11 @@ extension APIClient: DependencyKey {
         default:
           throw throwNetworkErr(.unknownError, statusCode: httpResponse.statusCode)
         }
-
-        func throwNetworkErr(_ error: NetworkError, statusCode: Int) -> NetworkError {
-          Logger.shared.log(level: .error, category: .network, "Description: \(error.localizedDescription)\nStatusCode: \(statusCode)")
-          return error
-        }
+      }
+      
+      func throwNetworkErr(_ error: NetworkError, statusCode: Int) -> NetworkError {
+        Logger.shared.log(level: .error, category: .network, "Description: \(error.localizedDescription)\nStatusCode: \(statusCode)")
+        return error
       }
     }
 

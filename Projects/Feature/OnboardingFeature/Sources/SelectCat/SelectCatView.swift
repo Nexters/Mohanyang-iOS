@@ -45,7 +45,7 @@ public struct SelectCatView: View {
           ZStack {
             Rectangle()
               .foregroundStyle(Alias.Color.Background.secondary)
-              .frame(height: 240)
+              .frame(maxHeight: .infinity)
             store.selectedCat?.catImage
           }
 
@@ -70,8 +70,9 @@ public struct SelectCatView: View {
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .low))
         .disabled(store.selectedCat == nil)
+        .padding(.bottom, Alias.Spacing.small)
       }
-      .padding(.horizontal, 20)
+      .padding(.horizontal, Alias.Spacing.xLarge)
     }
     .background {
       Alias.Color.Background.primary
