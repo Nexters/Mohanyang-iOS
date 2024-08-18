@@ -43,10 +43,7 @@ struct BottomSheetViewModifier<
         }
         .presentationBackground(.clear)
       }
-    //      .transaction { transaction in
-    //        transaction.disablesAnimations = true
-    //      }
-      .updateBottomSheetBackground($item, Global.Color.black.opacity(Global.Opacity._50d))
+      .updateBottomSheetBackground($item)
   }
 }
 
@@ -64,22 +61,25 @@ extension View {
 
 
 extension View {
-  func updateBottomSheetBackground<Item: Identifiable>(_ item: Binding<Item?>, _ changeColor: Color) -> some View {
-    self.modifier(BottomSheetBackgroundModifier(item: item, changeColor: changeColor))
+  func updateBottomSheetBackground<Item: Identifiable>(_ item: Binding<Item?>) -> some View {
+    self.modifier(BottomSheetBackgroundModifier(item: item))
   }
 }
 
-private struct BottomSheetBackgroundModifier<Item: Identifiable>: ViewModifier {
+struct BottomSheetBackgroundModifier<Item: Identifiable>: ViewModifier {
   @Binding var item: Item?
-  let changeColor: Color
+  @State var opacity: Double = 0
   
   func body(content: Content) -> some View {
     ZStack {
       content
-      if item != nil {
-        changeColor.ignoresSafeArea()
+      Global.Color.black.opacity(opacity)
+        .ignoresSafeArea()
+    }
+    .onChange(of: item == nil) { _, value in
+      withAnimation(.easeInOut) {
+        opacity = value ? 0 : Global.Opacity._50d
       }
     }
-    .animation(.easeInOut, value: item != nil)
   }
 }
