@@ -8,6 +8,8 @@
 
 import Foundation
 
+import CatFeature
+
 import ComposableArchitecture
 
 @Reducer

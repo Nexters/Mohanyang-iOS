@@ -27,7 +27,7 @@ public struct MyPageView: View {
       ScrollView {
         VStack(spacing: Alias.Spacing.medium) {
 
-          MyCatSectionView(name: store.catName)
+          MyCatSectionView(name: store.cat?.name ?? "")
             .padding(.all, Alias.Spacing.xLarge)
             .background(
               RoundedRectangle(cornerRadius: Alias.BorderRadius.small)

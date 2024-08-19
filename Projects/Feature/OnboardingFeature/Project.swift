@@ -16,7 +16,8 @@ let project: Project = .makeTMABasedProject(
   ],
   dependencies: [
     .sources: [
-      .dependency(rootModule: Domain.self)
+      .dependency(rootModule: Domain.self),
+      .dependency(module: Feature.CatFeature)
     ]
   ]
 )

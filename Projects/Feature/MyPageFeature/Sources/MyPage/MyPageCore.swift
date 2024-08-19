@@ -6,6 +6,7 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import CatFeature
 import APIClientInterface
 import UserServiceInterface
 
@@ -16,7 +17,7 @@ public struct MyPageCore {
   @ObservableState
   public struct State: Equatable {
     public init() { }
-    var catName: String = "머루"
+    var cat: AnyCat? = nil
     var isFocusTimeAlarmOn: Bool = false
     var isDisturbAlarmOn: Bool = false
     var isInternetConnected: Bool = false
@@ -46,6 +47,11 @@ public struct MyPageCore {
         await send(._responseUserInfo(data))
       }
     case ._responseUserInfo(let data):
+      state.cat = CatFactory.makeCat(
+        type: CatType(rawValue: data.cat.type.camelCased()) ?? .cheese,
+        no: data.cat.no,
+        name: data.cat.name
+      )
       return .none
     case .binding:
       return .none

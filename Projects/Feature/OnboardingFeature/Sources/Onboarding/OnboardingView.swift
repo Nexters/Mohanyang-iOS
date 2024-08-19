@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+
+import CatFeature
 import DesignSystem
 
 import ComposableArchitecture
