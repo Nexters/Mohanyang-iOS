@@ -34,7 +34,7 @@ public struct MyPageView: View {
                 .foregroundStyle(Alias.Color.Background.secondary)
             )
             .onTapGesture {
-              store.send(.tapMyCatDetail)
+              store.send(.myCatDetailTapped)
             }
 
           StatisticSectionView(isInternetConnected: $store.isInternetConnected)
@@ -72,6 +72,9 @@ public struct MyPageView: View {
             RoundedRectangle(cornerRadius: Alias.BorderRadius.small)
               .foregroundStyle(Alias.Color.Background.secondary)
           )
+          .onTapGesture {
+            openFeedbackForm(urlString: store.feedbackURLString)
+          }
 
         }
         .padding(.horizontal, Alias.Spacing.xLarge)
@@ -88,6 +91,12 @@ public struct MyPageView: View {
     }
     .onAppear {
       store.send(.onAppear)
+    }
+  }
+
+  private func openFeedbackForm(urlString: String) {
+    if let url = URL(string: urlString) {
+      UIApplication.shared.open(url)
     }
   }
 }
