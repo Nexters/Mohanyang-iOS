@@ -153,7 +153,7 @@ public struct TimeItem: WheelPickerData {
   }
   
   var title: String {
-    return "\(minute):00"
+    return String(format: "%02d:00", minute)
   }
   
   var data: Int {
