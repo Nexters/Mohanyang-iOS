@@ -48,7 +48,7 @@ public struct MyPageView: View {
             AlarmSectionView(
               title: "집중시간 알림받기",
               subTitle: "집중・휴식시간이 되면 고양이가 알려줘요",
-              isOn: $store.isFocusTimeAlarmOn
+              isOn: $store.isTimerAlarmOn
             )
             AlarmSectionView(
               title: "딴 짓 방해하기",

@@ -7,28 +7,36 @@
 //
 
 import Foundation
+import CatServiceInterface
 
 public enum LocalPushNotificationContent {
-  case test
-  
+  case focus(AnyCat)
+  case rest(AnyCat)
+  case disturb(AnyCat)
+
   public var title: String {
-    switch self {
-    case .test:
-      return "테스트 집중"
-    }
+    return "모하냥"
   }
   
   public var body: String {
     switch self {
-    case .test:
-      return "\(10)시 까지 집중해봐요!"
+    case .focus(let cat):
+      return cat.focusEndPushTitle
+    case .rest(let cat):
+      return cat.restEndPushTitle
+    case .disturb(let cat):
+      return cat.disturbPushTitle
     }
   }
   
   public var identifier: String {
     switch self {
-    case .test:
-      return "group1"
+    case .focus:
+      return "focus"
+    case .rest:
+      return "rest"
+    case .disturb:
+      return "disturb"
     }
   }
 }

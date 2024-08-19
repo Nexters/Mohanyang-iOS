@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+import CatServiceInterface
 import DesignSystem
 
 import ComposableArchitecture
@@ -112,7 +113,7 @@ struct CatPushNotificationExampleView: View {
                 .foregroundStyle(Alias.Color.Text.secondary)
             }
             HStack {
-              Text(selectedCat.pushNotificationTitle)
+              Text(selectedCat.disturbPushTitle)
                 .font(Typography.subBodyR)
                 .foregroundStyle(Alias.Color.Text.primary)
               Spacer()

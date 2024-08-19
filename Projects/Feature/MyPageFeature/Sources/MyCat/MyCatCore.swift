@@ -7,6 +7,7 @@
 //
 
 import CatFeature
+import CatServiceInterface
 
 import ComposableArchitecture
 
