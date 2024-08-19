@@ -1,0 +1,48 @@
+// swiftformat:disable all
+// swiftlint:disable all
+{% if groups.count > 0 %}
+{% set enumName %}{{param.enumName|default:"Rive"}}{% endset %}
+{% set useExt %}{% if param.useExtension|default:"true" %}true{% endif %}{% endset %}
+{% set accessModifier %}{% if param.publicAccess %}public{% else %}internal{% endif %}{% endset %}
+{% set resourceType %}{{param.resourceTypeName|default:"RiveViewModel"}}{% endset %}
+
+#if canImport(RiveRuntime)
+import RiveRuntime
+
+// MARK: - Rive Files
+{% macro groupBlock group %}
+  {% for file in group.files %}
+  {% call fileBlock file %}
+  {% endfor %}
+  {% for dir in group.directories %}
+  {% call dirBlock dir %}
+  {% endfor %}
+{% endmacro %}
+{% macro fileBlock file %}
+  {% set identifier %}{{ file.name }}{% if useExt %}.{{ file.ext }}{% endif %}{% endset %}
+  {{accessModifier}} static let {{identifier|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = {{resourceType}}(fileName: "{{file.name}}", in: .module)
+{% endmacro %}
+{% macro dirBlock directory %}
+  {% for file in directory.files %}
+  {% call fileBlock file %}
+  {% endfor %}
+  {% for dir in directory.directories %}
+  {% call dirBlock dir %}
+  {% endfor %}
+{% endmacro %}
+
+{{accessModifier}} enum {{enumName}} {
+  {% if groups.count > 1 or param.forceFileNameEnum %}
+  {% for group in groups %}
+  {{accessModifier}} enum {{group.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
+    {% filter indent:2 %}{% call groupBlock group %}{% endfilter %}
+  }
+  {% endfor %}
+  {% else %}
+  {% call groupBlock groups.first %}
+  {% endif %}
+}
+#endif
+{% endif %}
+// swiftformat:enable all
+// swiftlint:enable all

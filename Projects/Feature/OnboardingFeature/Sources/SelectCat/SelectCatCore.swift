@@ -10,8 +10,9 @@ import APIClientInterface
 import UserServiceInterface
 import CatServiceInterface
 import UserNotificationClientInterface
-import Shared
+import DesignSystem
 
+import RiveRuntime
 import ComposableArchitecture
 
 @Reducer
@@ -21,12 +22,14 @@ public struct SelectCatCore {
     public init() { }
     var catList: [AnyCat] = []
     var selectedCat: AnyCat? = nil
+    var catRiv: RiveViewModel = Rive.catSelectMotionRiv
     @Presents var namingCat: NamingCatCore.State?
   }
   
   public enum Action: BindableAction {
     case onAppear
     case selectCat(AnyCat)
+    case setRivTrigger
     case tapNextButton
     case moveToNamingCat
     case _fetchCatListRequest
@@ -56,8 +59,17 @@ public struct SelectCatCore {
     case .onAppear:
       return .run { send in await send(._fetchCatListRequest) }
 
-    case.selectCat(let selectedCat):
+    case .selectCat(let selectedCat):
       state.selectedCat = (state.selectedCat == selectedCat) ? nil : selectedCat
+      state.catRiv.stop()
+      return .run { send in await send(.setRivTrigger) }
+
+    case .setRivTrigger:
+      if let selectedCat = state.selectedCat {
+        state.catRiv.triggerInput(selectedCat.selectCatRivTrigger)
+      } else {
+        state.catRiv.play()
+      }
       return .none
 
     case .tapNextButton:

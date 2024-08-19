@@ -30,6 +30,7 @@ let project: Project = .makeTMABasedProject(
   resourceSynthesizers: [
     .fonts(), // for font
     .assets(), // for .xcassets,
-    .files(extensions: ["mp4", "gif"])
+    .custom(name: "Lottie", parser: .json, extensions: ["json"]),
+    .custom(name: "Rive", parser: .files, extensions: ["riv"])
   ]
 )
