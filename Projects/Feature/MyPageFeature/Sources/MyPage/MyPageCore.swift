@@ -6,6 +6,9 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import APIClientInterface
+import UserServiceInterface
+
 import ComposableArchitecture
 
 @Reducer
@@ -21,10 +24,12 @@ public struct MyPageCore {
   
   public enum Action: BindableAction {
     case onAppear
+    case _responseUserInfo(UserDTO.Response.GetUserInfoResponseDTO)
     case binding(BindingAction<State>)
   }
 
-  // @Dependency
+  @Dependency(APIClient.self) var apiClient
+  @Dependency(UserService.self) var userService
 
   public init() {}
   
@@ -36,6 +41,11 @@ public struct MyPageCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
+      return .run { send in
+        let data = try await userService.getUserInfo(apiClient: apiClient)
+        await send(._responseUserInfo(data))
+      }
+    case ._responseUserInfo(let data):
       return .none
     case .binding:
       return .none

@@ -20,5 +20,15 @@ public extension UserDTO.Request {
 }
 
 public extension UserDTO.Response {
+  struct GetUserInfoResponseDTO: Decodable {
+    public var registeredDeviceNo: Int
+    public var isPushEnabled: Bool
+    public var cat: Cat
+  }
 
+  struct Cat: Decodable {
+    public var no: Int
+    public var name: String
+    public var type: String
+  }
 }

@@ -78,6 +78,9 @@ public struct MyPageView: View {
       .scrollIndicators(.never)
     }
     .background(Alias.Color.Background.primary)
+    .onAppear {
+      store.send(.onAppear)
+    }
   }
 }
 

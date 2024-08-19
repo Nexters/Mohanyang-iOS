@@ -11,6 +11,7 @@ import APIClientInterface
 
 public enum UserAPIrequest {
   case selectCat(Int)
+  case getUserInfo
 }
 
 extension UserAPIrequest: APIBaseRequest {
@@ -22,6 +23,8 @@ extension UserAPIrequest: APIBaseRequest {
     switch self {
     case .selectCat:
       return "/api/v1/users/cats"
+    case .getUserInfo:
+      return "/api/v1/users/me"
     }
   }
 
@@ -29,6 +32,8 @@ extension UserAPIrequest: APIBaseRequest {
     switch self {
     case .selectCat:
       return .put
+    case .getUserInfo:
+      return .get
     }
   }
 
@@ -37,6 +42,8 @@ extension UserAPIrequest: APIBaseRequest {
     case .selectCat(let no):
       let dto = UserDTO.Request.SelectCatRequestDTO(catNo: no)
       return .body(dto)
+    case .getUserInfo:
+      return .requestPlain
     }
   }
 }

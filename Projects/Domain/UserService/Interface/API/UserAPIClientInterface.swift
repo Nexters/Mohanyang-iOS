@@ -20,6 +20,9 @@ public struct UserService {
     _ no: Int,
     _ apiClient: APIClient
   ) async throws -> Void
+  public var getUserInfo: @Sendable (
+    _ apiClient: APIClient
+  ) async throws -> UserDTO.Response.GetUserInfoResponseDTO
 }
 
 extension UserService: TestDependencyKey {
