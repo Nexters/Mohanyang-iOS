@@ -19,7 +19,11 @@ public struct TimerCore {
       interval: Duration? = nil,
       mode: Mode
     ) {
+#if DEV
+      self.interval = .milliseconds(1)
+#else
       self.interval = interval
+#endif
       self.mode = mode
     }
   }

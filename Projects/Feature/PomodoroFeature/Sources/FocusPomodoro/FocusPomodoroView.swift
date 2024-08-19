@@ -91,8 +91,8 @@ public struct FocusPomodoroView: View {
     ) { store in
       RestWaitingView(store: store)
     }
-    .onLoad {
-      store.send(.onLoad)
+    .task {
+      await store.send(.task).finish()
     }
   }
 }

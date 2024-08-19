@@ -49,9 +49,11 @@ public struct RestWaitingView: View {
           }
           
           ZStack {
-            LottieView(animation: AnimationAsset.lotiCompleteFocus.animation)
-            if true {
-              LottieView(animation: AnimationAsset.lotiParticle.animation)
+            LottieView(animation: AnimationAsset.completeFocus.animation)
+              .playing(loopMode: .playOnce)
+            if store.source == .overtimeFromFocusPomodoro {
+              LottieView(animation: AnimationAsset.particle.animation)
+                .playing(loopMode: .playOnce)
             }
           }
           .frame(width: 240, height: 240)
@@ -67,15 +69,16 @@ public struct RestWaitingView: View {
               ) {
                 store.send(.minus5MinuteButtonTapped)
               }
-              .buttonStyle(.select(isSelected: false))
+              .buttonStyle(.select(isSelected: store.changeFocusTimeByMinute < 0))
               .frame(width: 68, height: 38)
+              
               Button(
                 subtitle: "5분",
                 leftIcon: DesignSystemAsset.Image._16PlusPrimary.swiftUIImage
               ) {
                 store.send(.plus5MinuteButtonTapped)
               }
-              .buttonStyle(.select(isSelected: false))
+              .buttonStyle(.select(isSelected: store.changeFocusTimeByMinute > 0))
               .frame(width: 68, height: 38)
             }
           }
@@ -97,6 +100,7 @@ public struct RestWaitingView: View {
       }
     }
     .background(Alias.Color.Background.primary)
+    .toastDestination(toast: $store.toast)
     .navigationDestination(
       item: $store.scope(
         state: \.restPomodoro,
@@ -105,8 +109,8 @@ public struct RestWaitingView: View {
     ) { store in
       RestPomodoroView(store: store)
     }
-    .onLoad {
-      store.send(.onLoad)
+    .task {
+      await store.send(.task).finish()
     }
   }
 }

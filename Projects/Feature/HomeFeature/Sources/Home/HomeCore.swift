@@ -30,6 +30,7 @@ public struct HomeCore {
     var selectedCategory: PomodoroCategory?
     
     var toast: DefaultToast?
+    var dialog: DefaultDialog?
     
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
@@ -201,6 +202,15 @@ public struct HomeCore {
       return .none
 
     case .myPage:
+      return .none
+      
+    case .focusPomodoro(.presented(.restWaiting(.presented(.goToHomeByOver60Minute)))):
+      state.focusPomodoro = nil
+      state.dialog = DefaultDialog(
+        title: "집중을 끝내고 돌아왔어요",
+        subTitle: "너무 오랜 시간동안 대기화면에 머물러서 홈화면으로 이동되었어요.",
+        firstButton: DialogButtonModel(title: "확인")
+      )
       return .none
       
     case .focusPomodoro(.presented(.goToHome)),

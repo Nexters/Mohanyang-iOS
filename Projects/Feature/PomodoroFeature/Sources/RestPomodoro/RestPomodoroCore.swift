@@ -6,7 +6,13 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import Foundation
+
 import PomodoroServiceInterface
+import UserDefaultsClientInterface
+import DatabaseClientInterface
+import APIClientInterface
+import DesignSystem
 
 import ComposableArchitecture
 
@@ -14,58 +20,117 @@ import ComposableArchitecture
 public struct RestPomodoroCore {
   @ObservableState
   public struct State: Equatable {
-    var dialogueTooltip: PomodoroDialogueTooltip? {
-      PomodoroDialogueTooltip(
-        title: overTimeBySeconds > 0 ? "쉬는 게 제일 좋다냥" : "이제 다시 사냥놀이 하자냥!"
-      )
-    }
-    
     var selectedCategory: PomodoroCategory?
-    var restTimeBySeconds: Int = 60 * 30
+    var restTimeBySeconds: Int = 0
     var overTimeBySeconds: Int = 0
+    var changeRestTimeByMinute: Int = 0
+    
+    var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
+    var toast: DefaultToast?
     
     public init() {}
+    
+    var dialogueTooltip: PomodoroDialogueTooltip? {
+      PomodoroDialogueTooltip(
+        title: overTimeBySeconds > 0 ? "이제 다시 사냥놀이 하자냥!" : "쉬는 게 제일 좋다냥" 
+      )
+    }
+    var minus5MinuteButtonDisabled: Bool {
+      guard let restTimeMinute = selectedCategory?.restTimeMinute else { return false }
+      return restTimeMinute <= 5
+    }
+    var plus5MinuteButtonDisabled: Bool {
+      guard let restTimeMinute = selectedCategory?.restTimeMinute else { return false }
+      return restTimeMinute >= 30
+    }
   }
   
-  public enum Action {
-    case onLoad
+  public enum Action: BindableAction {
+    case binding(BindingAction<State>)
+    case task
     
     case focusAgainButtonTapped
     case endFocusButtonTapped
     case minus5MinuteButtonTapped
     case plus5MinuteButtonTapped
+    case setupRestTime
     
     case goToHome
     case goToFocus
+    
+    case timer(TimerCore.Action)
   }
   
-  //  <#@Dependency() var#>
+  @Dependency(PomodoroService.self) var pomodoroService
+  @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(APIClient.self) var apiClient
   
   public init() {}
   
   public var body: some ReducerOf<Self> {
+    BindingReducer()
+    Scope(state: \.timer, action: \.timer) {
+      TimerCore()
+    }
     Reduce(self.core)
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
-    case .onLoad:
+    case .binding:
       return .none
       
-    case .focusAgainButtonTapped:
+    case .task:
       return .run { send in
+        let selectedCategory = try await self.pomodoroService.getSelectedCategory(
+          userDefaultsClient: self.userDefaultsClient,
+          databaseClient: self.databaseClient
+        )
+        await send(.set(\.selectedCategory, selectedCategory))
+        await send(.setupRestTime)
+        await send(.timer(.start))
+      }
+      
+    case .focusAgainButtonTapped:
+      return .run { [state] send in
+        try await applyChangeRestTime(state: state)
         await send(.goToFocus)
       }
       
     case .endFocusButtonTapped:
-      return .run { send in
+      return .run { [state] send in
+        try await applyChangeRestTime(state: state)
         await send(.goToHome)
       }
       
     case .minus5MinuteButtonTapped:
+      guard !state.minus5MinuteButtonDisabled else {
+        state.toast = .init(message: "5분은 휴식해야 다음에 집중할 수 있어요", image: DesignSystemAsset.Image._24Clock.swiftUIImage)
+        return .none
+      }
+      if state.changeRestTimeByMinute == -5 {
+        state.changeRestTimeByMinute = 0
+      } else {
+        state.changeRestTimeByMinute = -5
+      }
       return .none
       
     case .plus5MinuteButtonTapped:
+      guard !state.plus5MinuteButtonDisabled else {
+        state.toast = .init(message: "최대 30분까지만 휴식할 수 있어요", image: DesignSystemAsset.Image._24Clock.swiftUIImage)
+        return .none
+      }
+      if state.changeRestTimeByMinute == 5 {
+        state.changeRestTimeByMinute = 0
+      } else {
+        state.changeRestTimeByMinute = 5
+      }
+      return .none
+      
+    case .setupRestTime:
+      guard let selectedCategory = state.selectedCategory else { return .none }
+      state.restTimeBySeconds = selectedCategory.restTimeMinute * 60
       return .none
       
     case .goToHome:
@@ -73,6 +138,44 @@ public struct RestPomodoroCore {
       
     case .goToFocus:
       return .none
+      
+    case .timer(.tick):
+      if state.restTimeBySeconds == 0 {
+        if state.overTimeBySeconds == 1800 { // 30분 초과시 휴식 대기화면으로 이동
+          return .run { send in
+            await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
+            await send(.goToHome)
+          }
+        } else {
+          state.overTimeBySeconds += 1
+        }
+      } else {
+        state.restTimeBySeconds -= 1
+      }
+      return .none
+      
+    case .timer:
+      return .none
     }
+  }
+  
+  func applyChangeRestTime(state: State) async throws -> Void {
+    guard let selectedCategory = state.selectedCategory,
+          state.changeRestTimeByMinute != 0
+    else { return }
+    
+    let changedTimeMinute = selectedCategory.restTimeMinute + state.changeRestTimeByMinute
+    let iso8601Duration = DateComponents(minute: changedTimeMinute).to8601DurationString()
+    let request = EditCategoryRequest(focusTime: nil, restTime: iso8601Duration)
+    
+    try await self.pomodoroService.changeCategoryTime(
+      apiClient: self.apiClient,
+      categoryID: selectedCategory.id,
+      request: request
+    )
+    try await self.pomodoroService.syncCategoryList(
+      apiClient: self.apiClient,
+      databaseClient: self.databaseClient
+    )
   }
 }

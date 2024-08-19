@@ -75,7 +75,7 @@ public struct RestPomodoroView: View {
               ) {
                 store.send(.minus5MinuteButtonTapped)
               }
-              .buttonStyle(.select(isSelected: false))
+              .buttonStyle(.select(isSelected: store.changeRestTimeByMinute < 0))
               .frame(width: 68, height: 38)
               Button(
                 subtitle: "5분",
@@ -83,7 +83,7 @@ public struct RestPomodoroView: View {
               ) {
                 store.send(.plus5MinuteButtonTapped)
               }
-              .buttonStyle(.select(isSelected: false))
+              .buttonStyle(.select(isSelected: store.changeRestTimeByMinute > 0))
               .frame(width: 68, height: 38)
             }
           }
@@ -105,9 +105,10 @@ public struct RestPomodoroView: View {
       }
     }
     .background(Alias.Color.Background.primary)
+    .toastDestination(toast: $store.toast)
     .tooltipDestination(tooltip: .constant(store.dialogueTooltip))
-    .onLoad {
-      store.send(.onLoad)
+    .task {
+      await store.send(.task).finish()
     }
   }
 }
