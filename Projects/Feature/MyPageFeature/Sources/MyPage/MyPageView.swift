@@ -41,7 +41,7 @@ public struct MyPageView: View {
                 .foregroundStyle(Alias.Color.Background.secondary)
             )
 
-          VStack(spacing: Alias.Spacing.small) {
+          VStack(spacing: Alias.Spacing.large) {
             AlarmSectionView(
               title: "집중시간 알림받기",
               subTitle: "집중・휴식시간이 되면 고양이가 알려줘요",
@@ -106,6 +106,7 @@ struct StatisticSectionView: View {
   var body: some View {
     ZStack {
       VStack(spacing: Alias.Spacing.medium) {
+        Spacer()
         if isInternetConnected {
           DesignSystemAsset.Image.imgUpdateStatistics.swiftUIImage
         } else {
@@ -120,9 +121,11 @@ struct StatisticSectionView: View {
             .foregroundStyle(Alias.Color.Text.secondary)
             .multilineTextAlignment(.center)
         }
+        Spacer()
       }
     }
     .frame(maxWidth: .infinity)
+    .frame(minHeight: 375)
   }
 }
 
@@ -132,7 +135,7 @@ struct AlarmSectionView: View {
   @Binding var isOn: Bool
   
   var body: some View {
-    HStack {
+    HStack(spacing: 0) {
       VStack(alignment: .leading, spacing: Alias.Spacing.xSmall) {
         Text(title)
           .font(Typography.bodySB)
@@ -140,8 +143,13 @@ struct AlarmSectionView: View {
         Text(subTitle)
           .font(Typography.subBodyR)
           .foregroundStyle(Alias.Color.Text.tertiary)
+          .lineLimit(1)
       }
+
+      Spacer()
+
       Toggle("", isOn: $isOn)
+        .labelsHidden()
         .tint(Alias.Color.Background.accent1)
     }
   }
