@@ -16,46 +16,92 @@ import ComposableArchitecture
 public struct FocusPomodoroCore {
   @ObservableState
   public struct State: Equatable {
-    var dialogueTooltip: PomodoroDialogueTooltip?
+    var dialogueTooltip: PomodoroDialogueTooltip? {
+      PomodoroDialogueTooltip(
+        title: overTimeBySeconds > 0 ? "이제 나랑 놀자냥!" : "잘 집중하고 있는 거냥?"
+      )
+    }
     var selectedCategory: PomodoroCategory?
     
+    var focusTimeBySeconds: Int = 0
+    var overTimeBySeconds: Int = 0
+    
+    var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
     
     public init() {}
   }
   
-  public enum Action: BindableAction {
-    case binding(BindingAction<State>)
+  public enum Action {
     case onLoad
-    case setDialogueTooltip(PomodoroDialogueTooltip?)
+    
+    case takeARestButtonTapped
+    case endFocusButtonTapped
+    case setupFocusTime
+    
+    case setSelectedCategory(PomodoroCategory?)
+    
+    case timer(TimerCore.Action)
   }
   
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(\.dismiss) var dismiss
   
   public init() {}
   
   public var body: some ReducerOf<Self> {
-    BindingReducer()
+    Scope(state: \.timer, action: \.timer) {
+      TimerCore()
+    }
     Reduce(self.core)
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
-    case .binding:
+    case .onLoad:
+      return .merge(
+        .run { send in
+          let selectedCategory = try await self.pomodoroService.getSelectedCategory(
+            userDefaultsClient: self.userDefaultsClient,
+            databaseClient: self.databaseClient
+          )
+          await send(.setSelectedCategory(selectedCategory))
+          await send(.setupFocusTime)
+          await send(.timer(.start))
+        }
+      )
+      
+    case .takeARestButtonTapped:
       return .none
       
-    case .onLoad:
-      state.dialogueTooltip = PomodoroDialogueTooltip(title: "잘 집중하고 있는 거냥?")
-      return .run { send in
-        let selectedCategory = try await self.pomodoroService.getSelectedCategory(
-          userDefaultsClient: self.userDefaultsClient,
-          databaseClient: self.databaseClient
-        )
-        await send(.set(\.selectedCategory, selectedCategory))
+    case .endFocusButtonTapped:
+      return .run { _ in
+        await self.dismiss()
       }
       
-    case .setDialogueTooltip:
+    case .setupFocusTime:
+      guard let selectedCategory = state.selectedCategory else { return .none }
+      state.focusTimeBySeconds = selectedCategory.focusTimeMinute * 60
+      return .none
+      
+    case let .setSelectedCategory(selectedCategory):
+      state.selectedCategory = selectedCategory
+      return .none
+      
+    case .timer(.tick):
+      if state.focusTimeBySeconds <= 0 {
+        if state.overTimeBySeconds >= (60 * 60) {
+          // TODO: 휴식하기 이동
+        } else {
+          state.overTimeBySeconds += 1
+        }
+      } else {
+        state.focusTimeBySeconds -= 1
+      }
+      return .none
+      
+    case .timer:
       return .none
     }
   }

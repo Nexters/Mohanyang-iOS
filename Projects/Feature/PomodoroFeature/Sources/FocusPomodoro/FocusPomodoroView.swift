@@ -50,13 +50,16 @@ public struct FocusPomodoroView: View {
                 .foregroundStyle(Alias.Color.Text.secondary)
                 .font(Typography.header5)
             }
-            Text("00:00")
+            Text(formatTime(from: store.focusTimeBySeconds))
               .foregroundStyle(Alias.Color.Text.primary)
               .font(Typography.header1)
-            if true {
-              Text("00:00 초과")
+            if store.overTimeBySeconds > 0 {
+              Text("\(formatTime(from: store.overTimeBySeconds)) 초과")
                 .foregroundStyle(Alias.Color.Accent.red)
                 .font(Typography.header4)
+            } else {
+              Spacer()
+                .frame(height: 25)
             }
           }
           .padding(.horizontal, Alias.Spacing.xxLarge)
@@ -67,11 +70,11 @@ public struct FocusPomodoroView: View {
         
         VStack(spacing: Alias.Spacing.small) {
           Button(title: "휴식하기") {
-            
+            store.send(.takeARestButtonTapped)
           }
-          .buttonStyle(.box(level: true ? .primary : .secondary, size: .large, width: .medium))
+          .buttonStyle(.box(level: store.overTimeBySeconds > 0 ? .primary : .secondary, size: .large, width: .medium))
           Button(title: "집중 끝내기") {
-            
+            store.send(.endFocusButtonTapped)
           }
           .buttonStyle(.text(level: .secondary, size: .large))
         }
@@ -82,5 +85,11 @@ public struct FocusPomodoroView: View {
     .onLoad {
       store.send(.onLoad)
     }
+  }
+  
+  func formatTime(from seconds: Int) -> String {
+    let minutes = seconds / 60
+    let remainingSeconds = seconds % 60
+    return String(format: "%02d:%02d", minutes, remainingSeconds)
   }
 }
