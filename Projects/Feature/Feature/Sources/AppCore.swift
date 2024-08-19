@@ -11,6 +11,7 @@ import SwiftUI
 import SplashFeature
 import HomeFeature
 import OnboardingFeature
+import MyPageFeature
 import PushService
 
 import ComposableArchitecture

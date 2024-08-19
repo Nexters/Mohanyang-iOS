@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+import MyPageFeature
 import DesignSystem
 import Utils
 
@@ -119,6 +120,14 @@ public struct HomeView: View {
       )
     ) { store in
       TimeSelectView(store: store)
+    }
+    .navigationDestination(
+      item: $store.scope(
+        state: \.myPage,
+        action: \.myPage
+      )
+    ) { store in
+      MyPageView(store: store)
     }
     .onLoad {
       store.send(.onLoad)
