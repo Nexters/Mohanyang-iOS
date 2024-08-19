@@ -20,7 +20,7 @@ extension Button where Label == SelectButtonDetail<Text?, Text?, Image?, Image?>
       SelectButtonDetail {
         title == nil ? nil : Text(title ?? "")
       } subtitle: {
-        title == nil ? nil : Text(subtitle ?? "")
+        subtitle == nil ? nil : Text(subtitle ?? "")
       } leftIcon: {
         leftIcon
       } rightIcon: {

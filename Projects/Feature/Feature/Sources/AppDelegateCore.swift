@@ -49,7 +49,6 @@ public struct AppDelegateCore {
     case .didFinishLaunching:
       UIApplication.shared.applicationIconBadgeNumber = 0
       FirebaseApp.configure()
-      keychainClient.checkSubsequentRun()
       let userNotificationEventStream = userNotificationClient.delegate()
       
       Logger.shared.log("FCMToken: \(Messaging.messaging().fcmToken ?? "not generated")")

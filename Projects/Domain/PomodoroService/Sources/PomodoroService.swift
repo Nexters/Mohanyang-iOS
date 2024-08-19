@@ -11,15 +11,14 @@ import APIClientInterface
 
 import Dependencies
 
-let selectedCategoryKey = ""
+let selectedCategoryKey = "userdefaults_key_selected_category"
 
 extension PomodoroService: DependencyKey {
   public static let liveValue: PomodoroService = .live()
   
   private static func live() -> PomodoroService {
     return .init(
-      syncCategoryList: {
-        apiClient, databaseClient in
+      syncCategoryList: { apiClient, databaseClient in
         let api = CategoryAPI.getCategoryList
         let categoryList = try await apiClient.apiRequest(request: api, as: [PomodoroCategory].self)
         for category in categoryList {
