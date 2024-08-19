@@ -12,6 +12,7 @@ let project: Project = .makeProject(
   dependencies: [
     DEP.SPMTarget.composableArchitecture,
     DEP.SPMTarget.dependencies,
-    DEP.SPMTarget.riveRuntime
+    DEP.SPMTarget.riveRuntime,
+    DEP.SPMTarget.lottie
   ]
 )
