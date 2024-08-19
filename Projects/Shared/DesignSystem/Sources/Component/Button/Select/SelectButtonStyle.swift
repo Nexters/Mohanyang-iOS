@@ -52,10 +52,9 @@ struct SelectButtonDetailStyleImpl: SelectButtonDetailStyle {
         .font(Typography.header5)
         .foregroundStyle(getTitleForegourndColor())
     }
-    .padding(.vertical, 16)
-    .frame(maxWidth: .infinity)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(
-      RoundedRectangle(cornerRadius: Alias.BorderRadius.small)
+      RoundedRectangle(cornerRadius: Alias.BorderRadius.xSmall)
         .fill(getBackgroundColor())
         .strokeBorder(isSelected ? Alias.Color.Background.accent1 : .clear, lineWidth: 1)
     )

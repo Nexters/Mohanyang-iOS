@@ -8,19 +8,19 @@
 
 import SwiftUI
 
-extension Button where Label == SelectButtonDetail<Text, Text, Image?, Image?> {
+extension Button where Label == SelectButtonDetail<Text?, Text?, Image?, Image?> {
   public init(
-    title: LocalizedStringKey,
-    subtitle: LocalizedStringKey,
+    title: LocalizedStringKey? = nil,
+    subtitle: LocalizedStringKey? = nil,
     leftIcon: Image? = nil,
     rightIcon: Image? = nil,
     action: @escaping () -> Void
   ) {
     self.init(action: action) {
       SelectButtonDetail {
-        Text(title)
+        title == nil ? nil : Text(title ?? "")
       } subtitle: {
-        Text(subtitle)
+        title == nil ? nil : Text(subtitle ?? "")
       } leftIcon: {
         leftIcon
       } rightIcon: {
