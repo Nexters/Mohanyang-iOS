@@ -28,19 +28,23 @@ public struct FocusPomodoroCore {
     
     var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
     
+    @Presents var restWaiting: RestWaitingCore.State?
+    
     public init() {}
   }
   
   public enum Action {
     case onLoad
     
-    case takeARestButtonTapped
+    case takeRestButtonTapped
     case endFocusButtonTapped
     case setupFocusTime
     
-    case setSelectedCategory(PomodoroCategory?)
+    case goToHome
     
+    case setSelectedCategory(PomodoroCategory?)
     case timer(TimerCore.Action)
+    case restWaiting(PresentationAction<RestWaitingCore.Action>)
   }
   
   @Dependency(PomodoroService.self) var pomodoroService
@@ -55,6 +59,9 @@ public struct FocusPomodoroCore {
       TimerCore()
     }
     Reduce(self.core)
+      .ifLet(\.$restWaiting, action: \.restWaiting) {
+        RestWaitingCore()
+      }
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -72,17 +79,21 @@ public struct FocusPomodoroCore {
         }
       )
       
-    case .takeARestButtonTapped:
+    case .takeRestButtonTapped:
+      state.restWaiting = .init()
       return .none
       
     case .endFocusButtonTapped:
-      return .run { _ in
-        await self.dismiss()
+      return .run { send in
+        await send(.goToHome)
       }
       
     case .setupFocusTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
       state.focusTimeBySeconds = selectedCategory.focusTimeMinute * 60
+      return .none
+      
+    case .goToHome:
       return .none
       
     case let .setSelectedCategory(selectedCategory):
@@ -102,6 +113,13 @@ public struct FocusPomodoroCore {
       return .none
       
     case .timer:
+      return .none
+      
+    case .restWaiting(.presented(.restPomodoro(.presented(.goToFocus)))):
+      state.restWaiting = nil
+      return .none
+      
+    case .restWaiting:
       return .none
     }
   }

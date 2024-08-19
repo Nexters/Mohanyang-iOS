@@ -203,6 +203,12 @@ public struct HomeCore {
     case .myPage:
       return .none
       
+    case .focusPomodoro(.presented(.goToHome)),
+        .focusPomodoro(.presented(.restWaiting(.presented(.goToHome)))),
+        .focusPomodoro(.presented(.restWaiting(.presented(.restPomodoro(.presented(.goToHome)))))):
+      state.focusPomodoro = nil
+      return .none
+      
     case .focusPomodoro:
       return .none
     }
