@@ -72,6 +72,9 @@ public struct HomeCore {
       .ifLet(\.$timeSelect, action: \.timeSelect) {
         TimeSelectCore()
       }
+      .ifLet(\.$myPage, action: \.myPage) {
+        MyPageCore()
+      }
   }
   
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
