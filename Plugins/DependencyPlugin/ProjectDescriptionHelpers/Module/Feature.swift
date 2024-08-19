@@ -12,4 +12,5 @@ public enum Feature: String, Modulable {
   case SplashFeature
   case HomeFeature
   case OnboardingFeature
+  case MyPageFeature
 }

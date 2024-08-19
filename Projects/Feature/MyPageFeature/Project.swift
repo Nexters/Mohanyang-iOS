@@ -6,18 +6,16 @@ import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Feature.HomeFeature,
+  module: Feature.MyPageFeature,
   scripts: [],
   targets: [
     .sources,
     .tests,
-    .testing,
-    .example
+    .testing
   ],
   dependencies: [
     .sources: [
-      .dependency(rootModule: Domain.self),
-      .dependency(module: Feature.MyPageFeature, target: .sources)
-    ],
+      .dependency(rootModule: Domain.self)
+    ]
   ]
 )

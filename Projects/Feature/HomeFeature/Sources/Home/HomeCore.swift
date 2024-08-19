@@ -13,6 +13,7 @@ import UserDefaultsClientInterface
 import DatabaseClientInterface
 import PomodoroServiceInterface
 import APIClientInterface
+import MyPageFeature
 
 import ComposableArchitecture
 
@@ -29,7 +30,8 @@ public struct HomeCore {
     
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
-    
+    @Presents var myPage: MyPageCore.State?
+
     public init() {}
   }
   
@@ -50,6 +52,7 @@ public struct HomeCore {
     
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
+    case myPage(PresentationAction<MyPageCore.Action>)
   }
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -68,6 +71,9 @@ public struct HomeCore {
       }
       .ifLet(\.$timeSelect, action: \.timeSelect) {
         TimeSelectCore()
+      }
+      .ifLet(\.$myPage, action: \.myPage) {
+        MyPageCore()
       }
   }
   
@@ -118,6 +124,7 @@ public struct HomeCore {
       return .none
       
     case .mypageButtonTappd:
+      state.myPage = MyPageCore.State()
       return .none
       
     case .playButtonTapped:
@@ -160,6 +167,9 @@ public struct HomeCore {
       }
       
     case .timeSelect:
+      return .none
+
+    case .myPage:
       return .none
     }
   }
