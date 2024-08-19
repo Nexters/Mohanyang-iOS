@@ -9,6 +9,8 @@
 import CatFeature
 import APIClientInterface
 import UserServiceInterface
+import CatServiceInterface
+import UserDefaultsClientInterface
 
 import ComposableArchitecture
 
@@ -18,7 +20,7 @@ public struct MyPageCore {
   public struct State: Equatable {
     public init() { }
     var cat: AnyCat? = nil
-    var isFocusTimeAlarmOn: Bool = false
+    var isTimerAlarmOn: Bool = false
     var isDisturbAlarmOn: Bool = false
     var isInternetConnected: Bool = false
     let feedbackURLString: String = "https://forms.gle/wEUPH9Tvxgua4hCZ9"
@@ -35,6 +37,9 @@ public struct MyPageCore {
 
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
+  @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  let isTimerAlarmOnKey = "mohanyang_userdefaults_isTimerAlarmOnKey"
+  let isDisturbAlarmOnKey = "mohanyang_userdefaults_isDisturmAlarmOnKey"
 
   public init() {}
   
@@ -49,6 +54,8 @@ public struct MyPageCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
+      state.isTimerAlarmOn = userDefaultsClient.boolForKey(isTimerAlarmOnKey)
+      state.isDisturbAlarmOn = userDefaultsClient.boolForKey(isDisturbAlarmOnKey)
       return .run { send in
         let data = try await userService.getUserInfo(apiClient: apiClient)
         await send(._responseUserInfo(data))
@@ -69,6 +76,16 @@ public struct MyPageCore {
 
     case .myCat:
       return .none
+
+    case .binding(\.isTimerAlarmOn):
+      return .run { [isTimerAlarmOn = state.isTimerAlarmOn] _ in
+        await userDefaultsClient.setBool(isTimerAlarmOn, isTimerAlarmOnKey)
+      }
+
+    case .binding(\.isDisturbAlarmOn):
+      return .run { [isDisturbAlarmOn = state.isDisturbAlarmOn] _ in
+        await userDefaultsClient.setBool(isDisturbAlarmOn, isDisturbAlarmOnKey)
+      }
 
     case .binding:
       return .none

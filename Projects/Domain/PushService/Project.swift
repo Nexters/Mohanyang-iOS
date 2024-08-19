@@ -14,7 +14,8 @@ let project: Project = .makeTMABasedProject(
   ],
   dependencies: [
     .sources: [
-      .dependency(rootModule: Core.self)
+      .dependency(rootModule: Core.self),
+      .dependency(module: Domain.CatService)
     ]
   ]
 )

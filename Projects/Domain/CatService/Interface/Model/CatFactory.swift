@@ -23,12 +23,14 @@ public struct AnyCat: CatFactoryProtocol, Identifiable, Equatable {
 
   public var id: String { base.id }
   public var no: Int { base.no }
+  public var name: String
   public var keyword: String { base.keyword }
   public var keywordImage: Image { base.keywordImage }
-  public var name: String
   public var catImage: Image { base.catImage }
   public var selectCatRivTrigger: String { base.selectCatRivTrigger }
-  public var pushNotificationTitle: String { base.pushNotificationTitle }
+  public var focusEndPushTitle: String { base.focusEndPushTitle }
+  public var restEndPushTitle: String { base.restEndPushTitle }
+  public var disturbPushTitle: String { base.disturbPushTitle }
 
   public static func == (lhs: AnyCat, rhs: AnyCat) -> Bool {
     lhs.base.id == rhs.base.id
@@ -49,7 +51,9 @@ public struct CheeseCat: CatFactoryProtocol {
   public var keywordImage: Image = DesignSystemAsset.Image._16Star.swiftUIImage
   public var catImage: Image = Image(systemName: "star.fill")
   public var selectCatRivTrigger: String = "Click_Cheese Cat"
-  public var pushNotificationTitle: String = "어디갔냐옹..."
+  public var focusEndPushTitle: String = "집중이 끝났다냥! 이제 나랑 놀아달라냥"
+  public var restEndPushTitle: String = "이제 다시 집중해볼까냥?"
+  public var disturbPushTitle: String = "날 두고 어디갔냥.."
 }
 
 // MARK: BLACK CAT
@@ -66,7 +70,9 @@ public struct BlackCat: CatFactoryProtocol {
   public var keywordImage: Image = DesignSystemAsset.Image._16Heart.swiftUIImage
   public var catImage: Image = Image(systemName: "star")
   public var selectCatRivTrigger: String = "Click_Black Cat"
-  public var pushNotificationTitle: String = "어디갔냐옹..."
+  public var focusEndPushTitle: String = "집중이 끝났다냥! 이제 나랑 놀아달라냥"
+  public var restEndPushTitle: String = "이제 다시 집중해볼까냥?"
+  public var disturbPushTitle: String = "날 두고 어디갔냥.."
 }
 
 // MARK: THREE_COLOR CAT
@@ -83,7 +89,9 @@ public struct ThreeColorCat: CatFactoryProtocol {
   public var keywordImage: Image = DesignSystemAsset.Image._16Focus.swiftUIImage
   public var catImage: Image = Image(systemName: "star.fill")
   public var selectCatRivTrigger: String = "Click_Calico Cat"
-  public var pushNotificationTitle: String = "내가 여기있는데 어디갔냐옹!"
+  public var focusEndPushTitle: String = "집중이 끝났다냥! 원하는 만큼 집중했냥?"
+  public var restEndPushTitle: String = "집중할 시간이다냥! 빨리 들어오라냥"
+  public var disturbPushTitle: String = "지금 뭐하고 있냥? 내가 감시하고 있다냥"
 }
 
 // MARK: MAKE CAT
