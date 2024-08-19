@@ -14,6 +14,7 @@ disabled_rules:
   - nesting
   - function_body_length
   - identifier_name
+  - cyclomatic_complexity
 
 opt_in_rules:
   - closure_end_indentation
