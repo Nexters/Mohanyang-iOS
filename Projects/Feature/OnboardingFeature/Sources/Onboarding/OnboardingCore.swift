@@ -26,7 +26,7 @@ public struct OnboardingCore {
   }
 
   public enum Action: BindableAction {
-    case onApear
+    case onLoad
     case calculateOffset(CGFloat, OnboardingItem)
     case dragStart
     case tapStartButton
@@ -56,7 +56,7 @@ public struct OnboardingCore {
     enum CancelID { case timer, timerDebounce }
 
     switch action {
-    case .onApear:
+    case .onLoad:
       state.currentItemID = state.data.first!.id.uuidString
       state.fakedData = state.data
       guard var first = state.data.first,
@@ -136,6 +136,11 @@ public struct OnboardingCore {
 
     case .binding:
       return .none
+
+    case .selectCat(.dismiss):
+      return .run { send in
+        await send(._timerStart)
+      }
 
     case .selectCat:
       return .none

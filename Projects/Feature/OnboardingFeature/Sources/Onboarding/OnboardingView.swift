@@ -73,8 +73,8 @@ public struct OnboardingView: View {
     ) { store in
       SelectCatView(store: store)
     }
-    .onAppear {
-      store.send(.onApear)
+    .onLoad {
+      store.send(.onLoad)
     }
   }
 }
