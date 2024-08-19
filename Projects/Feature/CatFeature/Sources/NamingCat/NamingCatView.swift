@@ -12,14 +12,14 @@ import DesignSystem
 
 import ComposableArchitecture
 
-struct NamingCatView: View {
+public struct NamingCatView: View {
   @Bindable var store: StoreOf<NamingCatCore>
   
-  init(store: StoreOf<NamingCatCore>) {
+  public init(store: StoreOf<NamingCatCore>) {
     self.store = store
   }
   
-  var body: some View {
+  public var body: some View {
     NavigationContainer(
       title: Text("고양이 이름짓기"),
       style: .navigation
@@ -30,11 +30,11 @@ struct NamingCatView: View {
         ZStack {
           Rectangle()
             .foregroundStyle(Alias.Color.Background.secondary)
-            .frame(height: 240)
           store.selectedCat.catImage
             .setTooltipTarget(tooltip: DownDirectionTooltip.self)
         }
-        
+        .frame(maxHeight: 240)
+
         VStack(spacing: Alias.Spacing.small) {
           HStack {
             Text("내 고양이의 이름")
@@ -52,8 +52,8 @@ struct NamingCatView: View {
         
         Spacer()
         
-        Button(title: "시작하기") {
-          store.send(.tapStartButton)
+        Button("확인") {
+          store.send(.namedButtonTapped)
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .low))
         .disabled(store.inputFieldError != nil || store.text == "")

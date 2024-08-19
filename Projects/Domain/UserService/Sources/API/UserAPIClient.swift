@@ -24,6 +24,14 @@ extension UserService: DependencyKey {
           as: EmptyResponse.self
         )
         return
+      },
+
+      getUserInfo: { apiClient in
+        let request = UserAPIrequest.getUserInfo
+        return try await apiClient.apiRequest(
+          request: request,
+          as: UserDTO.Response.GetUserInfoResponseDTO.self
+        )
       }
     )
   }

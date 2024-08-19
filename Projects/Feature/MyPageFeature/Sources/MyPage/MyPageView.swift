@@ -27,12 +27,15 @@ public struct MyPageView: View {
       ScrollView {
         VStack(spacing: Alias.Spacing.medium) {
 
-          MyCatSectionView(name: store.catName)
+          MyCatSectionView(name: store.cat?.name ?? "")
             .padding(.all, Alias.Spacing.xLarge)
             .background(
               RoundedRectangle(cornerRadius: Alias.BorderRadius.small)
                 .foregroundStyle(Alias.Color.Background.secondary)
             )
+            .onTapGesture {
+              store.send(.tapMyCatDetail)
+            }
 
           StatisticSectionView(isInternetConnected: $store.isInternetConnected)
             .padding(.all, Alias.Spacing.xLarge)
@@ -78,6 +81,14 @@ public struct MyPageView: View {
       .scrollIndicators(.never)
     }
     .background(Alias.Color.Background.primary)
+    .navigationDestination(
+      item: $store.scope(state: \.myCat, action: \.myCat)
+    ) { store in
+      MyCatView(store: store)
+    }
+    .onAppear {
+      store.send(.onAppear)
+    }
   }
 }
 

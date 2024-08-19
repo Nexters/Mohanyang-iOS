@@ -16,10 +16,12 @@ import ComposableArchitecture
 public struct NamingCatCore {
   @ObservableState
   public struct State: Equatable {
-    public init(selectedCat: AnyCat) {
+    public init(selectedCat: AnyCat, route: Route) {
       self.selectedCat = selectedCat
+      self.route = route
     }
 
+    var route: Route
     var selectedCat: AnyCat
     var text: String = ""
     var inputFieldError: NamingCatError?
@@ -27,12 +29,19 @@ public struct NamingCatCore {
   }
   
   public enum Action: BindableAction {
-    case tapStartButton
+    case namedButtonTapped
     case moveToHome
     case setTooltip(DownDirectionTooltip?)
+    case saveChangedCatName(String)
+    case _setNextAction
     case binding(BindingAction<State>)
   }
-  
+
+  public enum Route {
+    case onboarding
+    case myPage
+  }
+
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(APIClient.self) var apiClient
   @Dependency(CatService.self) var catService
@@ -48,14 +57,13 @@ public struct NamingCatCore {
     let isOnboardedKey = "mohanyang_userdefaults_isOnboarded"
 
     switch action {
-    case .tapStartButton:
+    case .namedButtonTapped:
       return .run { [text = state.text] send in
         _ = try await catService.changeCatName(
           apiClient: apiClient,
           name: text
         )
-        await userDefaultsClient.setBool(true, key: isOnboardedKey)
-        await send(.moveToHome)
+        await send(._setNextAction)
       }
 
     case .moveToHome:
@@ -63,6 +71,21 @@ public struct NamingCatCore {
       
     case .setTooltip:
       return .none
+
+    case .saveChangedCatName:
+      return .none
+
+    case ._setNextAction:
+      if state.route == .onboarding {
+        return .run { send in
+          await userDefaultsClient.setBool(true, key: isOnboardedKey)
+          await send(.moveToHome)
+        }
+      } else {
+        return .run { [name = state.text] send in
+          await send(.saveChangedCatName(name))
+        }
+      }
 
     case .binding(\.text):
       state.inputFieldError = setError(state.text)

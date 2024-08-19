@@ -69,7 +69,7 @@ public struct SelectCatView: View {
         Spacer(minLength: Alias.Spacing.large)
 
         Button(title: "이 고양이와 함께하기") {
-          store.send(.tapNextButton)
+          store.send(.selectButtonTapped)
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .low))
         .disabled(store.selectedCat == nil)

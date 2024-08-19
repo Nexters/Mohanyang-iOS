@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+
+import CatFeature
 import DesignSystem
 
 import ComposableArchitecture
@@ -71,8 +73,8 @@ public struct OnboardingView: View {
     ) { store in
       SelectCatView(store: store)
     }
-    .onAppear {
-      store.send(.onApear)
+    .onLoad {
+      store.send(.onLoad)
     }
   }
 }
