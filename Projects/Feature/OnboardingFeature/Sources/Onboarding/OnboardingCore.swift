@@ -99,7 +99,7 @@ public struct OnboardingCore {
       )
 
     case .tapStartButton:
-      state.selectCat = SelectCatCore.State()
+      state.selectCat = SelectCatCore.State(route: .onboarding)
       return .run { send in await send(._timerEnd) }
 
     case ._timerStart:

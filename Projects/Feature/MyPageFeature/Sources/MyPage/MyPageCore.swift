@@ -21,11 +21,14 @@ public struct MyPageCore {
     var isFocusTimeAlarmOn: Bool = false
     var isDisturbAlarmOn: Bool = false
     var isInternetConnected: Bool = false
+    @Presents var myCat: MyCatCore.State?
   }
   
   public enum Action: BindableAction {
     case onAppear
+    case tapMyCatDetail
     case _responseUserInfo(UserDTO.Response.GetUserInfoResponseDTO)
+    case myCat(PresentationAction<MyCatCore.Action>)
     case binding(BindingAction<State>)
   }
 
@@ -37,6 +40,9 @@ public struct MyPageCore {
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce(self.core)
+      .ifLet(\.$myCat, action: \.myCat) {
+        MyCatCore()
+      }
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -46,6 +52,12 @@ public struct MyPageCore {
         let data = try await userService.getUserInfo(apiClient: apiClient)
         await send(._responseUserInfo(data))
       }
+
+    case .tapMyCatDetail:
+      guard let cat = state.cat else { return .none }
+      state.myCat = MyCatCore.State(cat: cat)
+      return .none
+
     case ._responseUserInfo(let data):
       state.cat = CatFactory.makeCat(
         type: CatType(rawValue: data.cat.type.camelCased()) ?? .cheese,
@@ -53,6 +65,10 @@ public struct MyPageCore {
         name: data.cat.name
       )
       return .none
+
+    case .myCat:
+      return .none
+
     case .binding:
       return .none
     }

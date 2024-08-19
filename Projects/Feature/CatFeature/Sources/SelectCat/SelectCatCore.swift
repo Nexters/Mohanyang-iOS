@@ -19,9 +19,13 @@ import ComposableArchitecture
 public struct SelectCatCore {
   @ObservableState
   public struct State: Equatable {
-    public init() { }
+    public init(selectedCat: AnyCat? = nil, route: Route) {
+      self.selectedCat = selectedCat
+      self.route = route
+    }
+    var route: Route
     var catList: [AnyCat] = []
-    var selectedCat: AnyCat? = nil
+    var selectedCat: AnyCat?
     var catRiv: RiveViewModel = Rive.catSelectMotionRiv
     @Presents var namingCat: NamingCatCore.State?
   }
@@ -30,15 +34,21 @@ public struct SelectCatCore {
     case onAppear
     case selectCat(AnyCat)
     case setRivTrigger
-    case tapNextButton
-    case moveToNamingCat
+    case selectButtonTapped
+    case saveChangedCat(AnyCat)
+    case _setNextAction
+    case _moveToNamingCat
     case _fetchCatListRequest
     case _fetchCatListResponse(CatList)
-    case _selectCatRequest
     case binding(BindingAction<State>)
     case namingCat(PresentationAction<NamingCatCore.Action>)
   }
-  
+
+  public enum Route {
+    case onboarding
+    case myPage
+  }
+
   public init() {}
 
   @Dependency(APIClient.self) var apiClient
@@ -57,7 +67,11 @@ public struct SelectCatCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
-      return .run { send in await send(._fetchCatListRequest) }
+      state.catRiv.stop()
+      return .run { send in
+        await send(._fetchCatListRequest)
+        await send(.setRivTrigger)
+      }
 
     case .selectCat(let selectedCat):
       state.selectedCat = (state.selectedCat == selectedCat) ? nil : selectedCat
@@ -72,12 +86,36 @@ public struct SelectCatCore {
       }
       return .none
 
-    case .tapNextButton:
-      return .run { send in await send(._selectCatRequest) }
-
-    case .moveToNamingCat:
+    case .selectButtonTapped:
       guard let selectedCat = state.selectedCat else { return .none }
-      state.namingCat = NamingCatCore.State(selectedCat: selectedCat)
+      return .run { send in
+        _ = try await userService.selectCat(no: selectedCat.no, apiClient: apiClient)
+        await send(._setNextAction)
+      }
+
+    case .saveChangedCat:
+      return .none
+
+    case ._setNextAction:
+      if state.route == .onboarding {
+        return .run { send in
+          // user notification 요청
+          _ = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
+          await send(._moveToNamingCat)
+        }
+      } else {
+        guard let cat = state.selectedCat else { return .none}
+        return .run { send in
+          await send(.saveChangedCat(cat))
+        }
+      }
+
+    case ._moveToNamingCat:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.namingCat = NamingCatCore.State(
+        selectedCat: selectedCat,
+        route: .onboarding
+      )
       return .none
 
     case ._fetchCatListRequest:
@@ -95,15 +133,6 @@ public struct SelectCatCore {
         )
       }
       return .none
-
-    case ._selectCatRequest:
-      guard let selectedCat = state.selectedCat else { return .none }
-      return .run { send in
-        _ = try await userService.selectCat(no: selectedCat.no, apiClient: apiClient)
-        // user notification 요청
-        _ = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
-        await send(.moveToNamingCat)
-      }
 
     case .binding:
       return .none

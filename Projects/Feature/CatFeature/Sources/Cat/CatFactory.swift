@@ -18,13 +18,14 @@ public struct AnyCat: CatFactoryProtocol, Identifiable, Equatable {
   private let base: CatFactoryProtocol
   public init(_ base: CatFactoryProtocol) {
     self.base = base
+    self.name = base.name
   }
 
   public var id: String { base.id }
   public var no: Int { base.no }
   public var keyword: String { base.keyword }
   public var keywordImage: Image { base.keywordImage }
-  public var name: String { base.name }
+  public var name: String
   public var catImage: Image { base.catImage }
   public var selectCatRivTrigger: String { base.selectCatRivTrigger }
   public var pushNotificationTitle: String { base.pushNotificationTitle }

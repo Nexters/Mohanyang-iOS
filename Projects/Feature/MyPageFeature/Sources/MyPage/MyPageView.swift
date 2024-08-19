@@ -33,6 +33,9 @@ public struct MyPageView: View {
               RoundedRectangle(cornerRadius: Alias.BorderRadius.small)
                 .foregroundStyle(Alias.Color.Background.secondary)
             )
+            .onTapGesture {
+              store.send(.tapMyCatDetail)
+            }
 
           StatisticSectionView(isInternetConnected: $store.isInternetConnected)
             .padding(.all, Alias.Spacing.xLarge)
@@ -78,6 +81,11 @@ public struct MyPageView: View {
       .scrollIndicators(.never)
     }
     .background(Alias.Color.Background.primary)
+    .navigationDestination(
+      item: $store.scope(state: \.myCat, action: \.myCat)
+    ) { store in
+      MyCatView(store: store)
+    }
     .onAppear {
       store.send(.onAppear)
     }
