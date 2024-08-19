@@ -21,12 +21,13 @@ public struct MyPageCore {
     var isFocusTimeAlarmOn: Bool = false
     var isDisturbAlarmOn: Bool = false
     var isInternetConnected: Bool = false
+    let feedbackURLString: String = "https://forms.gle/wEUPH9Tvxgua4hCZ9"
     @Presents var myCat: MyCatCore.State?
   }
   
   public enum Action: BindableAction {
     case onAppear
-    case tapMyCatDetail
+    case myCatDetailTapped
     case _responseUserInfo(UserDTO.Response.GetUserInfoResponseDTO)
     case myCat(PresentationAction<MyCatCore.Action>)
     case binding(BindingAction<State>)
@@ -53,7 +54,7 @@ public struct MyPageCore {
         await send(._responseUserInfo(data))
       }
 
-    case .tapMyCatDetail:
+    case .myCatDetailTapped:
       guard let cat = state.cat else { return .none }
       state.myCat = MyCatCore.State(cat: cat)
       return .none
