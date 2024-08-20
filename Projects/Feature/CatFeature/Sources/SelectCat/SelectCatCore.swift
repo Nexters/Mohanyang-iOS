@@ -26,7 +26,7 @@ public struct SelectCatCore {
     var route: Route
     var catList: [AnyCat] = []
     var selectedCat: AnyCat?
-    var catRiv: RiveViewModel = Rive.catSelectRiv()
+    var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
     @Presents var namingCat: NamingCatCore.State?
   }
   

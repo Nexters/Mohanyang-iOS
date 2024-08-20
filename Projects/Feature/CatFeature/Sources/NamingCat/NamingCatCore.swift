@@ -28,7 +28,7 @@ public struct NamingCatCore {
     var text: String = ""
     var inputFieldError: NamingCatError?
     var tooltip: DownDirectionTooltip? = .init()
-    var catRiv: RiveViewModel = Rive.catSelectRiv()
+    var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
   }
   
   public enum Action: BindableAction {

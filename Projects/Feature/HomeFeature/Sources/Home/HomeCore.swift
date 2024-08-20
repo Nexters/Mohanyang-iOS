@@ -36,7 +36,7 @@ public struct HomeCore {
     var toast: DefaultToast?
     var dialog: DefaultDialog?
 
-    var catRiv: RiveViewModel = Rive.catHomeRiv()
+    var catRiv: RiveViewModel = Rive.catHomeRiv(stateMachineName: "State Machine_Home")
 
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
