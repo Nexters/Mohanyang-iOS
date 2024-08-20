@@ -57,7 +57,7 @@ public struct NamingCatView: View {
           store.send(.namedButtonTapped)
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .low))
-        .disabled(store.inputFieldError != nil || store.text == "")
+        .disabled(store.inputFieldError != nil)
         .padding(.bottom, Alias.Spacing.small)
       }
       .padding(.horizontal, Alias.Spacing.xLarge)

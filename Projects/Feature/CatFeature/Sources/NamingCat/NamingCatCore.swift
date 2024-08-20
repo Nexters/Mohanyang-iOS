@@ -67,10 +67,11 @@ public struct NamingCatCore {
       return .none
 
     case .namedButtonTapped:
-      return .run { [text = state.text] send in
+      let catName = state.text == "" ? state.selectedCat.name : state.text
+      return .run { send in
         _ = try await catService.changeCatName(
           apiClient: apiClient,
-          name: text
+          name: catName
         )
         await send(._setNextAction)
       }
