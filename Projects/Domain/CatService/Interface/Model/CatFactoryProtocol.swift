@@ -20,4 +20,5 @@ public protocol CatFactoryProtocol {
   var focusEndPushTitle: String { get }
   var restEndPushTitle: String { get }
   var disturbPushTitle: String { get }
+  var tooltipMessage: String { get }
 }

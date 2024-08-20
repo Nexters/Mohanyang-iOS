@@ -113,7 +113,7 @@ public struct HomeCore {
       }
       
     case .setHomeCatTooltip:
-      state.homeCatTooltip = .init(title: "오랜만이다냥") // TODO: - 문구 랜덤변경하기
+      state.homeCatTooltip = .init(title: state.selectedCat.tooltipMessage)
       return .none
       
     case let .setHomeCategoryGuideTooltip(tooltip):

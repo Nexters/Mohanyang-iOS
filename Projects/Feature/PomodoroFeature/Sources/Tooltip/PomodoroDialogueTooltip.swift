@@ -27,5 +27,5 @@ public struct PomodoroDialogueTooltip: Tooltip {
   
   public var targetCornerRadius: CGFloat? { nil }
   
-  public var padding: CGFloat { -12 }
+  public var padding: CGFloat { -30 }
 }
