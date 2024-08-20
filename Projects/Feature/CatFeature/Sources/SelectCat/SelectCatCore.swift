@@ -80,7 +80,7 @@ public struct SelectCatCore {
 
     case .setRivTrigger:
       if let selectedCat = state.selectedCat {
-        state.catRiv.triggerInput(selectedCat.selectCatRivTrigger)
+        state.catRiv.triggerInput(selectedCat.rivTriggerName)
       } else {
         state.catRiv.play()
       }

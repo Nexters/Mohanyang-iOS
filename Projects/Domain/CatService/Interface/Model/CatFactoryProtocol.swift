@@ -15,7 +15,8 @@ public protocol CatFactoryProtocol {
   var keyword: String { get }
   var keywordImage: Image { get } // 키워드에 따른 아이콘 이미지
   var catImage: Image { get }
-  var selectCatRivTrigger: String { get }
+  var rivTriggerName: String { get }
+  var rivInputName: String { get }
   var focusEndPushTitle: String { get }
   var restEndPushTitle: String { get }
   var disturbPushTitle: String { get }

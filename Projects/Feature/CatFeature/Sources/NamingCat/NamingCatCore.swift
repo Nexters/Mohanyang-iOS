@@ -63,7 +63,7 @@ public struct NamingCatCore {
     switch action {
     case .onAppear:
       state.catRiv.stop()
-      state.catRiv.triggerInput(state.selectedCat.selectCatRivTrigger)
+      state.catRiv.triggerInput(state.selectedCat.rivTriggerName)
       return .none
 
     case .namedButtonTapped:
