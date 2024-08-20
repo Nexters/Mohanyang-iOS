@@ -124,25 +124,25 @@ extension DateComponents {
   public func to8601DurationString() -> String {
     var components = "P"
     
-    if let year = year, year > 0 {
+    if let year = year {
       components += "\(year)Y"
     }
-    if let month = month, month > 0 {
+    if let month = month {
       components += "\(month)M"
     }
-    if let day = day, day > 0 {
+    if let day = day {
       components += "\(day)D"
     }
     
     var timeComponents = ""
     
-    if let hour = hour, hour > 0 {
+    if let hour = hour {
       timeComponents += "\(hour)H"
     }
-    if let minute = minute, minute > 0 {
+    if let minute = minute {
       timeComponents += "\(minute)M"
     }
-    if let second = second, second > 0 {
+    if let second = second {
       timeComponents += "\(second)S"
     }
     
