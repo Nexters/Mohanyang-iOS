@@ -27,7 +27,7 @@ public struct SelectCatView: View {
       style: .navigation
     ) {
       VStack(spacing: 0) {
-        Spacer(minLength: Alias.Spacing.xLarge)
+        Spacer(minLength: Alias.Spacing.large)
 
         HStack {
           VStack(spacing: Alias.Spacing.xSmall) {
@@ -48,27 +48,28 @@ public struct SelectCatView: View {
           ZStack {
             Rectangle()
               .foregroundStyle(Alias.Color.Background.secondary)
-              .frame(maxHeight: .infinity)
             store.catRiv.view()
           }
-
-          Spacer()
-
-          HStack {
-            ForEach(store.catList) { cat in
-              Button(
-                title: LocalizedStringKey(cat.name),
-                subtitle: LocalizedStringKey(cat.keyword),
-                rightIcon: cat.keywordImage,
-                action: { store.send(.selectCat(cat)) }
-              )
-              .buttonStyle(.select(isSelected: cat == store.selectedCat))
-              .frame(height: 80)
-            }
-          }
+          .frame(maxHeight: 240)
         }
 
         Spacer(minLength: Alias.Spacing.large)
+
+        HStack {
+          ForEach(store.catList) { cat in
+            Button(
+              title: LocalizedStringKey(cat.name),
+              subtitle: LocalizedStringKey(cat.keyword),
+              rightIcon: cat.keywordImage,
+              action: { store.send(.selectCat(cat)) }
+            )
+            .buttonStyle(.select(isSelected: cat == store.selectedCat))
+            .frame(height: 80)
+          }
+        }
+        .padding(.bottom, Alias.Spacing.medium)
+
+        Spacer(minLength: Alias.Spacing.xLarge)
 
         Button(title: "이 고양이와 함께하기") {
           store.send(.selectButtonTapped)

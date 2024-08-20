@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import RiveRuntime
 
 public struct NamingCatView: View {
   @Bindable var store: StoreOf<NamingCatCore>
@@ -30,7 +31,7 @@ public struct NamingCatView: View {
         ZStack {
           Rectangle()
             .foregroundStyle(Alias.Color.Background.secondary)
-          store.selectedCat.catImage
+          store.catRiv.view()
             .setTooltipTarget(tooltip: DownDirectionTooltip.self)
         }
         .frame(maxHeight: 240)
@@ -66,5 +67,8 @@ public struct NamingCatView: View {
         .ignoresSafeArea()
     }
     .tooltipDestination(tooltip: $store.tooltip.sending(\.setTooltip))
+    .onAppear {
+      store.send(.onAppear)
+    }
   }
 }

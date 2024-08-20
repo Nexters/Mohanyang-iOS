@@ -20,7 +20,9 @@ import RiveRuntime
 {% endmacro %}
 {% macro fileBlock file %}
   {% set identifier %}{{ file.name }}{% if useExt %}.{{ file.ext }}{% endif %}{% endset %}
-  {{accessModifier}} static let {{identifier|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = {{resourceType}}(fileName: "{{file.name}}", in: .module)
+  {{accessModifier}} static func {{identifier|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}(stateMachineName: String? = nil) -> {{resourceType}} {
+      {{resourceType}}(fileName: "{{file.name}}", in: .module, stateMachineName: stateMachineName)
+  }
 {% endmacro %}
 {% macro dirBlock directory %}
   {% for file in directory.files %}
