@@ -35,7 +35,7 @@ struct ToastViewModifier<T: Toast>: ViewModifier {
         .padding(16)
         .background(
           RoundedRectangle(cornerRadius: 16)
-            .fill(Alias.Color.Background.inverse)
+            .fill(Global.Color.black.opacity(Global.Opacity._90d))
             .opacity(Global.Opacity._90d)
         )
         .padding(.horizontal, Global.Dimension._20f)
@@ -45,7 +45,7 @@ struct ToastViewModifier<T: Toast>: ViewModifier {
         )
         .onAppear {
           if toast.hideAutomatically {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
               if self.toast != nil {
                 self.toast = nil
               }
