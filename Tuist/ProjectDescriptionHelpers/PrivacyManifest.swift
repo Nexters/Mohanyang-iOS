@@ -10,72 +10,45 @@ import ProjectDescription
 extension PrivacyManifest {
   public static var mohanyang: Self {
     return .privacyManifest(
-      tracking: true,
+      tracking: false,
       trackingDomains: [],
       collectedDataTypes: [
+        [
+          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeDeviceID",
+          "NSPrivacyCollectedDataTypeLinked": false,
+          "NSPrivacyCollectedDataTypeTracking": true,
+          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
+        ],
         [
           "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeCrashData",
           "NSPrivacyCollectedDataTypeLinked": false,
           "NSPrivacyCollectedDataTypeTracking": false,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAnalytics"]
+          "NSPrivacyCollectedDataTypePurposes": [
+            "NSPrivacyCollectedDataTypePurposeAnalytics",
+            "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+          ]
+        ],
+        [
+          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePerformanceData",
+          "NSPrivacyCollectedDataTypeLinked": false,
+          "NSPrivacyCollectedDataTypeTracking": false,
+          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
+        ],
+        [
+          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+          "NSPrivacyCollectedDataTypeLinked": false,
+          "NSPrivacyCollectedDataTypeTracking": false,
+          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
         ],
         [
           "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeProductInteraction",
           "NSPrivacyCollectedDataTypeLinked": false,
           "NSPrivacyCollectedDataTypeTracking": false,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAnalytics"]
-        ],
-        [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeDeviceID",
-          "NSPrivacyCollectedDataTypeLinked": false,
-          "NSPrivacyCollectedDataTypeTracking": true,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeDeveloperAdvertising"]
-        ],
-        [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeSearchHistory",
-          "NSPrivacyCollectedDataTypeLinked": false,
-          "NSPrivacyCollectedDataTypeTracking": false,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeProductPersonalization"]
-        ],
-        [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePhotosorVideos",
-          "NSPrivacyCollectedDataTypeLinked": false,
-          "NSPrivacyCollectedDataTypeTracking": false,
           "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
         ],
         [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeContacts",
+          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherUsageData",
           "NSPrivacyCollectedDataTypeLinked": false,
-          "NSPrivacyCollectedDataTypeTracking": false,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
-        ],
-        [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeCoarseLocation",
-          "NSPrivacyCollectedDataTypeLinked": false,
-          "NSPrivacyCollectedDataTypeTracking": false,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeProductPersonalization"]
-        ],
-        [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePaymentInfo",
-          "NSPrivacyCollectedDataTypeLinked": false,
-          "NSPrivacyCollectedDataTypeTracking": false,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
-        ],
-        [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePhoneNumber",
-          "NSPrivacyCollectedDataTypeLinked": true,
-          "NSPrivacyCollectedDataTypeTracking": false,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
-        ],
-        [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeEmailAddress",
-          "NSPrivacyCollectedDataTypeLinked": true,
-          "NSPrivacyCollectedDataTypeTracking": false,
-          "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
-        ],
-        [
-          "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeName",
-          "NSPrivacyCollectedDataTypeLinked": true,
           "NSPrivacyCollectedDataTypeTracking": false,
           "NSPrivacyCollectedDataTypePurposes": ["NSPrivacyCollectedDataTypePurposeAppFunctionality"]
         ]
