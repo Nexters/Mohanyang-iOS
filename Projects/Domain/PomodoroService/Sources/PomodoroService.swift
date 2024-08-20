@@ -39,6 +39,17 @@ extension PomodoroService: DependencyKey {
       changeCategoryTime: { apiClient, categoryID, request in
         let api = CategoryAPI.editCategory(id: categoryID, request: request)
         _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
+      },
+      saveFocusTimeHistory: { apiClient, databaseClient, request in
+        let api = FocusTimeAPI.saveFocusTimes(request: request)
+        _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
+        for focusTime in request {
+          try await databaseClient.create(object: focusTime)
+        }
+      },
+      getFocusTimeSummaries: { apiClient in
+        let api = FocusTimeAPI.getSummaries
+        return try await apiClient.apiRequest(request: api, as: FocusTimeSummary.self)
       }
     )
   }
