@@ -103,27 +103,29 @@ struct CatPushNotificationExampleView: View {
 
       if let selectedCat = selectedCat {
         HStack(spacing: 10){
-          Image(systemName: "star.fill")
-          VStack(spacing: 0) {
-            HStack {
-              Text("모하냥")
-                .font(Typography.bodyR)
-                .foregroundStyle(Alias.Color.Text.primary)
-              Spacer()
-              Text("지금")
-                .font(Typography.subBodyR)
-                .foregroundStyle(Alias.Color.Text.secondary)
-            }
-            HStack {
-              Text(selectedCat.disturbPushTitle)
-                .font(Typography.subBodyR)
-                .foregroundStyle(Alias.Color.Text.primary)
-              Spacer()
-            }
+          DesignSystemAsset.Image.appIconExample.swiftUIImage
+            .cornerRadius(8.5, corners: .allCorners)
+
+          VStack(alignment: .leading, spacing: .zero) {
+            Text("모하냥")
+              .font(Typography.bodySB)
+              .foregroundStyle(Alias.Color.Text.primary)
+            Text(selectedCat.disturbPushTitle)
+              .font(Typography.subBodyR)
+              .foregroundStyle(Alias.Color.Text.primary)
           }
+
           Spacer()
+          
+          VStack(alignment: .trailing, spacing: .zero) {
+            Text("지금")
+              .font(Typography.captionR)
+              .foregroundStyle(Alias.Color.Text.primary)
+            Spacer()
+          }
+          .padding(.trailing, Alias.Spacing.small)
         }
-        .padding(.all, Alias.Spacing.medium)
+        .padding(.all, Alias.Spacing.large)
       } else {
         Text("고양이를 선택하면\n딴 짓 방해알림 예시를 보여드려요")
           .font(Typography.bodyR)
