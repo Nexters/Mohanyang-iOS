@@ -6,11 +6,14 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import CatServiceInterface
 import PomodoroServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
+import DesignSystem
 
 import ComposableArchitecture
+import RiveRuntime
 
 @Reducer
 public struct FocusPomodoroCore {
@@ -21,7 +24,12 @@ public struct FocusPomodoroCore {
     var overTimeBySeconds: Int = 0
     
     var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
-    
+
+    // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
+    var selectedCat: AnyCat = CatFactory.makeCat(type: .threeColor, no: 0, name: "치즈냥")
+
+    var catRiv: RiveViewModel = Rive.catFocusRiv(stateMachineName: "State Machine_Focus")
+
     @Presents var restWaiting: RestWaitingCore.State?
     
     public init() {}
@@ -34,6 +42,7 @@ public struct FocusPomodoroCore {
   }
   
   public enum Action: BindableAction {
+    case onAppear
     case binding(BindingAction<State>)
     case task
     
@@ -66,6 +75,10 @@ public struct FocusPomodoroCore {
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
+    case .onAppear:
+      state.catRiv.setInput(state.selectedCat.rivInputName, value: true)
+      return .none
+
     case .binding:
       return .none
       

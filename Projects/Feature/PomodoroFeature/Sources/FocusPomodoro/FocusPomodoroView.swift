@@ -38,11 +38,17 @@ public struct FocusPomodoroView: View {
         Spacer()
         
         VStack(spacing: Alias.Spacing.xLarge) {
-          Rectangle()
-            .fill(Alias.Color.Background.secondary)
-            .frame(width: 240, height: 240)
-            .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
-          
+          ZStack {
+            Rectangle()
+              .fill(Alias.Color.Background.secondary)
+            store.catRiv.view()
+              .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
+              .onTapGesture {
+                store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
+              }
+          }
+          .frame(width: 240, height: 240)
+
           VStack(spacing: .zero) {
             HStack(spacing: Alias.Spacing.xSmall) {
               DesignSystemAsset.Image._20Focus.swiftUIImage
@@ -93,6 +99,9 @@ public struct FocusPomodoroView: View {
     }
     .task {
       await store.send(.task).finish()
+    }
+    .onAppear {
+      store.send(.onAppear)
     }
   }
 }
