@@ -34,7 +34,9 @@ public enum Global {
     public static let orange700 = DesignSystemAsset.Color.orange700.swiftUIColor
     public static let orange800 = DesignSystemAsset.Color.orange800.swiftUIColor
     public static let orange900 = DesignSystemAsset.Color.orange900.swiftUIColor
-    
+
+    public static let yellow100 = DesignSystemAsset.Color.yellow100.swiftUIColor
+
     public static let red50 = DesignSystemAsset.Color.red50.swiftUIColor
     public static let red100 = DesignSystemAsset.Color.red100.swiftUIColor
     public static let red200 = DesignSystemAsset.Color.red200.swiftUIColor

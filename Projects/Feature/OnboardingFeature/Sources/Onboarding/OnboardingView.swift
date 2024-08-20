@@ -84,13 +84,8 @@ struct OnboardingCarouselContentView: View {
   var item: OnboardingItem
   var body: some View {
     VStack(spacing: Alias.Spacing.xxxLarge) {
-      ZStack {
-        Rectangle()
-          .foregroundStyle(Alias.Color.Background.secondary)
-        item.image
-      }
-      .frame(width: 240, height: 240)
-      
+      item.image
+
       VStack(spacing: Alias.Spacing.small) {
         Text(item.title)
           .font(Typography.header4)
