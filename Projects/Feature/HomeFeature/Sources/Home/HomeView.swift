@@ -40,10 +40,18 @@ public struct HomeView: View {
     ) {
       VStack(spacing: 40) {
         VStack(spacing: Alias.Spacing.xLarge) {
-          Rectangle()
-            .fill(Alias.Color.Background.secondary)
-            .frame(width: 240, height: 240)
-            .setTooltipTarget(tooltip: HomeCatDialogueTooltip.self)
+
+          ZStack {
+            Rectangle()
+              .fill(Alias.Color.Background.secondary)
+            store.catRiv.view()
+              .setTooltipTarget(tooltip: HomeCatDialogueTooltip.self)
+              .onTapGesture {
+                store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
+              }
+          }
+          .frame(width: 240, height: 240)
+
           Text("치즈냥")
             .font(Typography.header4)
             .foregroundStyle(Alias.Color.Text.tertiary)

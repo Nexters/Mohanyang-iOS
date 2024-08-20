@@ -10,6 +10,7 @@ import UserNotifications
 
 import PomodoroFeature
 import PushService
+import CatServiceInterface
 import PomodoroServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
@@ -18,6 +19,7 @@ import MyPageFeature
 import DesignSystem
 
 import ComposableArchitecture
+import RiveRuntime
 
 @Reducer
 public struct HomeCore {
@@ -28,10 +30,14 @@ public struct HomeCore {
     var homeTimeGuideTooltip: HomeTimeGuideTooltip?
     
     var selectedCategory: PomodoroCategory?
-    
+    // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
+    var selectedCat: AnyCat = CatFactory.makeCat(type: .threeColor, no: 0, name: "치즈냥")
+
     var toast: DefaultToast?
     var dialog: DefaultDialog?
-    
+
+    var catRiv: RiveViewModel = Rive.catHomeRiv(stateMachineName: "State Machine_Home")
+
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
     @Presents var focusPomodoro: FocusPomodoroCore.State?
@@ -101,6 +107,7 @@ public struct HomeCore {
       }
       
     case .onAppear:
+      state.catRiv.setInput(state.selectedCat.rivInputName, value: true)
       return .run { send in
         await send(.syncCategory)
       }

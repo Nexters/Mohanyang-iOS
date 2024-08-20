@@ -26,7 +26,7 @@ public struct SelectCatCore {
     var route: Route
     var catList: [AnyCat] = []
     var selectedCat: AnyCat?
-    var catRiv: RiveViewModel = Rive.catSelectMotionRiv
+    var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
     @Presents var namingCat: NamingCatCore.State?
   }
   
@@ -80,7 +80,7 @@ public struct SelectCatCore {
 
     case .setRivTrigger:
       if let selectedCat = state.selectedCat {
-        state.catRiv.triggerInput(selectedCat.selectCatRivTrigger)
+        state.catRiv.triggerInput(selectedCat.rivTriggerName)
       } else {
         state.catRiv.play()
       }
@@ -89,7 +89,7 @@ public struct SelectCatCore {
     case .selectButtonTapped:
       guard let selectedCat = state.selectedCat else { return .none }
       return .run { send in
-        _ = try await userService.selectCat(no: selectedCat.no, apiClient: apiClient)
+        _ = try await userService.selectCat(selectedCat.no, apiClient)
         await send(._setNextAction)
       }
 
@@ -120,7 +120,7 @@ public struct SelectCatCore {
 
     case ._fetchCatListRequest:
       return .run { send in
-        let response = try await catService.fetchCatLists(apiClient: apiClient)
+        let response = try await catService.fetchCatLists(apiClient)
         await send(._fetchCatListResponse(response))
       }
 

@@ -9,8 +9,10 @@
 import UserDefaultsClientInterface
 import APIClientInterface
 import CatServiceInterface
+import DesignSystem
 
 import ComposableArchitecture
+import RiveRuntime
 
 @Reducer
 public struct NamingCatCore {
@@ -26,9 +28,11 @@ public struct NamingCatCore {
     var text: String = ""
     var inputFieldError: NamingCatError?
     var tooltip: DownDirectionTooltip? = .init()
+    var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
   }
   
   public enum Action: BindableAction {
+    case onAppear
     case namedButtonTapped
     case moveToHome
     case setTooltip(DownDirectionTooltip?)
@@ -57,11 +61,17 @@ public struct NamingCatCore {
     let isOnboardedKey = "mohanyang_userdefaults_isOnboarded"
 
     switch action {
+    case .onAppear:
+      state.catRiv.stop()
+      state.catRiv.triggerInput(state.selectedCat.rivTriggerName)
+      return .none
+
     case .namedButtonTapped:
-      return .run { [text = state.text] send in
+      let catName = state.text == "" ? state.selectedCat.name : state.text
+      return .run { send in
         _ = try await catService.changeCatName(
           apiClient: apiClient,
-          name: text
+          name: catName
         )
         await send(._setNextAction)
       }

@@ -27,7 +27,8 @@ public struct AnyCat: CatFactoryProtocol, Identifiable, Equatable {
   public var keyword: String { base.keyword }
   public var keywordImage: Image { base.keywordImage }
   public var catImage: Image { base.catImage }
-  public var selectCatRivTrigger: String { base.selectCatRivTrigger }
+  public var rivTriggerName: String { base.rivTriggerName }
+  public var rivInputName: String { base.rivInputName }
   public var focusEndPushTitle: String { base.focusEndPushTitle }
   public var restEndPushTitle: String { base.restEndPushTitle }
   public var disturbPushTitle: String { base.disturbPushTitle }
@@ -50,7 +51,8 @@ public struct CheeseCat: CatFactoryProtocol {
   public var keyword: String = "응원"
   public var keywordImage: Image = DesignSystemAsset.Image._16Star.swiftUIImage
   public var catImage: Image = Image(systemName: "star.fill")
-  public var selectCatRivTrigger: String = "Click_Cheese Cat"
+  public var rivTriggerName: String = "Click_Cheese Cat"
+  public var rivInputName: String = "cheeseCat"
   public var focusEndPushTitle: String = "집중이 끝났다냥! 이제 나랑 놀아달라냥"
   public var restEndPushTitle: String = "이제 다시 집중해볼까냥?"
   public var disturbPushTitle: String = "날 두고 어디갔냥.."
@@ -69,7 +71,8 @@ public struct BlackCat: CatFactoryProtocol {
   public var keyword: String = "긍정"
   public var keywordImage: Image = DesignSystemAsset.Image._16Heart.swiftUIImage
   public var catImage: Image = Image(systemName: "star")
-  public var selectCatRivTrigger: String = "Click_Black Cat"
+  public var rivTriggerName: String = "Click_Black Cat"
+  public var rivInputName: String = "blackCat"
   public var focusEndPushTitle: String = "집중이 끝났다냥! 이제 나랑 놀아달라냥"
   public var restEndPushTitle: String = "이제 다시 집중해볼까냥?"
   public var disturbPushTitle: String = "날 두고 어디갔냥.."
@@ -88,7 +91,8 @@ public struct ThreeColorCat: CatFactoryProtocol {
   public var keyword: String = "자극"
   public var keywordImage: Image = DesignSystemAsset.Image._16Focus.swiftUIImage
   public var catImage: Image = Image(systemName: "star.fill")
-  public var selectCatRivTrigger: String = "Click_Calico Cat"
+  public var rivTriggerName: String = "Click_Calico Cat"
+  public var rivInputName: String = "calicoCat"
   public var focusEndPushTitle: String = "집중이 끝났다냥! 원하는 만큼 집중했냥?"
   public var restEndPushTitle: String = "집중할 시간이다냥! 빨리 들어오라냥"
   public var disturbPushTitle: String = "지금 뭐하고 있냥? 내가 감시하고 있다냥"

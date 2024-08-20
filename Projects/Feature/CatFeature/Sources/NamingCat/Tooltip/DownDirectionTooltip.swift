@@ -16,5 +16,5 @@ public struct DownDirectionTooltip: Tooltip {
   public var direction: TooltipDirection { .down }
   public var targetCornerRadius: CGFloat? { Alias.BorderRadius.small }
   public var dimEnabled: Bool { false }
-  public var padding: CGFloat { 12 }
+  public var padding: CGFloat { -20 }
 }
