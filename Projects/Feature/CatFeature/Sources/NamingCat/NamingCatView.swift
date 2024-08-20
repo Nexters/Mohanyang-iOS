@@ -34,7 +34,7 @@ public struct NamingCatView: View {
           store.catRiv.view()
             .setTooltipTarget(tooltip: DownDirectionTooltip.self)
         }
-        .frame(maxHeight: 240)
+        .frame(height: 240)
 
         VStack(spacing: Alias.Spacing.small) {
           HStack {
