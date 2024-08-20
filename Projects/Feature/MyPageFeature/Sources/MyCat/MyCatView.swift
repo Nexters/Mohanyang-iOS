@@ -28,13 +28,8 @@ public struct MyCatView: View {
       VStack {
         Spacer()
         VStack(spacing: Alias.Spacing.medium) {
-          ZStack {
-            Rectangle()
-              .foregroundStyle(Alias.Color.Background.secondary)
-              .frame(maxHeight: .infinity)
-            store.cat.catImage
-              .setTooltipTarget(tooltip: MyCatTooltip.self)
-          }
+          store.catRiv.view()
+          .setTooltipTarget(tooltip: MyCatTooltip.self)
           .frame(maxHeight: 240)
 
           HStack(spacing: Alias.Spacing.xSmall) {
@@ -68,6 +63,9 @@ public struct MyCatView: View {
       item: $store.scope(state: \.namingCat, action: \.namingCat)
     ) { store in
       NamingCatView(store: store)
+    }
+    .onAppear {
+      store.send(.onAppear)
     }
   }
 }

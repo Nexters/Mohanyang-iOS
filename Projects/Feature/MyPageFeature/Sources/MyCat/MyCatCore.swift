@@ -8,8 +8,10 @@
 
 import CatFeature
 import CatServiceInterface
+import DesignSystem
 
 import ComposableArchitecture
+import RiveRuntime
 
 @Reducer
 public struct MyCatCore {
@@ -17,11 +19,13 @@ public struct MyCatCore {
   public struct State: Equatable {
     var cat: AnyCat
     var tooltip: MyCatTooltip? = .init()
+    var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
     @Presents var selectCat: SelectCatCore.State?
     @Presents var namingCat: NamingCatCore.State?
   }
   
   public enum Action {
+    case onAppear
     case setTooltip(MyCatTooltip?)
     case changeCatButtonTapped
     case changeCatNameButtonTapped
@@ -46,6 +50,11 @@ public struct MyCatCore {
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
+    case .onAppear:
+      state.catRiv.stop()
+      state.catRiv.triggerInput(state.cat.rivTriggerName)
+      return .none
+
     case .setTooltip:
       return .none
 
