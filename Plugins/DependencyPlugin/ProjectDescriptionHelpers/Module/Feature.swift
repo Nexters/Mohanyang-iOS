@@ -13,5 +13,6 @@ public enum Feature: String, Modulable {
   case HomeFeature
   case OnboardingFeature
   case MyPageFeature
+  case PomodoroFeature
   case CatFeature
 }

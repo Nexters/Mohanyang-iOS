@@ -17,7 +17,8 @@ let project: Project = .makeTMABasedProject(
   dependencies: [
     .sources: [
       .dependency(rootModule: Domain.self),
-      .dependency(module: Feature.MyPageFeature, target: .sources)
-    ],
+      .dependency(module: Feature.MyPageFeature),
+      .dependency(module: Feature.PomodoroFeature)
+    ]
   ]
 )

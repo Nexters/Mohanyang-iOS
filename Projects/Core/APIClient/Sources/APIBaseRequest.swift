@@ -7,8 +7,9 @@
 //
 
 import Foundation
+
 import APIClientInterface
-import Shared
+import Utils
 
 extension APIBaseRequest {
   func asURLRequest() async throws -> URLRequest {

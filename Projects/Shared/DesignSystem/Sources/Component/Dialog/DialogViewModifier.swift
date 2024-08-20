@@ -90,7 +90,6 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
         .zIndex(3)
       }
     }
-    .ignoresSafeArea()
     .animation(.easeInOut(duration: 0.3), value: self.dialog == nil)
   }
 }

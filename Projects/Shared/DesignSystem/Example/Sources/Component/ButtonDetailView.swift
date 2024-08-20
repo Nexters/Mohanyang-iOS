@@ -270,6 +270,7 @@ struct ButtonDetailView: View {
             }
           )
           .buttonStyle(.select(isSelected: true))
+          .frame(height: 80)
           Button(
             title: "Title",
             subtitle: "subTitle",
@@ -278,6 +279,7 @@ struct ButtonDetailView: View {
             action: { /*action*/ }
           )
           .buttonStyle(.select(isSelected: false))
+          .frame(height: 80)
           Button(
             title: "Title",
             subtitle: "subTitle",
@@ -287,6 +289,7 @@ struct ButtonDetailView: View {
           )
           .buttonStyle(.select(isSelected: false))
           .disabled(true)
+          .frame(height: 80)
         }
       }
       .padding(.horizontal, 20)

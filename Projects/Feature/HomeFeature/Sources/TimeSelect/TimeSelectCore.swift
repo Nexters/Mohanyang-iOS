@@ -75,7 +75,7 @@ public struct TimeSelectCore {
     case let .pickerSelection(selection):
       state.selectedTime = selection
       return .run { _ in
-        await self.feedbackGeneratorClient.impactOccurred(.soft)
+        await self.feedbackGeneratorClient.impactOccurred(.light)
       }
       
     case let .setSelectedCategory(category):
@@ -153,7 +153,7 @@ public struct TimeItem: WheelPickerData {
   }
   
   var title: String {
-    return "\(minute):00"
+    return String(format: "%02d:00", minute)
   }
   
   var data: Int {

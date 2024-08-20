@@ -16,4 +16,5 @@ public extension DEP.SPMTarget {
   static let composableArchitecture: TargetDependency = .external(name: "ComposableArchitecture")
   static let dependencies: TargetDependency = .external(name: "Dependencies")
   static let riveRuntime: TargetDependency = .external(name: "RiveRuntime")
+  static let lottie: TargetDependency = .external(name: "Lottie")
 }

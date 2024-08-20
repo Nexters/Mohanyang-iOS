@@ -63,6 +63,7 @@ public struct SelectCatView: View {
                 action: { store.send(.selectCat(cat)) }
               )
               .buttonStyle(.select(isSelected: cat == store.selectedCat))
+              .frame(height: 80)
             }
           }
         }

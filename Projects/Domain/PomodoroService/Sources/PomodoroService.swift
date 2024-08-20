@@ -11,15 +11,14 @@ import APIClientInterface
 
 import Dependencies
 
-let selectedCategoryKey = ""
+let selectedCategoryKey = "userdefaults_key_selected_category"
 
 extension PomodoroService: DependencyKey {
   public static let liveValue: PomodoroService = .live()
   
   private static func live() -> PomodoroService {
     return .init(
-      syncCategoryList: {
-        apiClient, databaseClient in
+      syncCategoryList: { apiClient, databaseClient in
         let api = CategoryAPI.getCategoryList
         let categoryList = try await apiClient.apiRequest(request: api, as: [PomodoroCategory].self)
         for category in categoryList {
@@ -40,6 +39,17 @@ extension PomodoroService: DependencyKey {
       changeCategoryTime: { apiClient, categoryID, request in
         let api = CategoryAPI.editCategory(id: categoryID, request: request)
         _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
+      },
+      saveFocusTimeHistory: { apiClient, databaseClient, request in
+        let api = FocusTimeAPI.saveFocusTimes(request: request)
+        _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
+        for focusTime in request {
+          try await databaseClient.create(object: focusTime)
+        }
+      },
+      getFocusTimeSummaries: { apiClient in
+        let api = FocusTimeAPI.getSummaries
+        return try await apiClient.apiRequest(request: api, as: FocusTimeSummary.self)
       }
     )
   }

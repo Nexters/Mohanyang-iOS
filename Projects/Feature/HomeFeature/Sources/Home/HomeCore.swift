@@ -8,12 +8,14 @@
 
 import UserNotifications
 
+import PomodoroFeature
 import PushService
+import PomodoroServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
-import PomodoroServiceInterface
 import APIClientInterface
 import MyPageFeature
+import DesignSystem
 
 import ComposableArchitecture
 
@@ -21,15 +23,18 @@ import ComposableArchitecture
 public struct HomeCore {
   @ObservableState
   public struct State: Equatable {
-    
     var homeCatTooltip: HomeCatDialogueTooltip?
     var homeCategoryGuideTooltip: HomeCategoryGuideTooltip?
     var homeTimeGuideTooltip: HomeTimeGuideTooltip?
     
     var selectedCategory: PomodoroCategory?
     
+    var toast: DefaultToast?
+    var dialog: DefaultDialog?
+    
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
+    @Presents var focusPomodoro: FocusPomodoroCore.State?
     @Presents var myPage: MyPageCore.State?
 
     public init() {}
@@ -52,6 +57,7 @@ public struct HomeCore {
     
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
+    case focusPomodoro(PresentationAction<FocusPomodoroCore.Action>)
     case myPage(PresentationAction<MyPageCore.Action>)
   }
   
@@ -71,6 +77,9 @@ public struct HomeCore {
       }
       .ifLet(\.$timeSelect, action: \.timeSelect) {
         TimeSelectCore()
+      }
+      .ifLet(\.$focusPomodoro, action: \.focusPomodoro) {
+        FocusPomodoroCore()
       }
       .ifLet(\.$myPage, action: \.myPage) {
         MyPageCore()
@@ -128,6 +137,7 @@ public struct HomeCore {
       return .none
       
     case .playButtonTapped:
+      state.focusPomodoro = .init()
       return .none
       
     case .syncCategory:
@@ -153,12 +163,34 @@ public struct HomeCore {
         }
       }
       
+    case .categorySelect(.presented(.bottomCheckButtonTapped)):
+      state.toast = DefaultToast(
+        message: "카테고리를 변경했어요",
+        image: DesignSystemAsset.Image._24CheckSecondary.swiftUIImage
+      )
+      return .none
+      
     case .categorySelect(.dismiss):
       return .run { send in
         await send(.syncCategory)
       }
       
     case .categorySelect:
+      return .none
+      
+    case .timeSelect(.presented(.bottomCheckButtonTapped)):
+      guard let mode = state.timeSelect?.mode else { return .none }
+      var message: String
+      switch mode {
+      case .focus:
+        message = "집중시간을 변경했어요"
+      case .rest:
+        message = "휴식시간을 변경했어요"
+      }
+      state.toast = DefaultToast(
+        message: message,
+        image: DesignSystemAsset.Image._24CheckSecondary.swiftUIImage
+      )
       return .none
       
     case .timeSelect(.dismiss):
@@ -170,6 +202,24 @@ public struct HomeCore {
       return .none
 
     case .myPage:
+      return .none
+      
+    case .focusPomodoro(.presented(.restWaiting(.presented(.goToHomeByOver60Minute)))):
+      state.focusPomodoro = nil
+      state.dialog = DefaultDialog(
+        title: "집중을 끝내고 돌아왔어요",
+        subTitle: "너무 오랜 시간동안 대기화면에 머물러서 홈화면으로 이동되었어요.",
+        firstButton: DialogButtonModel(title: "확인")
+      )
+      return .none
+      
+    case .focusPomodoro(.presented(.goToHome)),
+        .focusPomodoro(.presented(.restWaiting(.presented(.goToHome)))),
+        .focusPomodoro(.presented(.restWaiting(.presented(.restPomodoro(.presented(.goToHome)))))):
+      state.focusPomodoro = nil
+      return .none
+      
+    case .focusPomodoro:
       return .none
     }
   }

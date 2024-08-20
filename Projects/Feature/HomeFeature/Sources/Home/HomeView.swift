@@ -9,6 +9,7 @@
 import SwiftUI
 
 import MyPageFeature
+import PomodoroFeature
 import DesignSystem
 import Utils
 
@@ -105,6 +106,8 @@ public struct HomeView: View {
     .tooltipDestination(tooltip: $store.homeCatTooltip.sending(\.setHomeCatTooltip))
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
+    .toastDestination(toast: $store.toast)
+    .dialog(dialog: $store.dialog)
     .bottomSheet(
       item: $store.scope(
         state: \.categorySelect,
@@ -120,6 +123,14 @@ public struct HomeView: View {
       )
     ) { store in
       TimeSelectView(store: store)
+    }
+    .navigationDestination(
+      item: $store.scope(
+        state: \.focusPomodoro,
+        action: \.focusPomodoro
+      )
+    ) { store in
+      FocusPomodoroView(store: store)
     }
     .navigationDestination(
       item: $store.scope(

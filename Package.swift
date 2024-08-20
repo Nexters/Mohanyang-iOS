@@ -17,6 +17,7 @@ let package: Package = .init(
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.11.2"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies.git", exact: "1.3.3"),
-    .package(url: "https://github.com/rive-app/rive-ios.git", exact: "5.15.1")
+    .package(url: "https://github.com/rive-app/rive-ios.git", exact: "5.15.1"),
+    .package(url: "https://github.com/airbnb/lottie-spm.git", exact: "4.5.0")
   ]
 )
