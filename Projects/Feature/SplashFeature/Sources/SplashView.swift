@@ -34,7 +34,6 @@ public struct SplashView: View {
     .getFrameMeasure { value in
       guard let frame = value[backgroundFrameID] else { return }
       store.width = frame.width
-      print("대체 몇인데 \(store.width)")
     }
     .onAppear {
       store.send(.onAppear)

@@ -62,7 +62,7 @@ public struct SplashCore {
 
     case .moveToHome:
       return .none
-      
+
     case .moveToOnboarding:
       return .none
 
@@ -88,7 +88,7 @@ extension SplashCore {
 
       try await Task.sleep(for: .seconds(1.5))
       userDefaultsClient.boolForKey(isOnboardedKey) ?
-      await send(.moveToHome) : await send(.moveToOnboarding)
+      await send(.moveToHome, animation: .easeOut(duration: 0.5)) : await send(.moveToOnboarding, animation: .easeOut(duration: 0.5))
     }
   }
 
