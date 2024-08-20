@@ -34,11 +34,10 @@ public struct RestWaitingView: View {
               Button(
                 title: .init(selectedCategory.title),
                 leftIcon: selectedCategory.image
-              ) {
-              }
+              ) {}
               .buttonStyle(.box(level: .tertiary, size: .small))
             }
-            Text(formatTime(from: store.restWaitingTimeBySeconds))
+            Text(formatTime(from: store.focusedTimeBySeconds))
               .foregroundStyle(Alias.Color.Text.primary)
               .font(Typography.header1)
             if store.overTimeBySeconds > 0 {

@@ -22,17 +22,23 @@ public struct RestWaitingCore {
   public struct State: Equatable {
     let source: Source
     var selectedCategory: PomodoroCategory?
-    var restWaitingTimeBySeconds: Int = 60 * 30 // 휴식 대기는 30분 고정
-    var overTimeBySeconds: Int = 0
+    let focusedTimeBySeconds: Int
+    let overTimeBySeconds: Int
     var changeFocusTimeByMinute: Int = 0
     
-    var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
+    var timer: TimerCore.State = .init(interval: .seconds(3600), mode: .continuous)
     var toast: DefaultToast?
     
     @Presents var restPomodoro: RestPomodoroCore.State?
     
-    public init(source: Source) {
+    public init(
+      source: Source,
+      focusedTimeBySeconds: Int,
+      overTimeBySeconds: Int
+    ) {
       self.source = source
+      self.focusedTimeBySeconds = focusedTimeBySeconds
+      self.overTimeBySeconds = overTimeBySeconds
     }
     
     var minus5MinuteButtonDisabled: Bool {
@@ -141,19 +147,9 @@ public struct RestWaitingCore {
       return .none
       
     case .timer(.tick):
-      if state.restWaitingTimeBySeconds == 0 {
-        if state.overTimeBySeconds == 1800 { // 30분 초과시 홈화면으로 나가기
-          return .run { send in
-            await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
-            await send(.goToHomeByOver60Minute)
-          }
-        } else {
-          state.overTimeBySeconds += 1
-        }
-      } else {
-        state.restWaitingTimeBySeconds -= 1
+      return .run { send in
+        await send(.goToHomeByOver60Minute)
       }
-      return .none
       
     case .timer:
       return .none

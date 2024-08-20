@@ -94,7 +94,11 @@ public struct FocusPomodoroCore {
       }
       
     case .takeRestButtonTapped:
-      state.restWaiting = RestWaitingCore.State(source: .focusPomodoro)
+      state.restWaiting = RestWaitingCore.State(
+        source: .focusPomodoro,
+        focusedTimeBySeconds: state.focusTimeBySeconds,
+        overTimeBySeconds: state.overTimeBySeconds
+      )
       return .none
       
     case .endFocusButtonTapped:
@@ -113,9 +117,18 @@ public struct FocusPomodoroCore {
     case .timer(.tick):
       if state.focusTimeBySeconds == 0 {
         if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
-          return .run { send in
+          return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
-            await send(.set(\.restWaiting, RestWaitingCore.State(source: .overtimeFromFocusPomodoro)))
+            await send(
+              .set(
+                \.restWaiting,
+                 RestWaitingCore.State(
+                  source: .overtimeFromFocusPomodoro,
+                  focusedTimeBySeconds: state.focusTimeBySeconds,
+                  overTimeBySeconds: state.overTimeBySeconds
+                 )
+              )
+            )
           }
         } else {
           state.overTimeBySeconds += 1
