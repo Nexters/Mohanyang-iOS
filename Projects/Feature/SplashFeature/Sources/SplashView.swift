@@ -13,16 +13,31 @@ import DesignSystem
 import ComposableArchitecture
 
 public struct SplashView: View {
-  let store: StoreOf<SplashCore>
+  @Namespace var backgroundFrameID
+  @Bindable var store: StoreOf<SplashCore>
 
   public init(store: StoreOf<SplashCore>) {
     self.store = store
   }
   public var body: some View {
-    Text("Splash")
-      .font(Typography.time)
-      .onAppear {
-        store.send(.onAppear)
+    HStack {
+      Spacer()
+      VStack {
+        Spacer()
+        DesignSystemAsset.Image.appSymbol.swiftUIImage
+        Spacer()
       }
+      Spacer()
+    }
+    .background(Global.Color.yellow100)
+    .setFrameMeasure(space: .global, identifier: backgroundFrameID)
+    .getFrameMeasure { value in
+      guard let frame = value[backgroundFrameID] else { return }
+      store.width = frame.width
+      print("대체 몇인데 \(store.width)")
+    }
+    .onAppear {
+      store.send(.onAppear)
+    }
   }
 }

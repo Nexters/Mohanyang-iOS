@@ -21,14 +21,16 @@ public struct SplashCore {
   @ObservableState
   public struct State: Equatable {
     public init() { }
+    var width: CGFloat = .zero
     var isLoggedIn: Bool = false
   }
 
-  public enum Action {
+  public enum Action: BindableAction {
     case onAppear
     case didFinishInitializeDatabase
     case moveToHome
     case moveToOnboarding
+    case binding(BindingAction<State>)
   }
 
   public init() { }
@@ -43,6 +45,7 @@ public struct SplashCore {
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
 
   public var body: some ReducerOf<Self> {
+    BindingReducer()
     Reduce(self.core)
   }
 
@@ -53,9 +56,17 @@ public struct SplashCore {
         try await initilizeDatabaseSystem(databaseClient: databaseClient)
         await send(.didFinishInitializeDatabase)
       }
+
     case.didFinishInitializeDatabase:
       return checkDeviceIDExist()
-    default:
+
+    case .moveToHome:
+      return .none
+      
+    case .moveToOnboarding:
+      return .none
+
+    case .binding:
       return .none
     }
   }
