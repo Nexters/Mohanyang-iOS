@@ -12,17 +12,21 @@ import NetworkTrackingInterface
 
 import Dependencies
 
-extension NetworkTracking {
+extension NetworkTracking: DependencyKey {
   public static let liveValue: NetworkTracking = .live()
 
   public static func live() -> NetworkTracking {
     let networkMonitor = NWPathMonitor()
+    let globalQueue = DispatchQueue.global()
+
     return NetworkTracking(
       start: {
-        networkMonitor.start(queue: DispatchQueue.global())
+        networkMonitor.start(queue: globalQueue)
       },
       updateNetworkConnected: {
-        return AsyncThrowingStream<Bool, Error> { continuation in
+        return AsyncStream<Bool> { continuation in
+          let initialState = networkMonitor.currentPath.status == .satisfied ? true : false
+          continuation.yield(initialState)
           networkMonitor.pathUpdateHandler = { path in
             let isConnected = path.status == .satisfied ? true : false
             continuation.yield(isConnected)

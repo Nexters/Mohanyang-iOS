@@ -11,6 +11,7 @@ import APIClientInterface
 import UserServiceInterface
 import CatServiceInterface
 import UserDefaultsClientInterface
+import NetworkTrackingInterface
 
 import ComposableArchitecture
 
@@ -22,15 +23,17 @@ public struct MyPageCore {
     var cat: AnyCat? = nil
     var isTimerAlarmOn: Bool = false
     var isDisturbAlarmOn: Bool = false
-    var isInternetConnected: Bool = false
+    var isNetworkConnected: Bool = false
     let feedbackURLString: String = "https://forms.gle/wEUPH9Tvxgua4hCZ9"
     @Presents var myCat: MyCatCore.State?
   }
   
   public enum Action: BindableAction {
     case onAppear
+    case onDisappear
     case myCatDetailTapped
     case _responseUserInfo(UserDTO.Response.GetUserInfoResponseDTO)
+    case _fetchNetworkConntection(Bool)
     case myCat(PresentationAction<MyCatCore.Action>)
     case binding(BindingAction<State>)
   }
@@ -38,6 +41,7 @@ public struct MyPageCore {
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(NetworkTracking.self) var networkTracking
   let isTimerAlarmOnKey = "mohanyang_userdefaults_isTimerAlarmOnKey"
   let isDisturbAlarmOnKey = "mohanyang_userdefaults_isDisturmAlarmOnKey"
 
@@ -56,10 +60,17 @@ public struct MyPageCore {
     case .onAppear:
       state.isTimerAlarmOn = userDefaultsClient.boolForKey(isTimerAlarmOnKey)
       state.isDisturbAlarmOn = userDefaultsClient.boolForKey(isDisturbAlarmOnKey)
-      return .run { send in
-        let data = try await userService.getUserInfo(apiClient: apiClient)
-        await send(._responseUserInfo(data))
-      }
+      return .merge(
+        .run { send in
+          let data = try await userService.getUserInfo(apiClient: apiClient)
+          await send(._responseUserInfo(data))
+        },
+        fetchNetworkConnection()
+      )
+
+    case .onDisappear:
+      networkTracking.cancel()
+      return .none
 
     case .myCatDetailTapped:
       guard let cat = state.cat else { return .none }
@@ -72,6 +83,10 @@ public struct MyPageCore {
         no: data.cat.no,
         name: data.cat.name
       )
+      return .none
+
+    case ._fetchNetworkConntection(let isConntected):
+      state.isNetworkConnected = isConntected
       return .none
 
     case .myCat:
@@ -89,6 +104,15 @@ public struct MyPageCore {
 
     case .binding:
       return .none
+    }
+  }
+
+  private func fetchNetworkConnection() -> Effect<Action> {
+    networkTracking.start()
+    return .run { send in
+      for await isConnected in networkTracking.updateNetworkConnected() {
+        await send(._fetchNetworkConntection(isConnected))
+      }
     }
   }
 }

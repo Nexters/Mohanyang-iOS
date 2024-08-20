@@ -14,11 +14,11 @@ import ComposableArchitecture
 
 public struct MyPageView: View {
   @Bindable var store: StoreOf<MyPageCore>
-  
+
   public init(store: StoreOf<MyPageCore>) {
     self.store = store
   }
-  
+
   public var body: some View {
     NavigationContainer(
       title: Text("마이페이지"),
@@ -27,17 +27,22 @@ public struct MyPageView: View {
       ScrollView {
         VStack(spacing: Alias.Spacing.medium) {
 
-          MyCatSectionView(name: store.cat?.name ?? "")
-            .padding(.all, Alias.Spacing.xLarge)
-            .background(
-              RoundedRectangle(cornerRadius: Alias.BorderRadius.small)
-                .foregroundStyle(Alias.Color.Background.secondary)
-            )
-            .onTapGesture {
+          MyCatSectionView(
+            name: store.cat?.name ?? "",
+            isNetworkConntected: $store.isNetworkConnected
+          )
+          .padding(.all, Alias.Spacing.xLarge)
+          .background(
+            RoundedRectangle(cornerRadius: Alias.BorderRadius.small)
+              .foregroundStyle(Alias.Color.Background.secondary)
+          )
+          .onTapGesture {
+            if store.isNetworkConnected {
               store.send(.myCatDetailTapped)
             }
+          }
 
-          StatisticSectionView(isInternetConnected: $store.isInternetConnected)
+          StatisticSectionView(isNetworkConnected: $store.isNetworkConnected)
             .padding(.all, Alias.Spacing.xLarge)
             .background(
               RoundedRectangle(cornerRadius: Alias.BorderRadius.medium)
@@ -92,6 +97,9 @@ public struct MyPageView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .onDisappear {
+      store.send(.onDisappear)
+    }
   }
 
   private func openFeedbackForm(urlString: String) {
@@ -103,6 +111,7 @@ public struct MyPageView: View {
 
 struct MyCatSectionView: View {
   let name: String
+  @Binding var isNetworkConntected: Bool
 
   var body: some View {
     HStack {
@@ -115,19 +124,21 @@ struct MyCatSectionView: View {
           .foregroundStyle(Color.black)
       }
       Spacer()
-      DesignSystemAsset.Image._24ChevronRightPrimary.swiftUIImage
+      if isNetworkConntected {
+        DesignSystemAsset.Image._24ChevronRightPrimary.swiftUIImage
+      }
     }
   }
 }
 
 struct StatisticSectionView: View {
-  @Binding var isInternetConnected: Bool
+  @Binding var isNetworkConnected: Bool
 
   var body: some View {
     ZStack {
       VStack(spacing: Alias.Spacing.medium) {
         Spacer()
-        if isInternetConnected {
+        if isNetworkConnected {
           DesignSystemAsset.Image.imgUpdateStatistics.swiftUIImage
         } else {
           DesignSystemAsset.Image.imgOfflineStatistics.swiftUIImage
@@ -153,7 +164,7 @@ struct AlarmSectionView: View {
   let title: String
   let subTitle: String
   @Binding var isOn: Bool
-  
+
   var body: some View {
     HStack(spacing: 0) {
       VStack(alignment: .leading, spacing: Alias.Spacing.xSmall) {
