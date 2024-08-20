@@ -6,10 +6,13 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import Foundation
+
 import CatServiceInterface
 import PomodoroServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
+import APIClientInterface
 import DesignSystem
 
 import ComposableArchitecture
@@ -39,6 +42,10 @@ public struct FocusPomodoroCore {
         title: overTimeBySeconds > 0 ? "이제 나랑 놀자냥!" : "잘 집중하고 있는 거냥?"
       )
     }
+    var focusedTime: Int {
+      guard let selectedCategory else { return 0 }
+      return selectedCategory.focusTimeSeconds - focusTimeBySeconds
+    }
   }
   
   public enum Action: BindableAction {
@@ -51,6 +58,7 @@ public struct FocusPomodoroCore {
     case setupFocusTime
     
     case goToHome
+    case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
     case restWaiting(PresentationAction<RestWaitingCore.Action>)
@@ -59,6 +67,7 @@ public struct FocusPomodoroCore {
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(APIClient.self) var apiClient
   
   public init() {}
   
@@ -96,13 +105,14 @@ public struct FocusPomodoroCore {
     case .takeRestButtonTapped:
       state.restWaiting = RestWaitingCore.State(
         source: .focusPomodoro,
-        focusedTimeBySeconds: state.focusTimeBySeconds,
+        focusedTimeBySeconds: state.focusedTime,
         overTimeBySeconds: state.overTimeBySeconds
       )
       return .none
       
     case .endFocusButtonTapped:
-      return .run { send in
+      return .run { [focusedTime = state.focusedTime] send in
+        await send(.saveHistory(focusTimeBySeconds: focusedTime, restTimeBySeconds: 0))
         await send(.goToHome)
       }
       
@@ -114,21 +124,20 @@ public struct FocusPomodoroCore {
     case .goToHome:
       return .none
       
+    case .saveHistory:
+      return .none
+      
     case .timer(.tick):
       if state.focusTimeBySeconds == 0 {
         if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
-            await send(
-              .set(
-                \.restWaiting,
-                 RestWaitingCore.State(
-                  source: .overtimeFromFocusPomodoro,
-                  focusedTimeBySeconds: state.focusTimeBySeconds,
-                  overTimeBySeconds: state.overTimeBySeconds
-                 )
-              )
+            let restWaitingState = RestWaitingCore.State(
+              source: .overtimeFromFocusPomodoro,
+              focusedTimeBySeconds: state.focusedTime,
+              overTimeBySeconds: state.overTimeBySeconds
             )
+            await send(.set(\.restWaiting, restWaitingState))
           }
         } else {
           state.overTimeBySeconds += 1

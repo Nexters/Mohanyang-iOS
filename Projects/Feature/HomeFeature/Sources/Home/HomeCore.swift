@@ -207,9 +207,29 @@ public struct HomeCore {
       
     case .timeSelect:
       return .none
-
+      
     case .myPage:
       return .none
+      
+    case let .focusPomodoro(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))), // FocusPomodoro
+      let .focusPomodoro(.presented(.restWaiting(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))))), // RestWaiting
+      let .focusPomodoro(.presented(.restWaiting(.presented(.restPomodoro(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))))))): // RestPomodoro
+      guard let selectedCategoryID = state.selectedCategory?.id else { return .none }
+      if focusTimeBySeconds >= 60 {
+        return .run { _ in
+          try await self.saveFocusTime(
+            selectedCategoryID: selectedCategoryID,
+            focusTimeBySeconds: focusTimeBySeconds,
+            restTimeBySeconds: restTimeBySeconds
+          )
+        }
+      } else {
+        state.toast = DefaultToast(
+          message: "최소 1분 이상은 집중해야 기록돼요",
+          image: DesignSystemAsset.Image._24Clock.swiftUIImage
+        )
+        return .none
+      }
       
     case .focusPomodoro(.presented(.restWaiting(.presented(.goToHomeByOver60Minute)))):
       state.focusPomodoro = nil
@@ -229,5 +249,25 @@ public struct HomeCore {
     case .focusPomodoro:
       return .none
     }
+  }
+  
+  func saveFocusTime(
+    selectedCategoryID: Int,
+    focusTimeBySeconds: Int,
+    restTimeBySeconds: Int
+  ) async throws -> Void {
+    let focusedTime = DateComponents(minute: focusTimeBySeconds / 60, second: focusTimeBySeconds % 60).to8601DurationString()
+    let restedTime = DateComponents(minute: restTimeBySeconds / 60, second: restTimeBySeconds % 60).to8601DurationString()
+    let request = FocusTimeHistory(
+      categoryNo: selectedCategoryID,
+      focusedTime: focusedTime,
+      restedTime: restedTime,
+      doneAt: Date()
+    )
+    try await self.pomodoroService.saveFocusTimeHistory(
+      apiClient: self.apiClient,
+      databaseClient: self.databaseClient,
+      request: [request]
+    )
   }
 }

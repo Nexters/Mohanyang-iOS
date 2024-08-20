@@ -21,9 +21,9 @@ public struct RestWaitingCore {
   @ObservableState
   public struct State: Equatable {
     let source: Source
-    var selectedCategory: PomodoroCategory?
     let focusedTimeBySeconds: Int
     let overTimeBySeconds: Int
+    var selectedCategory: PomodoroCategory?
     var changeFocusTimeByMinute: Int = 0
     
     var timer: TimerCore.State = .init(interval: .seconds(3600), mode: .continuous)
@@ -61,6 +61,7 @@ public struct RestWaitingCore {
     
     case goToHome
     case goToHomeByOver60Minute
+    case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
     case restPomodoro(PresentationAction<RestPomodoroCore.Action>)
@@ -131,11 +132,12 @@ public struct RestWaitingCore {
     case .takeRestButtonTapped:
       return .run { [state] send in
         try await applyChangeFocusTime(state: state)
-        await send(.set(\.restPomodoro, RestPomodoroCore.State()))
+        await send(.set(\.restPomodoro, RestPomodoroCore.State(focusedTimeBySeconds: state.focusedTimeBySeconds)))
       }
       
     case .endFocusButtonTapped:
       return .run { [state] send in
+        await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: 0))
         try await applyChangeFocusTime(state: state)
         await send(.goToHome)
       }
@@ -146,8 +148,12 @@ public struct RestWaitingCore {
     case .goToHomeByOver60Minute:
       return .none
       
+    case .saveHistory:
+      return .none
+      
     case .timer(.tick):
-      return .run { send in
+      return .run { [state] send in
+        await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: 0))
         await send(.goToHomeByOver60Minute)
       }
       

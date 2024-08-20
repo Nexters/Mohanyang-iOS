@@ -73,6 +73,16 @@ extension PomodoroCategory {
     let dateComponents = DateComponents.durationFrom8601String(restTime)
     return dateComponents?.minute ?? 0
   }
+  
+  public var focusTimeSeconds: Int {
+    let dateComponents = DateComponents.durationFrom8601String(focusTime)
+    return (dateComponents?.minute ?? 0) * 60
+  }
+  
+  public var restTimeSeconds: Int {
+    let dateComponents = DateComponents.durationFrom8601String(restTime)
+    return (dateComponents?.minute ?? 0) * 60
+  }
 }
 
 public enum PomodoroCategoryCode: String, PersistableEnum, Codable {
