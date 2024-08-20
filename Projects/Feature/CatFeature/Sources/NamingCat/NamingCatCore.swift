@@ -26,6 +26,7 @@ public struct NamingCatCore {
     var route: Route
     var selectedCat: AnyCat
     var text: String = ""
+    var isButtonDisabled: Bool = false
     var inputFieldError: NamingCatError?
     var tooltip: DownDirectionTooltip? = .init()
     var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
@@ -62,6 +63,9 @@ public struct NamingCatCore {
 
     switch action {
     case .onAppear:
+      if state.route == .myPage {
+        state.isButtonDisabled = true
+      }
       state.catRiv.stop()
       state.catRiv.triggerInput(state.selectedCat.rivTriggerName)
       return .none
@@ -99,6 +103,13 @@ public struct NamingCatCore {
 
     case .binding(\.text):
       state.inputFieldError = setError(state.text)
+      if state.text == "" && state.route == .myPage {
+        state.isButtonDisabled = true
+      } else if state.inputFieldError != nil {
+        state.isButtonDisabled = true
+      } else if state.inputFieldError == nil {
+        state.isButtonDisabled = false
+      }
       return .none
 
     case .binding:
