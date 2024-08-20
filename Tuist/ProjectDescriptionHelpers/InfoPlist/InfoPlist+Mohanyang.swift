@@ -18,8 +18,6 @@ extension InfoPlist {
 
         // MARK: - ThirdParty
         
-        "KAKAO_APP_KEY": "",
-        
         
         // MARK: - Security
         
@@ -54,12 +52,12 @@ extension InfoPlist {
         "NSBonjourServices": [
           "_dartobservatory._tcp"
         ],
-        "NSCameraUsageDescription": "",
-        "NSContactsUsageDescription": "",
-        "NSLocationWhenInUseUsageDescription": "",
-        "NSMicrophoneUsageDescription": "",
-        "NSPhotoLibraryUsageDescription": "",
-        "NSUserTrackingUsageDescription": "",
+//        "NSCameraUsageDescription": "",
+//        "NSContactsUsageDescription": "",
+//        "NSLocationWhenInUseUsageDescription": "",
+//        "NSMicrophoneUsageDescription": "",
+//        "NSPhotoLibraryUsageDescription": "",
+//        "NSUserTrackingUsageDescription": "",
         
         
         // MARK: - UIKit
