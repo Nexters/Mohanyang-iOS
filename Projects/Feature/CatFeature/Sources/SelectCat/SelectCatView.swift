@@ -42,15 +42,11 @@ public struct SelectCatView: View {
         }
 
         Spacer(minLength: Alias.Spacing.xLarge)
-
+        
         VStack(spacing: Alias.Spacing.small) {
           CatPushNotificationExampleView(selectedCat: $store.selectedCat)
-          ZStack {
-            Rectangle()
-              .foregroundStyle(Alias.Color.Background.secondary)
-            store.catRiv.view()
-          }
-          .frame(maxHeight: 240)
+          store.catRiv.view()
+            .frame(maxHeight: 240)
         }
 
         Spacer(minLength: Alias.Spacing.large)
