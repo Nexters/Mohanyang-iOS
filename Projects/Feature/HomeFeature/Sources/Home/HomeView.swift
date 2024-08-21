@@ -104,6 +104,27 @@ public struct HomeView: View {
       }
     }
     .background(Global.Color.gray50)
+    .overlay {
+      if !store.isNetworkConnected {
+        VStack {
+          HStack(spacing: Alias.Spacing.small) {
+            DesignSystemAsset.Image._16NullPrimary.swiftUIImage
+            Text("오프라인 모드")
+              .font(Typography.bodySB)
+              .foregroundStyle(Alias.Color.Text.secondary)
+          }
+          .padding(.horizontal, Alias.Spacing.large)
+          .padding(.vertical, Alias.Spacing.small)
+          .background {
+            RoundedRectangle(cornerRadius: Alias.BorderRadius.max)
+              .foregroundStyle(Global.Color.white)
+              .shadow(radius: Alias.BorderRadius.max, y: 4)
+          }
+          .padding(.top, Alias.Spacing.large)
+          Spacer()
+        }
+      }
+    }
     .tooltipDestination(tooltip: $store.homeCatTooltip.sending(\.setHomeCatTooltip))
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
@@ -140,6 +161,9 @@ public struct HomeView: View {
       )
     ) { store in
       MyPageView(store: store)
+    }
+    .task {
+      await store.send(.task).finish()
     }
     .onLoad {
       store.send(.onLoad)

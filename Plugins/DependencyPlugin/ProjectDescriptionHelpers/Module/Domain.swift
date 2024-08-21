@@ -15,5 +15,4 @@ public enum Domain: String, Modulable {
   case UserService
   case CatService
   case PomodoroService
-  case NetworkTracking
 }

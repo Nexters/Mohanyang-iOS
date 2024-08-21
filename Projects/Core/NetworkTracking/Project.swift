@@ -1,12 +1,12 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-@_spi(Domain)
 @_spi(Core)
+@_spi(Shared)
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Domain.NetworkTracking,
+  module: Core.NetworkTracking,
   scripts: [],
   targets: [
     .sources,
@@ -14,7 +14,7 @@ let project: Project = .makeTMABasedProject(
   ],
   dependencies: [
     .interface: [
-      .dependency(rootModule: Core.self)
+      .dependency(rootModule: Shared.self)
     ]
   ]
 )

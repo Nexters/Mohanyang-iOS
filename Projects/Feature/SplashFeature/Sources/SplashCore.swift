@@ -13,6 +13,8 @@ import DatabaseClientInterface
 import KeychainClientInterface
 import UserDefaultsClientInterface
 import AppService
+import NetworkTrackingInterface
+import DesignSystem
 
 import ComposableArchitecture
 
@@ -23,11 +25,16 @@ public struct SplashCore {
     public init() { }
     var width: CGFloat = .zero
     var isLoggedIn: Bool = false
+
+    var dialog: DefaultDialog?
   }
 
   public enum Action: BindableAction {
-    case onAppear
+    case task
     case didFinishInitializeDatabase
+    case _fetchNetworkConnection(Bool)
+    case _checkDeviceIDExist
+    case presentNetworkDialog
     case moveToHome
     case moveToOnboarding
     case binding(BindingAction<State>)
@@ -43,6 +50,7 @@ public struct SplashCore {
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(KeychainClient.self) var keychainClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(NetworkTracking.self) var networkTracking
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -51,14 +59,44 @@ public struct SplashCore {
 
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
-    case .onAppear:
+    case .task:
       return .run { send in
         try await initilizeDatabaseSystem(databaseClient: databaseClient)
         await send(.didFinishInitializeDatabase)
       }
 
     case.didFinishInitializeDatabase:
-      return checkDeviceIDExist()
+      return .run { send in
+        for await isConnected in networkTracking.updateNetworkConnected() {
+          await send(._fetchNetworkConnection(isConnected))
+        }
+      }
+
+    case ._fetchNetworkConnection(let isConnected):
+      if isConnected {
+        return .run { send in
+          await send(._checkDeviceIDExist)
+        }
+      } else {
+        return .run { send in
+          if try await !databaseClient.checkHasTable() {
+            await send(.presentNetworkDialog)
+          } else {
+            await send(._checkDeviceIDExist)
+          }
+        }
+      }
+
+    case ._checkDeviceIDExist:
+      let deviceID = keychainClient.read(key: deviceIDKey) ?? getDeviceUUID()
+      return login(deviceID: deviceID)
+
+    case .presentNetworkDialog:
+      state.dialog = DefaultDialog(
+        title: "네트워크 연결을 확인해주세요",
+        firstButton: DialogButtonModel(title: "확인")
+      )
+      return .none
 
     case .moveToHome:
       return .none
@@ -73,11 +111,6 @@ public struct SplashCore {
 }
 
 extension SplashCore {
-  private func checkDeviceIDExist() -> Effect<Action> {
-    let deviceID = keychainClient.read(key: deviceIDKey) ?? getDeviceUUID()
-    return login(deviceID: deviceID)
-  }
-
   private func login(deviceID: String) -> Effect<Action> {
     return .run { send in
       try await authService.login(
