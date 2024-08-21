@@ -13,9 +13,7 @@ import DependenciesMacros
 
 @DependencyClient
 public struct NetworkTracking {
-  //public var start: @Sendable () -> Void
   public var updateNetworkConnected: @Sendable () -> AsyncStream<Bool> = { .never }
-  //public var cancel: @Sendable () -> Void
 }
 
 extension NetworkTracking: TestDependencyKey {
