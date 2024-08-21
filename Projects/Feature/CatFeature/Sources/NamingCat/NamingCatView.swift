@@ -28,13 +28,9 @@ public struct NamingCatView: View {
       VStack(spacing: 40) {
         Spacer()
         
-        ZStack {
-          Rectangle()
-            .foregroundStyle(Alias.Color.Background.secondary)
-          store.catRiv.view()
-            .setTooltipTarget(tooltip: DownDirectionTooltip.self)
-        }
-        .frame(height: 240)
+        store.catRiv.view()
+          .setTooltipTarget(tooltip: DownDirectionTooltip.self)
+          .frame(maxHeight: 240)
 
         VStack(spacing: Alias.Spacing.small) {
           HStack {

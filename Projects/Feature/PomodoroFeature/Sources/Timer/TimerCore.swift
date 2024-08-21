@@ -20,7 +20,7 @@ public struct TimerCore {
       mode: Mode
     ) {
 #if DEV
-      self.interval = .milliseconds(1)
+      self.interval = .milliseconds((interval?.components.seconds ?? 0) * 100)
 #else
       self.interval = interval
 #endif

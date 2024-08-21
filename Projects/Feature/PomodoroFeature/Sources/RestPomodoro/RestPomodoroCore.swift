@@ -22,6 +22,7 @@ import RiveRuntime
 public struct RestPomodoroCore {
   @ObservableState
   public struct State: Equatable {
+    let focusedTimeBySeconds: Int
     var selectedCategory: PomodoroCategory?
     var restTimeBySeconds: Int = 0
     var overTimeBySeconds: Int = 0
@@ -35,7 +36,9 @@ public struct RestPomodoroCore {
 
     var catRiv: RiveViewModel = Rive.catRestRiv(stateMachineName: "State Machine_Home")
 
-    public init() {}
+    public init(focusedTimeBySeconds: Int) {
+      self.focusedTimeBySeconds = focusedTimeBySeconds
+    }
     
     var dialogueTooltip: PomodoroDialogueTooltip? {
       PomodoroDialogueTooltip(
@@ -65,6 +68,7 @@ public struct RestPomodoroCore {
     
     case goToHome
     case goToFocus
+    case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
   }
@@ -106,12 +110,14 @@ public struct RestPomodoroCore {
       
     case .focusAgainButtonTapped:
       return .run { [state] send in
+        await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: state.restTimeBySeconds))
         try await applyChangeRestTime(state: state)
         await send(.goToFocus)
       }
       
     case .endFocusButtonTapped:
       return .run { [state] send in
+        await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: state.restTimeBySeconds))
         try await applyChangeRestTime(state: state)
         await send(.goToHome)
       }
@@ -151,11 +157,15 @@ public struct RestPomodoroCore {
     case .goToFocus:
       return .none
       
+    case .saveHistory:
+      return .none
+      
     case .timer(.tick):
       if state.restTimeBySeconds == 0 {
         if state.overTimeBySeconds == 1800 { // 30분 초과시 휴식 대기화면으로 이동
-          return .run { send in
+          return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
+            await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: state.restTimeBySeconds))
             await send(.goToHome)
           }
         } else {

@@ -38,16 +38,12 @@ public struct FocusPomodoroView: View {
         Spacer()
         
         VStack(spacing: Alias.Spacing.xLarge) {
-          ZStack {
-            Rectangle()
-              .fill(Alias.Color.Background.secondary)
-            store.catRiv.view()
-              .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
-              .onTapGesture {
-                store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
-              }
-          }
-          .frame(width: 240, height: 240)
+          store.catRiv.view()
+            .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
+            .onTapGesture {
+              store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
+            }
+            .frame(width: 240, height: 240)
 
           VStack(spacing: .zero) {
             HStack(spacing: Alias.Spacing.xSmall) {

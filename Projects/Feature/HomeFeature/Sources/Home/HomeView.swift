@@ -24,9 +24,7 @@ public struct HomeView: View {
   
   public var body: some View {
     NavigationContainer(
-      leading: {
-        Spacer()
-      },
+      leading: { Spacer() },
       trailing: {
         Button(
           icon: DesignSystemAsset.Image._24MenuPrimary.swiftUIImage,
@@ -40,17 +38,12 @@ public struct HomeView: View {
     ) {
       VStack(spacing: 40) {
         VStack(spacing: Alias.Spacing.xLarge) {
-
-          ZStack {
-            Rectangle()
-              .fill(Alias.Color.Background.secondary)
-            store.catRiv.view()
-              .setTooltipTarget(tooltip: HomeCatDialogueTooltip.self)
-              .onTapGesture {
-                store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
-              }
-          }
-          .frame(width: 240, height: 240)
+          store.catRiv.view()
+            .setTooltipTarget(tooltip: HomeCatDialogueTooltip.self)
+            .onTapGesture {
+              store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
+            }
+            .frame(width: 240, height: 240)
 
           Text("치즈냥")
             .font(Typography.header4)

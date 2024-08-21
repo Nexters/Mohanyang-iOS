@@ -21,18 +21,24 @@ public struct RestWaitingCore {
   @ObservableState
   public struct State: Equatable {
     let source: Source
+    let focusedTimeBySeconds: Int
+    let overTimeBySeconds: Int
     var selectedCategory: PomodoroCategory?
-    var restWaitingTimeBySeconds: Int = 60 * 30 // 휴식 대기는 30분 고정
-    var overTimeBySeconds: Int = 0
     var changeFocusTimeByMinute: Int = 0
     
-    var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
+    var timer: TimerCore.State = .init(interval: .seconds(3600), mode: .continuous)
     var toast: DefaultToast?
     
     @Presents var restPomodoro: RestPomodoroCore.State?
     
-    public init(source: Source) {
+    public init(
+      source: Source,
+      focusedTimeBySeconds: Int,
+      overTimeBySeconds: Int
+    ) {
       self.source = source
+      self.focusedTimeBySeconds = focusedTimeBySeconds
+      self.overTimeBySeconds = overTimeBySeconds
     }
     
     var minus5MinuteButtonDisabled: Bool {
@@ -55,6 +61,7 @@ public struct RestWaitingCore {
     
     case goToHome
     case goToHomeByOver60Minute
+    case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
     case restPomodoro(PresentationAction<RestPomodoroCore.Action>)
@@ -125,11 +132,12 @@ public struct RestWaitingCore {
     case .takeRestButtonTapped:
       return .run { [state] send in
         try await applyChangeFocusTime(state: state)
-        await send(.set(\.restPomodoro, RestPomodoroCore.State()))
+        await send(.set(\.restPomodoro, RestPomodoroCore.State(focusedTimeBySeconds: state.focusedTimeBySeconds)))
       }
       
     case .endFocusButtonTapped:
       return .run { [state] send in
+        await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: 0))
         try await applyChangeFocusTime(state: state)
         await send(.goToHome)
       }
@@ -140,20 +148,14 @@ public struct RestWaitingCore {
     case .goToHomeByOver60Minute:
       return .none
       
-    case .timer(.tick):
-      if state.restWaitingTimeBySeconds == 0 {
-        if state.overTimeBySeconds == 1800 { // 30분 초과시 홈화면으로 나가기
-          return .run { send in
-            await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
-            await send(.goToHomeByOver60Minute)
-          }
-        } else {
-          state.overTimeBySeconds += 1
-        }
-      } else {
-        state.restWaitingTimeBySeconds -= 1
-      }
+    case .saveHistory:
       return .none
+      
+    case .timer(.tick):
+      return .run { [state] send in
+        await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: 0))
+        await send(.goToHomeByOver60Minute)
+      }
       
     case .timer:
       return .none

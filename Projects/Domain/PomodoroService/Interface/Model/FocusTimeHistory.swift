@@ -20,7 +20,7 @@ public struct FocusTimeHistory: Encodable, Persistable {
   let doneAt: Date
   
   public init(
-    clientFocusTimeId: String,
+    clientFocusTimeId: String = UUID().uuidString,
     categoryNo: Int,
     focusedTime: String,
     restedTime: String,

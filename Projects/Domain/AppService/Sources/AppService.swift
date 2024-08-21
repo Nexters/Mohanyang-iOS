@@ -8,6 +8,7 @@
 
 import Logger
 import DatabaseClientInterface
+import UserDefaultsClientInterface
 
 import RealmSwift
 
@@ -31,4 +32,36 @@ public func initilizeDatabaseSystem(
   Logger.shared.log(category: .database, "💾 Realm Path :\n\(configuration.fileURL?.absoluteString ?? "NONE")")
   
   try await databaseClient.initialize(configuration)
+}
+
+
+let isDisturbAlarmOnKey = "mohanyang_userdefaults_isDisturmAlarmOnKey"
+
+public func setDisturbAlarm(
+  userDefaultsClient: UserDefaultsClient,
+  isEnabled: Bool
+) async -> Void {
+  await userDefaultsClient.setBool(isEnabled, isDisturbAlarmOnKey)
+}
+
+public func getDisturbAlarm(
+  userDefaultsClient: UserDefaultsClient
+) -> Bool {
+  return userDefaultsClient.boolForKey(isDisturbAlarmOnKey)
+}
+
+
+let isTimerAlarmOnKey = "mohanyang_userdefaults_isTimerAlarmOnKey"
+
+public func setTimerAlarm(
+  userDefaultsClient: UserDefaultsClient,
+  isEnabled: Bool
+) async -> Void {
+  await userDefaultsClient.setBool(isEnabled, isTimerAlarmOnKey)
+}
+
+public func getTimerAlarm(
+  userDefaultsClient: UserDefaultsClient
+) -> Bool {
+  return userDefaultsClient.boolForKey(isTimerAlarmOnKey)
 }
