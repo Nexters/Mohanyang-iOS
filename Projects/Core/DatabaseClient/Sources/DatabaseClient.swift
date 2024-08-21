@@ -79,6 +79,13 @@ extension DatabaseClient: DependencyKey {
         } else {
           throw(NSError(domain: "Realm is not initialized", code: 0))
         }
+      },
+      checkHasTable: {
+        if let realmActor {
+          await realmActor.checkHasTable()
+        } else {
+          throw(NSError(domain: "Realm is not initialized", code: 0))
+        }
       }
     )
   }
@@ -134,5 +141,9 @@ extension DatabaseClient.RealmActor {
     try await realm.asyncWrite {
       realm.deleteAll()
     }
+  }
+  
+  public func checkHasTable() -> Bool{
+    return !realm.isEmpty
   }
 }

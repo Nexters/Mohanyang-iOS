@@ -31,6 +31,8 @@ public struct DatabaseClient {
   /// Use delete<T: Object>(_ type:).
   public var deleteAllTable: @Sendable () async throws -> Void
   
+  public var checkHasTable: @Sendable () async throws -> Bool
+  
   public func create<T: Persistable>(object: T) async throws {
     try await create(object)
   }
