@@ -11,6 +11,7 @@ import APIClientInterface
 import UserServiceInterface
 import CatServiceInterface
 import UserDefaultsClientInterface
+import NetworkTrackingInterface
 
 import ComposableArchitecture
 
@@ -22,15 +23,17 @@ public struct MyPageCore {
     var cat: AnyCat? = nil
     var isTimerAlarmOn: Bool = false
     var isDisturbAlarmOn: Bool = false
-    var isInternetConnected: Bool = false
+    var isNetworkConnected: Bool = false
     let feedbackURLString: String = "https://forms.gle/wEUPH9Tvxgua4hCZ9"
     @Presents var myCat: MyCatCore.State?
   }
   
   public enum Action: BindableAction {
     case onAppear
+    case task
     case myCatDetailTapped
     case _responseUserInfo(UserDTO.Response.GetUserInfoResponseDTO)
+    case _fetchNetworkConntection(Bool)
     case myCat(PresentationAction<MyCatCore.Action>)
     case binding(BindingAction<State>)
   }
@@ -38,6 +41,7 @@ public struct MyPageCore {
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(NetworkTracking.self) var networkTracking
   let isTimerAlarmOnKey = "mohanyang_userdefaults_isTimerAlarmOnKey"
   let isDisturbAlarmOnKey = "mohanyang_userdefaults_isDisturmAlarmOnKey"
 
@@ -61,6 +65,13 @@ public struct MyPageCore {
         await send(._responseUserInfo(data))
       }
 
+    case .task:
+      return .run { send in
+        for await isConnected in networkTracking.updateNetworkConnected() {
+          await send(._fetchNetworkConntection(isConnected))
+        }
+      }
+
     case .myCatDetailTapped:
       guard let cat = state.cat else { return .none }
       state.myCat = MyCatCore.State(cat: cat)
@@ -72,6 +83,10 @@ public struct MyPageCore {
         no: data.cat.no,
         name: data.cat.name
       )
+      return .none
+
+    case ._fetchNetworkConntection(let isConntected):
+      state.isNetworkConnected = isConntected
       return .none
 
     case .myCat:
