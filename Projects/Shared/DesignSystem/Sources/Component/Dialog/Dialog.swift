@@ -9,20 +9,29 @@
 import SwiftUI
 
 public struct DialogButtonModel: Equatable {
-  public static func == (lhs: DialogButtonModel, rhs: DialogButtonModel) -> Bool {
-    lhs.title == rhs.title
-  }
-  
   let title: String
   let leftIcon: Image?
   let rightIcon: Image?
-  let action: (() -> Void)? // 버튼 액션을 Nil로 두면 자동으로 CancelButton이 됩니다
+  
+  /// nil로 설정시 CancelButton이 됩니다.
+  var action: (() async -> Void)?
 
-  public init(title: String, leftIcon: Image? = nil, rightIcon: Image? = nil, action: (() -> Void)? = nil) {
+  public init(
+    title: String,
+    leftIcon: Image? = nil,
+    rightIcon: Image? = nil,
+    action: (() async -> Void)? = nil
+  ) {
     self.title = title
     self.leftIcon = leftIcon
     self.rightIcon = rightIcon
     self.action = action
+  }
+  
+  public static func == (lhs: DialogButtonModel, rhs: DialogButtonModel) -> Bool {
+    return lhs.title == rhs.title &&
+    lhs.leftIcon == rhs.leftIcon &&
+    lhs.rightIcon == rhs.rightIcon
   }
 }
 

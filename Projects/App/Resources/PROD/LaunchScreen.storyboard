@@ -3,6 +3,7 @@
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,18 +16,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash_logo" translatesAutoresizingMaskIntoConstraints="NO" id="pzC-Y0-937">
-                                <rect key="frame" x="65.666666666666686" y="209.66666666666663" width="262" height="262"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash_logo" translatesAutoresizingMaskIntoConstraints="NO" id="LcJ-lv-Bhd">
+                                <rect key="frame" x="119.66666666666669" y="352" width="154" height="173"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="pzC-Y0-937" secondAttribute="height" multiplier="1:1" id="EAQ-cy-uwv"/>
+                                    <constraint firstAttribute="width" secondItem="LcJ-lv-Bhd" secondAttribute="height" multiplier="154:173" id="fYu-Ww-TSh"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" name="Yellow100"/>
                         <constraints>
-                            <constraint firstItem="pzC-Y0-937" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" multiplier="0.8" id="QWX-xg-YOT"/>
-                            <constraint firstItem="pzC-Y0-937" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.666667" id="cbF-IZ-ACd"/>
-                            <constraint firstItem="pzC-Y0-937" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="e57-b9-x5i"/>
+                            <constraint firstItem="LcJ-lv-Bhd" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="cZ9-oa-0L1"/>
+                            <constraint firstItem="LcJ-lv-Bhd" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="vGK-2k-QFf"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -36,6 +37,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="splash_logo" width="240" height="240"/>
+        <image name="splash_logo" width="154" height="173"/>
+        <namedColor name="Yellow100">
+            <color red="1" green="0.91399997472763062" blue="0.74900001287460327" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>

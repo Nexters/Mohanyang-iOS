@@ -13,6 +13,10 @@ import HomeFeature
 import OnboardingFeature
 import MyPageFeature
 import PushService
+import AppService
+import UserDefaultsClientInterface
+import UserNotificationClientInterface
+import CatServiceInterface
 
 import ComposableArchitecture
 
@@ -36,6 +40,9 @@ public struct AppCore {
     case home(HomeCore.Action)
     case onboarding(OnboardingCore.Action)
   }
+  
+  @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(UserNotificationClient.self) var userNotificationClient
   
   public init() {}
   
@@ -77,6 +84,24 @@ public struct AppCore {
       
     case .appDelegate:
       return .none
+      
+    case .didChangeScenePhase(.background):
+      // TODO: -  집중중일때만 가능하도록 해야함 + 내가 고른 고양이를 불러오도록
+      let selectedCat = CatFactory.makeCat(type: .threeColor, no: 0, name: "치즈냥")
+      let isDisturbAlarmEnabled = getDisturbAlarm(userDefaultsClient: self.userDefaultsClient)
+      let trigger = UNTimeIntervalNotificationTrigger(
+        timeInterval: TimeInterval(1),
+        repeats: false
+      )
+      return .run { send in
+        if isDisturbAlarmEnabled {
+          try await scheduleNotification(
+            userNotificationClient: self.userNotificationClient,
+            contentType: .disturb(selectedCat),
+            trigger: trigger
+          )
+        }
+      }
       
     case .didChangeScenePhase:
       return .none

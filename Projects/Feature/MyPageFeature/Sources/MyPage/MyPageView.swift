@@ -53,12 +53,12 @@ public struct MyPageView: View {
             AlarmSectionView(
               title: "집중시간 알림받기",
               subTitle: "집중・휴식시간이 되면 고양이가 알려줘요",
-              isOn: $store.isTimerAlarmOn
+              isOn: $store.isTimerAlarmOn.sending(\.timerAlarmToggleButtonTapped)
             )
             AlarmSectionView(
               title: "딴 짓 방해하기",
               subTitle: "다른 앱을 사용하면 고양이가 방해해요",
-              isOn: $store.isDisturbAlarmOn
+              isOn: $store.isDisturbAlarmOn.sending(\.disturbAlarmToggleButtonTapped)
             )
           }
           .padding(.all, Alias.Spacing.xLarge)
@@ -67,8 +67,10 @@ public struct MyPageView: View {
               .foregroundStyle(Alias.Color.Background.secondary)
           )
 
-          HStack {
+          HStack(spacing: .zero) {
             Text("의견 보내기")
+              .font(Typography.bodySB)
+              .foregroundStyle(Alias.Color.Text.primary)
             Spacer()
             DesignSystemAsset.Image._24ChevronRightPrimary.swiftUIImage
           }
@@ -78,9 +80,8 @@ public struct MyPageView: View {
               .foregroundStyle(Alias.Color.Background.secondary)
           )
           .onTapGesture {
-            openFeedbackForm(urlString: store.feedbackURLString)
+            store.send(.sendFeedbackButtonTapped)
           }
-
         }
         .padding(.horizontal, Alias.Spacing.xLarge)
 
@@ -89,6 +90,7 @@ public struct MyPageView: View {
       .scrollIndicators(.never)
     }
     .background(Alias.Color.Background.primary)
+    .dialog(dialog: $store.dialog)
     .navigationDestination(
       item: $store.scope(state: \.myCat, action: \.myCat)
     ) { store in
@@ -99,12 +101,6 @@ public struct MyPageView: View {
     }
     .onAppear {
       store.send(.onAppear)
-    }
-  }
-
-  private func openFeedbackForm(urlString: String) {
-    if let url = URL(string: urlString) {
-      UIApplication.shared.open(url)
     }
   }
 }

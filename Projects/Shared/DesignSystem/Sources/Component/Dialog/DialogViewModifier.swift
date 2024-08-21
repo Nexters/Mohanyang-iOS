@@ -53,7 +53,9 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
               rightIcon: dialog.firstButton.rightIcon,
               action: {
                 self.dialog = nil
-                dialog.firstButton.action?()
+                Task {
+                  await dialog.firstButton.action?()
+                }
               }
             )
             .buttonStyle(
@@ -70,7 +72,9 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
                 rightIcon: secondButton.rightIcon,
                 action: {
                   self.dialog = nil
-                  secondButton.action?()
+                  Task {
+                    await secondButton.action?()
+                  }
                 }
               )
               .buttonStyle(
