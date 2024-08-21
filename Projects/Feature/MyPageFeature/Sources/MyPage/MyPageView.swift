@@ -94,11 +94,11 @@ public struct MyPageView: View {
     ) { store in
       MyCatView(store: store)
     }
+    .task {
+      await store.send(.task).finish()
+    }
     .onAppear {
       store.send(.onAppear)
-    }
-    .onDisappear {
-      store.send(.onDisappear)
     }
   }
 

@@ -20,21 +20,21 @@ extension NetworkTracking: DependencyKey {
     let globalQueue = DispatchQueue.global()
 
     return NetworkTracking(
-      start: {
-        networkMonitor.start(queue: globalQueue)
-      },
       updateNetworkConnected: {
+        networkMonitor.start(queue: globalQueue)
         return AsyncStream<Bool> { continuation in
           let initialState = networkMonitor.currentPath.status == .satisfied ? true : false
           continuation.yield(initialState)
+
           networkMonitor.pathUpdateHandler = { path in
             let isConnected = path.status == .satisfied ? true : false
             continuation.yield(isConnected)
           }
+
+          continuation.onTermination = { _ in
+            networkMonitor.cancel()
+          }
         }
-      },
-      cancel: {
-        networkMonitor.cancel()
       }
     )
   }

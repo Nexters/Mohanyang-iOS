@@ -30,7 +30,7 @@ public struct MyPageCore {
   
   public enum Action: BindableAction {
     case onAppear
-    case onDisappear
+    case task
     case myCatDetailTapped
     case _responseUserInfo(UserDTO.Response.GetUserInfoResponseDTO)
     case _fetchNetworkConntection(Bool)
@@ -60,17 +60,17 @@ public struct MyPageCore {
     case .onAppear:
       state.isTimerAlarmOn = userDefaultsClient.boolForKey(isTimerAlarmOnKey)
       state.isDisturbAlarmOn = userDefaultsClient.boolForKey(isDisturbAlarmOnKey)
-      return .merge(
-        .run { send in
-          let data = try await userService.getUserInfo(apiClient: apiClient)
-          await send(._responseUserInfo(data))
-        },
-        fetchNetworkConnection()
-      )
+      return .run { send in
+        let data = try await userService.getUserInfo(apiClient: apiClient)
+        await send(._responseUserInfo(data))
+      }
 
-    case .onDisappear:
-      networkTracking.cancel()
-      return .none
+    case .task:
+      return .run { send in
+        for await isConnected in networkTracking.updateNetworkConnected() {
+          await send(._fetchNetworkConntection(isConnected))
+        }
+      }
 
     case .myCatDetailTapped:
       guard let cat = state.cat else { return .none }
@@ -104,15 +104,6 @@ public struct MyPageCore {
 
     case .binding:
       return .none
-    }
-  }
-
-  private func fetchNetworkConnection() -> Effect<Action> {
-    networkTracking.start()
-    return .run { send in
-      for await isConnected in networkTracking.updateNetworkConnected() {
-        await send(._fetchNetworkConntection(isConnected))
-      }
     }
   }
 }
