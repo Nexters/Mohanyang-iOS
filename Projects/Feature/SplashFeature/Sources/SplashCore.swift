@@ -14,6 +14,7 @@ import KeychainClientInterface
 import UserDefaultsClientInterface
 import AppService
 import NetworkTrackingInterface
+import DesignSystem
 
 import ComposableArchitecture
 
@@ -24,12 +25,15 @@ public struct SplashCore {
     public init() { }
     var width: CGFloat = .zero
     var isLoggedIn: Bool = false
-    var isNetworkConntected: Bool = false
+    var networkOffCount: Int = 0
+
+    var dialog: DefaultDialog?
   }
 
   public enum Action: BindableAction {
-    case onAppear
+    case task
     case didFinishInitializeDatabase
+    case _fetchNetworkConnection(Bool)
     case moveToHome
     case moveToOnboarding
     case binding(BindingAction<State>)
@@ -54,14 +58,31 @@ public struct SplashCore {
 
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
-    case .onAppear:
+    case .task:
       return .run { send in
         try await initilizeDatabaseSystem(databaseClient: databaseClient)
         await send(.didFinishInitializeDatabase)
       }
 
     case.didFinishInitializeDatabase:
-      return checkDeviceIDExist()
+      return .run { send in
+        for await isConnected in networkTracking.updateNetworkConnected() {
+          await send(._fetchNetworkConnection(isConnected))
+        }
+      }
+
+    case ._fetchNetworkConnection(let isConnected):
+      if isConnected {
+        return checkDeviceIDExist()
+      } else if !isConnected && state.networkOffCount > 1 {
+        state.dialog = DefaultDialog(
+          title: "네트워크 연결을 확인해주세요",
+          firstButton: DialogButtonModel(title: "확인")
+        )
+      } else if !isConnected {
+        state.networkOffCount += 1
+      }
+      return .none
 
     case .moveToHome:
       return .none

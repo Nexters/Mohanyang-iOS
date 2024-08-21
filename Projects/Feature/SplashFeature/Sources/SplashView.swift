@@ -35,8 +35,9 @@ public struct SplashView: View {
       guard let frame = value[backgroundFrameID] else { return }
       store.width = frame.width
     }
-    .onAppear {
-      store.send(.onAppear)
+    .dialog(dialog: $store.dialog)
+    .task {
+      await store.send(.task).finish()
     }
   }
 }

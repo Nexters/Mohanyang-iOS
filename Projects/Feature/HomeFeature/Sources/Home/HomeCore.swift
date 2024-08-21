@@ -62,7 +62,7 @@ public struct HomeCore {
     case restTimeButtonTapped
     case mypageButtonTappd
     case playButtonTapped
-    case _fetchNetworkConntection(Bool)
+    case _fetchNetworkConnection(Bool)
 
     case syncCategory
     
@@ -106,7 +106,7 @@ public struct HomeCore {
     case .task:
       return .run { send in
         for await isConnected in networkTracking.updateNetworkConnected() {
-          await send(._fetchNetworkConntection(isConnected))
+          await send(._fetchNetworkConnection(isConnected))
         }
       }
 
@@ -160,7 +160,7 @@ public struct HomeCore {
       state.focusPomodoro = .init()
       return .none
 
-    case let ._fetchNetworkConntection(isConnected):
+    case let ._fetchNetworkConnection(isConnected):
       state.isNetworkConnected = isConnected
       return .none
 
