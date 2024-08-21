@@ -39,6 +39,7 @@ struct ToastViewModifier<T: Toast>: ViewModifier {
             .opacity(Global.Opacity._90d)
         )
         .padding(.horizontal, Global.Dimension._20f)
+        .padding(.bottom, 30)
         .transition(
           .move(edge: .bottom)
           .combined(with: .opacity.animation(.easeInOut))
