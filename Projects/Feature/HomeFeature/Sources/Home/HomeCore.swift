@@ -9,6 +9,7 @@
 import UserNotifications
 
 import PomodoroFeature
+import NetworkTrackingInterface
 import PushService
 import CatServiceInterface
 import PomodoroServiceInterface
@@ -33,6 +34,8 @@ public struct HomeCore {
     // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
     var selectedCat: AnyCat = CatFactory.makeCat(type: .threeColor, no: 0, name: "치즈냥")
 
+    var isNetworkConnected: Bool = false
+
     var toast: DefaultToast?
     var dialog: DefaultDialog?
 
@@ -48,6 +51,7 @@ public struct HomeCore {
   
   public enum Action: BindableAction {
     case binding(BindingAction<State>)
+    case task
     case onLoad
     case onAppear
     case setHomeCatTooltip(HomeCatDialogueTooltip?)
@@ -58,7 +62,8 @@ public struct HomeCore {
     case restTimeButtonTapped
     case mypageButtonTappd
     case playButtonTapped
-    
+    case _fetchNetworkConntection(Bool)
+
     case syncCategory
     
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
@@ -71,6 +76,7 @@ public struct HomeCore {
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(APIClient.self) var apiClient
   @Dependency(PomodoroService.self) var pomodoroService
+  @Dependency(NetworkTracking.self) var networkTracking
   let isHomeGuideCompletedKey = "mohanyang_userdefaults_isHomeGuideCompleted"
   
   public init() {}
@@ -96,7 +102,14 @@ public struct HomeCore {
     switch action {
     case .binding:
       return .none
-      
+
+    case .task:
+      return .run { send in
+        for await isConnected in networkTracking.updateNetworkConnected() {
+          await send(._fetchNetworkConntection(isConnected))
+        }
+      }
+
     case .onLoad:
       return .run { send in
         await send(.setHomeCatTooltip(nil))
@@ -146,7 +159,11 @@ public struct HomeCore {
     case .playButtonTapped:
       state.focusPomodoro = .init()
       return .none
-      
+
+    case let ._fetchNetworkConntection(isConnected):
+      state.isNetworkConnected = isConnected
+      return .none
+
     case .syncCategory:
       return .run { send in
         try await self.pomodoroService.syncCategoryList(
