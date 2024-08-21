@@ -42,6 +42,7 @@ public struct MyPageCore {
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(NetworkTracking.self) var networkTracking
 
   public init() {}
   
