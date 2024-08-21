@@ -12,6 +12,7 @@ import UserServiceInterface
 import CatServiceInterface
 import UserDefaultsClientInterface
 import NetworkTrackingInterface
+import AppService
 
 import ComposableArchitecture
 
@@ -41,9 +42,6 @@ public struct MyPageCore {
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
-  @Dependency(NetworkTracking.self) var networkTracking
-  let isTimerAlarmOnKey = "mohanyang_userdefaults_isTimerAlarmOnKey"
-  let isDisturbAlarmOnKey = "mohanyang_userdefaults_isDisturmAlarmOnKey"
 
   public init() {}
   
@@ -58,8 +56,8 @@ public struct MyPageCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
-      state.isTimerAlarmOn = userDefaultsClient.boolForKey(isTimerAlarmOnKey)
-      state.isDisturbAlarmOn = userDefaultsClient.boolForKey(isDisturbAlarmOnKey)
+      state.isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
+      state.isDisturbAlarmOn = getDisturbAlarm(userDefaultsClient: self.userDefaultsClient)
       return .run { send in
         let data = try await userService.getUserInfo(apiClient: apiClient)
         await send(._responseUserInfo(data))
@@ -94,12 +92,18 @@ public struct MyPageCore {
 
     case .binding(\.isTimerAlarmOn):
       return .run { [isTimerAlarmOn = state.isTimerAlarmOn] _ in
-        await userDefaultsClient.setBool(isTimerAlarmOn, isTimerAlarmOnKey)
+        await setTimerAlarm(
+          userDefaultsClient: self.userDefaultsClient,
+          isEnabled: isTimerAlarmOn
+        )
       }
 
     case .binding(\.isDisturbAlarmOn):
       return .run { [isDisturbAlarmOn = state.isDisturbAlarmOn] _ in
-        await userDefaultsClient.setBool(isDisturbAlarmOn, isDisturbAlarmOnKey)
+        await setDisturbAlarm(
+          userDefaultsClient: self.userDefaultsClient,
+          isEnabled: isDisturbAlarmOn
+        )
       }
 
     case .binding:
