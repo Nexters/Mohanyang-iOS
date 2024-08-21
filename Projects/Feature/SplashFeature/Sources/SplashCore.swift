@@ -13,6 +13,7 @@ import DatabaseClientInterface
 import KeychainClientInterface
 import UserDefaultsClientInterface
 import AppService
+import NetworkTrackingInterface
 
 import ComposableArchitecture
 
@@ -23,6 +24,7 @@ public struct SplashCore {
     public init() { }
     var width: CGFloat = .zero
     var isLoggedIn: Bool = false
+    var isNetworkConntected: Bool = false
   }
 
   public enum Action: BindableAction {
@@ -43,6 +45,7 @@ public struct SplashCore {
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(KeychainClient.self) var keychainClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(NetworkTracking.self) var networkTracking
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
