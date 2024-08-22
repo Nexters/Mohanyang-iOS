@@ -1,5 +1,5 @@
 //
-//  PushNotificationContent.swift
+//  RemotePushNotiContent.swift
 //  PushService
 //
 //  Created by devMinseok on 7/22/24.
@@ -8,6 +8,6 @@
 
 import Foundation
 
-public enum PushNotificationContent: Decodable {
-  case test
+public enum RemotePushNotiContent: Decodable {
+  case example
 }

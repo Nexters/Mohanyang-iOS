@@ -6,41 +6,46 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
-import Foundation
 import APIClientInterface
 
-public enum CatAPIrequest {
-  case fetchCatList, changeCatName(String)
+@_spi(Internal)
+public enum CatAPI {
+  case fetchCatList
+  case changeCatName(request: ChangeCatNameRequest)
 }
 
-extension CatAPIrequest: APIBaseRequest {
+extension CatAPI: APIBaseRequest {
   public var baseURL: String {
     return API.apiBaseURL
   }
-
+  
   public var path: String {
     switch self {
-    case .fetchCatList, .changeCatName:
+    case .fetchCatList:
+      return "/api/v1/cats"
+      
+    case .changeCatName:
       return "/api/v1/cats"
     }
   }
-
+  
   public var method: HTTPMethod {
     switch self {
     case .fetchCatList:
       return .get
+      
     case.changeCatName:
       return .put
     }
   }
-
+  
   public var parameters: RequestParams {
     switch self {
     case .fetchCatList:
       return .requestPlain
-    case .changeCatName(let name):
-      let dto = CatDTO.Request.ChangeCatNameRequestDTO(name: name)
-      return .body(dto)
+      
+    case let .changeCatName(request):
+      return .body(request)
     }
   }
 }
