@@ -30,7 +30,7 @@ public struct NamingCatView: View {
         
         store.catRiv.view()
           .setTooltipTarget(tooltip: DownDirectionTooltip.self)
-          .frame(maxHeight: 240)
+          .frame(height: 240)
 
         VStack(spacing: Alias.Spacing.small) {
           HStack {
@@ -41,7 +41,7 @@ public struct NamingCatView: View {
             Spacer()
           }
           InputField(
-            placeholder: store.selectedCat.name,
+            placeholder: store.selectedCat?.baseInfo.name ?? "",
             text: $store.text,
             fieldError: $store.inputFieldError
           )

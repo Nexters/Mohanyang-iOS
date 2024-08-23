@@ -7,8 +7,9 @@
 
 import Foundation
 
-import APIClientInterface
+@_spi(Internal)
 import CatServiceInterface
+import APIClientInterface
 
 import Dependencies
 
@@ -16,16 +17,15 @@ extension CatService: DependencyKey {
   public static let liveValue: CatService = .live()
   private static func live() -> Self {
     return CatService(
-      fetchCatLists: { apiClient in
-        let request = CatAPIrequest.fetchCatList
+      getCatList: { apiClient in
+        let request = CatAPI.fetchCatList
         return try await apiClient.apiRequest(
           request: request,
-          as: CatList.self
+          as: [Cat].self
         )
       },
-
-      changeCatName: { apiClient, name in
-        let request = CatAPIrequest.changeCatName(name)
+      changeCatName: { apiClient, request in
+        let request = CatAPI.changeCatName(request: request)
         _ = try await apiClient.apiRequest(
           request: request,
           as: EmptyResponse.self

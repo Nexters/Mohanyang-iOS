@@ -10,10 +10,14 @@ import Foundation
 
 import CatServiceInterface
 import PomodoroServiceInterface
+import UserServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
 import DesignSystem
+import PushService
+import UserNotificationClientInterface
+import AppService
 
 import ComposableArchitecture
 import RiveRuntime
@@ -29,9 +33,11 @@ public struct FocusPomodoroCore {
     var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
 
     // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
-    var selectedCat: AnyCat = CatFactory.makeCat(type: .threeColor, no: 0, name: "치즈냥")
+    var selectedCat: SomeCat?
 
     var catRiv: RiveViewModel = Rive.catFocusRiv(stateMachineName: "State Machine_Focus")
+    
+    var pushTriggered: Bool = false
 
     @Presents var restWaiting: RestWaitingCore.State?
     
@@ -55,7 +61,10 @@ public struct FocusPomodoroCore {
     
     case takeRestButtonTapped
     case endFocusButtonTapped
+    case catTapped
     case setupFocusTime
+    case catSetInput
+    case _pushNotificationTrigger
     
     case goToHome
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
@@ -68,6 +77,8 @@ public struct FocusPomodoroCore {
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(APIClient.self) var apiClient
+  @Dependency(UserService.self) var userService
+  @Dependency(UserNotificationClient.self) var userNotificationClient
   
   public init() {}
   
@@ -85,8 +96,12 @@ public struct FocusPomodoroCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
-      state.catRiv.setInput(state.selectedCat.rivInputName, value: true)
-      return .none
+      return .run { send in
+        if let myCat = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
+          await send(.set(\.selectedCat, SomeCat(baseInfo: myCat)))
+        }
+        await send(.catSetInput)
+      }
 
     case .binding:
       return .none
@@ -116,10 +131,38 @@ public struct FocusPomodoroCore {
         await send(.goToHome)
       }
       
+    case .catTapped:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.catRiv.triggerInput(selectedCat.rivTriggerName)
+      return .none
+      
     case .setupFocusTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
       state.focusTimeBySeconds = selectedCategory.focusTimeMinute * 60
       return .none
+      
+    case .catSetInput:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.catRiv.reset()
+      state.catRiv.setInput(selectedCat.rivInputName, value: true)
+      return .none
+      
+    case ._pushNotificationTrigger:
+      let isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
+      guard isTimerAlarmOn,
+            let selectedCat = state.selectedCat
+      else { return .none }
+      return .run { _ in
+        let trigger = UNTimeIntervalNotificationTrigger(
+          timeInterval: 0.1,
+          repeats: false
+        )
+        try await scheduleNotification(
+          userNotificationClient: self.userNotificationClient,
+          contentType: .focusEnd(selectedCat),
+          trigger: trigger
+        )
+      }
       
     case .goToHome:
       return .none
@@ -129,6 +172,12 @@ public struct FocusPomodoroCore {
       
     case .timer(.tick):
       if state.focusTimeBySeconds == 0 {
+        if !state.pushTriggered {
+          state.pushTriggered = true
+          return .run { send in
+            await send(._pushNotificationTrigger)
+          }
+        }
         if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop

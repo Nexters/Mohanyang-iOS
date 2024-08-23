@@ -66,6 +66,7 @@ struct TokenInterceptor {
     guard (200...299).contains(httpResponse.statusCode) else {
       let error = NetworkError.authorizationError
       Logger.shared.log(level: .error, category: .network, "API Error:\n\(dump(error))")
+      keychainClient.deleteAll() // MARK: - 인증오류시 키체인 리셋 해야함 (이게 없으면 공장초기화 아니면 앱 못 쓰게됨)
       throw error
     }
 

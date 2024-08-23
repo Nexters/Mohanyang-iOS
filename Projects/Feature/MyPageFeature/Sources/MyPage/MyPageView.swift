@@ -26,9 +26,8 @@ public struct MyPageView: View {
     ) {
       ScrollView {
         VStack(spacing: Alias.Spacing.medium) {
-
           MyCatSectionView(
-            name: store.cat?.name ?? "",
+            name: store.cat?.baseInfo.name ?? "",
             isNetworkConntected: $store.isNetworkConnected
           )
           .padding(.all, Alias.Spacing.xLarge)

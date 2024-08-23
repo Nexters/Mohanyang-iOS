@@ -14,7 +14,8 @@ let project: Project = .makeTMABasedProject(
   ],
   dependencies: [
     .interface: [
-      .dependency(rootModule: Core.self)
+      .dependency(rootModule: Core.self),
+      .dependency(module: Domain.CatService, target: .interface)
     ]
   ]
 )

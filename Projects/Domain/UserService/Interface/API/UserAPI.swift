@@ -10,7 +10,7 @@ import Foundation
 import APIClientInterface
 
 public enum UserAPIrequest {
-  case selectCat(Int)
+  case selectCat(request: SelectCatRequest)
   case getUserInfo
 }
 
@@ -23,6 +23,7 @@ extension UserAPIrequest: APIBaseRequest {
     switch self {
     case .selectCat:
       return "/api/v1/users/cats"
+      
     case .getUserInfo:
       return "/api/v1/users/me"
     }
@@ -32,6 +33,7 @@ extension UserAPIrequest: APIBaseRequest {
     switch self {
     case .selectCat:
       return .put
+      
     case .getUserInfo:
       return .get
     }
@@ -39,9 +41,9 @@ extension UserAPIrequest: APIBaseRequest {
 
   public var parameters: RequestParams {
     switch self {
-    case .selectCat(let no):
-      let dto = UserDTO.Request.SelectCatRequestDTO(catNo: no)
-      return .body(dto)
+    case let .selectCat(request):
+      return .body(request)
+      
     case .getUserInfo:
       return .requestPlain
     }

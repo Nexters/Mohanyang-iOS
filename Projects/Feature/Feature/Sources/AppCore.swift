@@ -17,6 +17,8 @@ import AppService
 import UserDefaultsClientInterface
 import UserNotificationClientInterface
 import CatServiceInterface
+import UserServiceInterface
+import DatabaseClientInterface
 
 import ComposableArchitecture
 
@@ -43,6 +45,8 @@ public struct AppCore {
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(UserService.self) var userService
+  @Dependency(DatabaseClient.self) var databaseClient
   
   public init() {}
   
@@ -68,40 +72,39 @@ public struct AppCore {
       state.splash = SplashCore.State()
       return .none
       
-    case let .appDelegate(.userNotifications(.didReceiveResponse(response, completionHandler))):
-      let userInfo = response.notification.request.content.userInfo
-      guard let pushNotiContent = getPushNotificationContent(from: userInfo) else {
-        completionHandler()
-        return .none
-      }
-      return .run { _ in
-        switch pushNotiContent {
-        case .test:
-          break
-        }
-        completionHandler()
-      }
-      
     case .appDelegate:
       return .none
       
     case .didChangeScenePhase(.background):
-      // TODO: -  집중중일때만 가능하도록 해야함 + 내가 고른 고양이를 불러오도록
-      let selectedCat = CatFactory.makeCat(type: .threeColor, no: 0, name: "치즈냥")
       let isDisturbAlarmEnabled = getDisturbAlarm(userDefaultsClient: self.userDefaultsClient)
-      let trigger = UNTimeIntervalNotificationTrigger(
-        timeInterval: TimeInterval(1),
-        repeats: false
-      )
       return .run { send in
-        if isDisturbAlarmEnabled {
+        if isDisturbAlarmEnabled,
+           let myCatInfo = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
+          let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: TimeInterval(10),
+            repeats: false
+          )
           try await scheduleNotification(
             userNotificationClient: self.userNotificationClient,
-            contentType: .disturb(selectedCat),
+            contentType: .disturb(SomeCat(baseInfo: myCatInfo)),
             trigger: trigger
           )
         }
       }
+      
+    case .didChangeScenePhase(.active):
+      return .merge(
+        .run { send in
+          let settings = await self.userNotificationClient.getNotificationSettings()
+          if settings.authorizationStatus != .authorized {
+            await setTimerAlarm(userDefaultsClient: self.userDefaultsClient, isEnabled: false)
+            await setDisturbAlarm(userDefaultsClient: self.userDefaultsClient, isEnabled: false)
+          }
+        },
+        .run { _ in
+          await removePendingNotification(userNotificationClient: self.userNotificationClient, identifier: ["disturb"])
+        }
+      )
       
     case .didChangeScenePhase:
       return .none
