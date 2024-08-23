@@ -15,6 +15,9 @@ import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
 import DesignSystem
+import PushService
+import UserNotificationClientInterface
+import AppService
 
 import ComposableArchitecture
 import RiveRuntime
@@ -33,6 +36,8 @@ public struct FocusPomodoroCore {
     var selectedCat: SomeCat?
 
     var catRiv: RiveViewModel = Rive.catFocusRiv(stateMachineName: "State Machine_Focus")
+    
+    var pushTriggered: Bool = false
 
     @Presents var restWaiting: RestWaitingCore.State?
     
@@ -59,6 +64,7 @@ public struct FocusPomodoroCore {
     case catTapped
     case setupFocusTime
     case catSetInput
+    case _pushNotificationTrigger
     
     case goToHome
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
@@ -72,6 +78,7 @@ public struct FocusPomodoroCore {
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
+  @Dependency(UserNotificationClient.self) var userNotificationClient
   
   public init() {}
   
@@ -140,6 +147,23 @@ public struct FocusPomodoroCore {
       state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
       
+    case ._pushNotificationTrigger:
+      let isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
+      guard isTimerAlarmOn,
+            let selectedCat = state.selectedCat
+      else { return .none }
+      return .run { _ in
+        let trigger = UNTimeIntervalNotificationTrigger(
+          timeInterval: 0.1,
+          repeats: false
+        )
+        try await scheduleNotification(
+          userNotificationClient: self.userNotificationClient,
+          contentType: .focusEnd(selectedCat),
+          trigger: trigger
+        )
+      }
+      
     case .goToHome:
       return .none
       
@@ -148,6 +172,12 @@ public struct FocusPomodoroCore {
       
     case .timer(.tick):
       if state.focusTimeBySeconds == 0 {
+        if !state.pushTriggered {
+          state.pushTriggered = true
+          return .run { send in
+            await send(._pushNotificationTrigger)
+          }
+        }
         if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop

@@ -14,7 +14,7 @@ public enum LocalPushNotiContent {
   case disturb(SomeCat)
 
   public var title: String {
-    return "모하냥"
+    return ""
   }
   
   public var body: String {

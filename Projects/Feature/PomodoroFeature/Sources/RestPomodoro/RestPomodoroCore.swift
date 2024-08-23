@@ -15,6 +15,9 @@ import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
 import DesignSystem
+import UserNotificationClientInterface
+import PushService
+import AppService
 
 import ComposableArchitecture
 import RiveRuntime
@@ -36,6 +39,8 @@ public struct RestPomodoroCore {
     var selectedCat: SomeCat?
 
     var catRiv: RiveViewModel = Rive.catRestRiv(stateMachineName: "State Machine_Home")
+    
+    var pushTriggered: Bool = false
 
     public init(focusedTimeBySeconds: Int) {
       self.focusedTimeBySeconds = focusedTimeBySeconds
@@ -72,6 +77,7 @@ public struct RestPomodoroCore {
     case goToHome
     case goToFocus
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
+    case _pushNotificationTrigger
     
     case timer(TimerCore.Action)
   }
@@ -81,6 +87,7 @@ public struct RestPomodoroCore {
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
+  @Dependency(UserNotificationClient.self) var userNotificationClient
   
   public init() {}
   
@@ -179,8 +186,31 @@ public struct RestPomodoroCore {
     case .saveHistory:
       return .none
       
+    case ._pushNotificationTrigger:
+      let isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
+      guard isTimerAlarmOn,
+            let selectedCat = state.selectedCat
+      else { return .none }
+      return .run { _ in
+        let trigger = UNTimeIntervalNotificationTrigger(
+          timeInterval: 0.1,
+          repeats: false
+        )
+        try await scheduleNotification(
+          userNotificationClient: self.userNotificationClient,
+          contentType: .restEnd(selectedCat),
+          trigger: trigger
+        )
+      }
+      
     case .timer(.tick):
       if state.restTimeBySeconds == 0 {
+        if !state.pushTriggered {
+          state.pushTriggered = true
+          return .run { send in
+            await send(._pushNotificationTrigger)
+          }
+        }
         if state.overTimeBySeconds == 1800 { // 30분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
