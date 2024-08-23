@@ -46,7 +46,7 @@ public struct SelectCatView: View {
         VStack(spacing: Alias.Spacing.small) {
           CatPushNotificationExampleView(selectedCat: $store.selectedCat)
           store.catRiv.view()
-            .frame(height: 240)
+            .frame(minHeight: 200, maxHeight: 240)
         }
 
         Spacer(minLength: Alias.Spacing.large)
@@ -103,23 +103,26 @@ struct CatPushNotificationExampleView: View {
             .cornerRadius(8.5, corners: .allCorners)
 
           VStack(alignment: .leading, spacing: .zero) {
-            Text("모하냥")
-              .font(Typography.bodySB)
-              .foregroundStyle(Alias.Color.Text.primary)
+            HStack {
+              Text("모하냥")
+                .font(Typography.bodySB)
+                .foregroundStyle(Alias.Color.Text.primary)
+
+              Spacer()
+
+              VStack(alignment: .trailing, spacing: .zero) {
+                Text("지금")
+                  .font(Typography.captionR)
+                  .foregroundStyle(Alias.Color.Text.primary)
+                Spacer()
+              }
+              .padding(.trailing, Alias.Spacing.small)
+            }
+
             Text(selectedCat.disturbPushTitle)
               .font(Typography.subBodyR)
               .foregroundStyle(Alias.Color.Text.primary)
           }
-
-          Spacer()
-          
-          VStack(alignment: .trailing, spacing: .zero) {
-            Text("지금")
-              .font(Typography.captionR)
-              .foregroundStyle(Alias.Color.Text.primary)
-            Spacer()
-          }
-          .padding(.trailing, Alias.Spacing.small)
         }
         .padding(.all, Alias.Spacing.large)
       } else {
