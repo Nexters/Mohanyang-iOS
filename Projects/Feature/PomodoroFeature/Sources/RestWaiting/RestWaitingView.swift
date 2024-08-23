@@ -64,21 +64,28 @@ public struct RestWaitingView: View {
             HStack(spacing: Alias.Spacing.small) {
               Button(
                 subtitle: "5분",
-                leftIcon: DesignSystemAsset.Image._16MinusPrimary.swiftUIImage
+                leftIcon: DesignSystemAsset.Image._16MinusTertiary.swiftUIImage
               ) {
                 store.send(.minus5MinuteButtonTapped)
               }
-              .buttonStyle(.select(isSelected: store.changeFocusTimeByMinute < 0))
-              .frame(width: 68, height: 38)
-              
+              .buttonStyle(
+                .selectChip(
+                  isSelected: store.changeFocusTimeByMinute < 0,
+                  isDisabled: store.minus5MinuteButtonDisabled
+                )
+              )
               Button(
                 subtitle: "5분",
-                leftIcon: DesignSystemAsset.Image._16PlusPrimary.swiftUIImage
+                leftIcon: DesignSystemAsset.Image._16PlusTertiary.swiftUIImage
               ) {
                 store.send(.plus5MinuteButtonTapped)
               }
-              .buttonStyle(.select(isSelected: store.changeFocusTimeByMinute > 0))
-              .frame(width: 68, height: 38)
+              .buttonStyle(
+                .selectChip(
+                  isSelected: store.changeFocusTimeByMinute > 0,
+                  isDisabled: store.plus5MinuteButtonDisabled
+                )
+              )
             }
           }
         }
