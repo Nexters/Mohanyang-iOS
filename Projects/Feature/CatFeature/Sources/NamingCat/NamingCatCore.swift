@@ -26,8 +26,8 @@ public struct NamingCatCore {
     var isButtonDisabled: Bool = false
     var inputFieldError: NamingCatError?
     var tooltip: DownDirectionTooltip? = .init()
-    var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
-    
+    var catRiv: RiveViewModel = Rive.catRenameRiv(stateMachineName: "State Machine_Rename")
+
     public init(route: Route) {
       self.route = route
     }
@@ -36,7 +36,7 @@ public struct NamingCatCore {
   public enum Action: BindableAction {
     case onAppear
     case namedButtonTapped
-    case triggerCatAnimation
+    case catSetInput
     case moveToHome
     case setTooltip(DownDirectionTooltip?)
     case saveChangedCat(SomeCat)
@@ -73,7 +73,7 @@ public struct NamingCatCore {
         if let myCat = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
           await send(.set(\.selectedCat, SomeCat(baseInfo: myCat)))
         }
-        await send(.triggerCatAnimation)
+        await send(.catSetInput)
       }
 
     case .namedButtonTapped:
@@ -89,10 +89,10 @@ public struct NamingCatCore {
         await send(._setNextAction)
       }
       
-    case .triggerCatAnimation:
+    case .catSetInput:
       guard let selectedCat = state.selectedCat else { return .none }
-      state.catRiv.stop()
-      state.catRiv.triggerInput(selectedCat.rivTriggerName)
+      state.catRiv.reset()
+      state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
 
     case .moveToHome:
