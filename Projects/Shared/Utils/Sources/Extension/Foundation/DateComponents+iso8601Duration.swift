@@ -20,7 +20,7 @@ import Foundation
  * For more information look here: http://en.wikipedia.org/wiki/ISO_8601#Durations
  */
 extension DateComponents {
-  /// ISO8601 Duration -> DateComponents 
+  /// ISO8601 Duration -> DateComponents
   public static func durationFrom8601String(_ durationString: String) -> DateComponents? {
     try? Self.from8601String(durationString)
   }
@@ -122,7 +122,7 @@ extension DateComponents.DurationParsingError: LocalizedError {
 
 extension DateComponents {
   /// DateComponents -> ISO8601 Duration
-  public func to8601DurationString() -> String {
+  public func to8601DurationString() -> String? {
     var durationString = "P"
     
     // 년, 월, 주, 일, 시간, 분, 초를 고려하여 변환
@@ -135,7 +135,7 @@ extension DateComponents {
     + (self.year ?? 0) * 31557600 // 평균 년 길이 (365.25일)
     
     if totalSeconds == 0 {
-      return ""
+      return nil
     }
     
     var remainingSeconds = totalSeconds
