@@ -64,24 +64,24 @@ public struct PomodoroCategory: Persistable, Equatable, Identifiable, Codable {
 }
 
 extension PomodoroCategory {
-  public var focusTimeMinute: Int {
+  public var focusTimeMinutes: Int {
     let dateComponents = DateComponents.durationFrom8601String(focusTime)
-    return dateComponents?.minute ?? 0
+    return dateComponents?.totalMinutes ?? 0
   }
   
-  public var restTimeMinute: Int {
+  public var restTimeMinutes: Int {
     let dateComponents = DateComponents.durationFrom8601String(restTime)
-    return dateComponents?.minute ?? 0
+    return dateComponents?.totalMinutes ?? 0
   }
   
   public var focusTimeSeconds: Int {
     let dateComponents = DateComponents.durationFrom8601String(focusTime)
-    return (dateComponents?.minute ?? 0) * 60
+    return dateComponents?.totalSeconds ?? 0
   }
   
   public var restTimeSeconds: Int {
     let dateComponents = DateComponents.durationFrom8601String(restTime)
-    return (dateComponents?.minute ?? 0) * 60
+    return dateComponents?.totalSeconds ?? 0
   }
 }
 

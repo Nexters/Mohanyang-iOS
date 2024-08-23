@@ -296,8 +296,8 @@ public struct HomeCore {
     let restedTime = DateComponents(minute: restTimeBySeconds / 60, second: restTimeBySeconds % 60).to8601DurationString()
     let request = FocusTimeHistory(
       categoryNo: selectedCategoryID,
-      focusedTime: focusedTime,
-      restedTime: restedTime,
+      focusedTime: focusedTime ?? "PT0M",
+      restedTime: restedTime ?? "PT0M",
       doneAt: Date()
     )
     try await self.pomodoroService.saveFocusTimeHistory(

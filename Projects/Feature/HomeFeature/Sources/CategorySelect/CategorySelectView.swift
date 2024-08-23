@@ -39,7 +39,7 @@ public struct CategorySelectView: View {
         ForEach(store.categoryList) { category in
           Button(
             title: .init(category.title),
-            subtitle: "집중 \(category.focusTimeMinute)분 | 휴식 \(category.restTimeMinute)분",
+            subtitle: "집중 \(category.focusTimeMinutes)분 | 휴식 \(category.restTimeMinutes)분",
             leftIcon: category.image
           ) {
             store.send(.selectCategory(category))
