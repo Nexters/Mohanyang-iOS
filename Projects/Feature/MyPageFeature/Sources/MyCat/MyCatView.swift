@@ -30,7 +30,7 @@ public struct MyCatView: View {
         VStack(spacing: Alias.Spacing.medium) {
           store.catRiv.view()
           .setTooltipTarget(tooltip: MyCatTooltip.self)
-          .frame(maxHeight: 240)
+          .frame(height: 240)
 
           HStack(spacing: Alias.Spacing.xSmall) {
             Text(store.cat?.baseInfo.name ?? "")

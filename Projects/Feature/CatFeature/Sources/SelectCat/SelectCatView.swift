@@ -46,7 +46,7 @@ public struct SelectCatView: View {
         VStack(spacing: Alias.Spacing.small) {
           CatPushNotificationExampleView(selectedCat: $store.selectedCat)
           store.catRiv.view()
-            .frame(maxHeight: 240)
+            .frame(height: 240)
         }
 
         Spacer(minLength: Alias.Spacing.large)
