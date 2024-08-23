@@ -1,0 +1,25 @@
+//
+//  Project.swift
+//  {{ name }}Manifests
+//
+//  Created by <#T##Author name#> on {{ nowDate }}.
+//
+
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+@_spi(<#T##SPI#>)
+import DependencyPlugin
+
+let project: Project = .makeTMABasedProject(
+  module: <#T##Modulable#>,
+  scripts: [],
+  targets: [
+    .sources,
+    .interface,
+    .tests,
+    .testing,
+    .example
+  ],
+  dependencies: [:]
+)

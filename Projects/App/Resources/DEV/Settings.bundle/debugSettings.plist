@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>StringsTable</key>
+	<string>Root</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>앱 정보</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>버전</string>
+			<key>Key</key>
+			<string>appVersion</string>
+			<key>DefaultValue</key>
+			<string>0.0.0</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>앱 설정</string>
+			<key>FooterText</key>
+			<string>⚠️ 로그아웃 및 앱 종료후, 재 실행해야 설정됩니다.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>서버 선택</string>
+			<key>Key</key>
+			<string>apiMode</string>
+			<key>DefaultValue</key>
+			<string>prod</string>
+			<key>Values</key>
+			<array>
+				<string>dev</string>
+				<string>prod</string>
+			</array>
+			<key>Titles</key>
+			<array>
+				<string>DEV - 개발 환경 서버</string>
+				<string>PROD - 실제 환경 서버</string>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>계정 정보</string>
+			<key>FooterText</key>
+			<string>⚠️ 비로그인시 정보가 표시되지 않습니다.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>Member ID</string>
+			<key>Key</key>
+			<string>memId</string>
+			<key>DefaultValue</key>
+			<string> </string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>API Key</string>
+			<key>Key</key>
+			<string>apiKey</string>
+			<key>DefaultValue</key>
+			<string> </string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>FCM Token</string>
+			<key>Key</key>
+			<string>fcmToken</string>
+			<key>DefaultValue</key>
+			<string> </string>
+		</dict>
+	</array>
+</dict>
+</plist>

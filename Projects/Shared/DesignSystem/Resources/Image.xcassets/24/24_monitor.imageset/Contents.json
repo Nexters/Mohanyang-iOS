@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "24_monitor.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
