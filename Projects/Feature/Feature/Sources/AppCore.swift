@@ -72,21 +72,6 @@ public struct AppCore {
       state.splash = SplashCore.State()
       return .none
       
-    case let .appDelegate(.userNotifications(.didReceiveResponse(response, completionHandler))):
-//      let userInfo = response.notification.request.content.userInfo
-//      guard let pushNotiContent = getPushNotificationContent(from: userInfo) else {
-//        completionHandler()
-//        return .none
-//      }
-//      return .run { _ in
-//        switch pushNotiContent {
-//        case .test:
-//          break
-//        }
-//        completionHandler()
-//      }
-      return .none
-      
     case .appDelegate:
       return .none
       

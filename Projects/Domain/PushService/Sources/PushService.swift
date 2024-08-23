@@ -11,14 +11,6 @@ import UserNotifications
 
 import UserNotificationClientInterface
 
-//public func getPushNotificationContent(from userInfo: [AnyHashable: Any]) -> PushNotiContent? {
-//  guard let data = try? JSONSerialization.data(withJSONObject: userInfo) else {
-//    return nil
-//  }
-//  let pushNotiContent = try? JSONDecoder().decode(PushNotificationContent.self, from: data)
-//  return pushNotiContent
-//}
-
 public func scheduleNotification(
   userNotificationClient: UserNotificationClient,
   contentType: LocalPushNotiContent,
