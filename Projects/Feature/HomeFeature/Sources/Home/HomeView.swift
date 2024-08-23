@@ -64,7 +64,7 @@ public struct HomeView: View {
               Text("집중")
                 .font(Typography.bodySB)
                 .foregroundStyle(Global.Color.gray500)
-              Text("\(store.selectedCategory?.focusTimeMinute ?? 0)분")
+              Text("\(store.selectedCategory?.focusTimeMinutes ?? 0)분")
                 .font(Typography.header3)
                 .foregroundStyle(Alias.Color.Text.secondary)
             }
@@ -81,7 +81,7 @@ public struct HomeView: View {
               Text("휴식")
                 .font(Typography.bodySB)
                 .foregroundStyle(Global.Color.gray500)
-              Text("\(store.selectedCategory?.restTimeMinute ?? 0)분")
+              Text("\(store.selectedCategory?.restTimeMinutes ?? 0)분")
                 .font(Typography.header3)
                 .foregroundStyle(Alias.Color.Text.secondary)
             }

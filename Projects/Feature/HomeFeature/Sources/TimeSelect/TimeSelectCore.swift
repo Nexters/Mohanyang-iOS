@@ -83,9 +83,9 @@ public struct TimeSelectCore {
       if let category {
         switch state.mode {
         case .focus:
-          state.selectedTime = TimeItem(minute: category.focusTimeMinute)
+          state.selectedTime = TimeItem(minute: category.focusTimeMinutes)
         case .rest:
-          state.selectedTime = TimeItem(minute: category.restTimeMinute)
+          state.selectedTime = TimeItem(minute: category.restTimeMinutes)
         }
       } else {
         state.selectedTime = state.timeList.last

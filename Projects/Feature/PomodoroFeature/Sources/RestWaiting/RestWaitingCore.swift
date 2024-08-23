@@ -42,12 +42,12 @@ public struct RestWaitingCore {
     }
     
     var minus5MinuteButtonDisabled: Bool {
-      guard let focusTimeMinute = selectedCategory?.focusTimeMinute else { return false }
-      return focusTimeMinute <= 10
+      guard let focusTimeMinutes = selectedCategory?.focusTimeMinutes else { return false }
+      return focusTimeMinutes <= 10
     }
     var plus5MinuteButtonDisabled: Bool {
-      guard let focusTimeMinute = selectedCategory?.focusTimeMinute else { return false }
-      return focusTimeMinute >= 60
+      guard let focusTimeMinutes = selectedCategory?.focusTimeMinutes else { return false }
+      return focusTimeMinutes >= 60
     }
   }
   
@@ -170,7 +170,7 @@ public struct RestWaitingCore {
           state.changeFocusTimeByMinute != 0
     else { return }
     
-    let changedTimeMinute = selectedCategory.focusTimeMinute + state.changeFocusTimeByMinute
+    let changedTimeMinute = selectedCategory.focusTimeMinutes + state.changeFocusTimeByMinute
     let iso8601Duration = DateComponents(minute: changedTimeMinute).to8601DurationString()
     let request = EditCategoryRequest(focusTime: iso8601Duration, restTime: nil)
     

@@ -52,11 +52,11 @@ public struct RestPomodoroCore {
       )
     }
     var minus5MinuteButtonDisabled: Bool {
-      guard let restTimeMinute = selectedCategory?.restTimeMinute else { return false }
+      guard let restTimeMinute = selectedCategory?.restTimeMinutes else { return false }
       return restTimeMinute <= 5
     }
     var plus5MinuteButtonDisabled: Bool {
-      guard let restTimeMinute = selectedCategory?.restTimeMinute else { return false }
+      guard let restTimeMinute = selectedCategory?.restTimeMinutes else { return false }
       return restTimeMinute >= 30
     }
   }
@@ -163,7 +163,7 @@ public struct RestPomodoroCore {
       
     case .setupRestTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
-      state.restTimeBySeconds = selectedCategory.restTimeMinute * 60
+      state.restTimeBySeconds = selectedCategory.restTimeSeconds
       return .none
       
     case .catTapped:
@@ -235,7 +235,7 @@ public struct RestPomodoroCore {
           state.changeRestTimeByMinute != 0
     else { return }
     
-    let changedTimeMinute = selectedCategory.restTimeMinute + state.changeRestTimeByMinute
+    let changedTimeMinute = selectedCategory.restTimeMinutes + state.changeRestTimeByMinute
     let iso8601Duration = DateComponents(minute: changedTimeMinute).to8601DurationString()
     let request = EditCategoryRequest(focusTime: nil, restTime: iso8601Duration)
     

@@ -138,7 +138,7 @@ public struct FocusPomodoroCore {
       
     case .setupFocusTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
-      state.focusTimeBySeconds = selectedCategory.focusTimeMinute * 60
+      state.focusTimeBySeconds = selectedCategory.focusTimeSeconds
       return .none
       
     case .catSetInput:
