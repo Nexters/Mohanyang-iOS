@@ -8,153 +8,62 @@
 
 import Foundation
 
-/*
- * https://github.com/leonx98/Swift-ISO8601-DurationParser
- * This extension converts ISO 8601 duration strings with the format: P[n]Y[n]M[n]DT[n]H[n]M[n]S or P[n]W into date components
- * Examples:
- * PT12H = 12 hours
- * P3D = 3 days
- * P3DT12H = 3 days, 12 hours
- * P3Y6M4DT12H30M5S = 3 years, 6 months, 4 days, 12 hours, 30 minutes and 5 seconds
- * P10W = 70 days
- * For more information look here: http://en.wikipedia.org/wiki/ISO_8601#Durations
- */
-
-public extension DateComponents {
-  static func durationFrom8601String(_ durationString: String) -> DateComponents? {
-    try? Self.from8601String(durationString)
-  }
-  
-  // Note: Does not handle fractional values for months
-  // Format: PnYnMnDTnHnMnS or PnW
-  static func from8601String(_ durationString: String) throws -> DateComponents {
-    guard durationString.starts(with: "P") else {
-      throw DurationParsingError.invalidFormat(durationString)
-    }
-    
-    let durationString = String(durationString.dropFirst())
-    var dateComponents = DateComponents()
-    
-    if let week = componentFor("W", in: durationString) {
-      // 7 day week specified in ISO 8601 standard
-      dateComponents.day = Int(week * 7.0)
-      return dateComponents
-    }
-    
-    let tRange = (durationString as NSString).range(of: "T", options: .literal)
-    let periodString: String
-    let timeString: String
-    if tRange.location == NSNotFound {
-      periodString = durationString
-      timeString = ""
-    } else {
-      periodString = (durationString as NSString).substring(to: tRange.location)
-      timeString = (durationString as NSString).substring(from: tRange.location + 1)
-    }
-    
-    // DnMnYn
-    let year = componentFor("Y", in: periodString)
-    let month = componentFor("M", in: periodString).addingFractionsFrom(year, multiplier: 12)
-    let day = componentFor("D", in: periodString)
-    
-    if let monthFraction = month?.truncatingRemainder(dividingBy: 1),
-       monthFraction != 0 {
-      // Representing fractional months isn't supported by DateComponents, so we don't allow it here
-      throw DurationParsingError.unsupportedFractionsForMonth(durationString)
-    }
-    
-    dateComponents.year = year?.nonFractionParts
-    dateComponents.month = month?.nonFractionParts
-    dateComponents.day = day?.nonFractionParts
-    
-    // SnMnHn
-    let hour = componentFor("H", in: timeString).addingFractionsFrom(day, multiplier: 24)
-    let minute = componentFor("M", in: timeString).addingFractionsFrom(hour, multiplier: 60)
-    let second = componentFor("S", in: timeString).addingFractionsFrom(minute, multiplier: 60)
-    dateComponents.hour = hour?.nonFractionParts
-    dateComponents.minute = minute?.nonFractionParts
-    dateComponents.second = second.map { Int($0.rounded()) }
-    
-    return dateComponents
-  }
-  
-  private static func componentFor(_ designator: String, in string: String) -> Double? {
-    // First split by the designator we're interested in, and then split by all separators. This should give us whatever's before our designator, but after the previous one.
-    let beforeDesignator = string.components(separatedBy: designator).first?.components(separatedBy: .separators).last
-    return beforeDesignator.flatMap { Double($0) }
-  }
-  
-  enum DurationParsingError: Error {
-    case invalidFormat(String)
-    case unsupportedFractionsForMonth(String)
-  }
-}
-
-private extension Optional where Wrapped == Double {
-  func addingFractionsFrom(_ other: Double?, multiplier: Double) -> Self {
-    guard let other = other else { return self }
-    let toAdd = other.truncatingRemainder(dividingBy: 1) * multiplier
-    guard let self = self else { return toAdd }
-    return self + toAdd
-  }
-}
-
-private extension Double {
-  var nonFractionParts: Int {
-    Int(floor(self))
-  }
-}
-
-private extension CharacterSet {
-  static let separators = CharacterSet(charactersIn: "PWTYMDHMS")
-}
-
-extension DateComponents.DurationParsingError: LocalizedError {
-  public var errorDescription: String? {
-    switch self {
-    case .invalidFormat(let durationString):
-      return "\(durationString) has an invalid format, The durationString must have a format of PnYnMnDTnHnMnS or PnW"
-    case .unsupportedFractionsForMonth(let durationString):
-      return "\(durationString) has an invalid format, fractions aren't supported for the month-position"
-    }
-  }
-}
-
 extension DateComponents {
-  public func to8601DurationString() -> String {
-    var components = "P"
-    
-    if let year = year {
-      components += "\(year)Y"
-    }
-    if let month = month {
-      components += "\(month)M"
-    }
-    if let day = day {
-      components += "\(day)D"
-    }
-    
-    var timeComponents = ""
-    
-    if let hour = hour {
-      timeComponents += "\(hour)H"
-    }
-    if let minute = minute {
-      timeComponents += "\(minute)M"
-    }
-    if let second = second {
-      timeComponents += "\(second)S"
-    }
-    
-    if !timeComponents.isEmpty {
-      components += "T" + timeComponents
-    }
-    
-    // ISO 8601 duration strings with only time components must start with 'PT'
-    if components == "P" && !timeComponents.isEmpty {
-      components = "PT" + timeComponents
-    }
-    
-    return components
+  public var totalSeconds: Int {
+    let secondsFromMinutes = (self.minute ?? 0) * 60
+    let secondsFromHours = (self.hour ?? 0) * 3600
+    let secondsFromDays = (self.day ?? 0) * 86400
+    let secondsFromWeeks = (self.weekOfYear ?? 0) * 604800
+    let secondsFromMonths = (self.month ?? 0) * 2629800 // 평균 월 길이 (30.44일)
+    let secondsFromYears = (self.year ?? 0) * 31557600 // 평균 년 길이 (365.25일)
+    return (self.second ?? 0) + secondsFromMinutes + secondsFromHours + secondsFromDays + secondsFromWeeks + secondsFromMonths + secondsFromYears
+  }
+  
+  public var totalMinutes: Int {
+    let minutesFromSeconds = (self.second ?? 0) / 60
+    let minutesFromHours = (self.hour ?? 0) * 60
+    let minutesFromDays = (self.day ?? 0) * 1440
+    let minutesFromWeeks = (self.weekOfYear ?? 0) * 10080
+    let minutesFromMonths = (self.month ?? 0) * 43830 // 평균 월 길이 (30.44일)
+    let minutesFromYears = (self.year ?? 0) * 525960 // 평균 년 길이 (365.25일)
+    return (self.minute ?? 0) + minutesFromSeconds + minutesFromHours + minutesFromDays + minutesFromWeeks + minutesFromMonths + minutesFromYears
+  }
+  
+  public var totalHours: Int {
+    let hoursFromMinutes = (self.minute ?? 0) / 60
+    let hoursFromDays = (self.day ?? 0) * 24
+    let hoursFromWeeks = (self.weekOfYear ?? 0) * 168
+    let hoursFromMonths = (self.month ?? 0) * 730 // 평균 월 길이 (30.44일)
+    let hoursFromYears = (self.year ?? 0) * 8766 // 평균 년 길이 (365.25일)
+    return (self.hour ?? 0) + hoursFromMinutes + hoursFromDays + hoursFromWeeks + hoursFromMonths + hoursFromYears
+  }
+  
+  public var totalDays: Int {
+    let daysFromHours = (self.hour ?? 0) / 24
+    let daysFromWeeks = (self.weekOfYear ?? 0) * 7
+    let daysFromMonths = (self.month ?? 0) * 30 // 평균 월 길이 (30일)
+    let daysFromYears = (self.year ?? 0) * 365 // 평균 년 길이 (365일)
+    return (self.day ?? 0) + daysFromHours + daysFromWeeks + daysFromMonths + daysFromYears
+  }
+  
+  public var totalWeeks: Int {
+    let weeksFromDays = (self.day ?? 0) / 7
+    let weeksFromMonths = (self.month ?? 0) * 4 // 평균 월 길이 (4주)
+    let weeksFromYears = (self.year ?? 0) * 52 // 평균 년 길이 (52주)
+    return (self.weekOfYear ?? 0) + weeksFromDays + weeksFromMonths + weeksFromYears
+  }
+  
+  public var totalMonths: Int {
+    let monthsFromDays = (self.day ?? 0) / 30 // 평균 일 길이 (30일)
+    let monthsFromWeeks = (self.weekOfYear ?? 0) / 4 // 평균 주 길이 (4주)
+    let monthsFromYears = (self.year ?? 0) * 12
+    return (self.month ?? 0) + monthsFromDays + monthsFromWeeks + monthsFromYears
+  }
+  
+  public var totalYears: Int {
+    let yearsFromDays = (self.day ?? 0) / 365 // 평균 일 길이 (365일)
+    let yearsFromWeeks = (self.weekOfYear ?? 0) / 52 // 평균 주 길이 (52주)
+    let yearsFromMonths = (self.month ?? 0) / 12
+    return (self.year ?? 0) + yearsFromDays + yearsFromWeeks + yearsFromMonths
   }
 }
