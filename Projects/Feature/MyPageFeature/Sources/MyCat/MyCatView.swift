@@ -33,7 +33,7 @@ public struct MyCatView: View {
           .frame(maxHeight: 240)
 
           HStack(spacing: Alias.Spacing.xSmall) {
-            Text(store.cat.name)
+            Text(store.cat?.baseInfo.name ?? "")
               .font(Typography.header4)
               .foregroundStyle(Alias.Color.Text.secondary)
             DesignSystemAsset.Image._24PenPrimary.swiftUIImage

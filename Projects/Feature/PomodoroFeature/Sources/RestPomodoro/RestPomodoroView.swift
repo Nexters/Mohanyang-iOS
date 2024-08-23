@@ -40,7 +40,7 @@ public struct RestPomodoroView: View {
           store.catRiv.view()
             .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
             .onTapGesture {
-              store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
+              store.send(.catTapped)
             }
             .frame(width: 240, height: 240)
 
@@ -111,6 +111,9 @@ public struct RestPomodoroView: View {
     .tooltipDestination(tooltip: .constant(store.dialogueTooltip))
     .task {
       await store.send(.task).finish()
+    }
+    .onAppear {
+      store.send(.onAppear)
     }
   }
 }

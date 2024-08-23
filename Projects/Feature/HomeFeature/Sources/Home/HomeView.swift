@@ -41,13 +41,13 @@ public struct HomeView: View {
           store.catRiv.view()
             .setTooltipTarget(tooltip: HomeCatDialogueTooltip.self)
             .onTapGesture {
-              store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
+              store.send(.catTapped)
             }
             .frame(width: 240, height: 240)
-
-          Text("치즈냥")
+          
+          Text(store.selectedCat?.baseInfo.name ?? "")
             .font(Typography.header4)
-            .foregroundStyle(Alias.Color.Text.tertiary)
+            .foregroundStyle(Alias.Color.Text.secondary)
         }
         VStack(spacing: Alias.Spacing.medium) {
           Button(

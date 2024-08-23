@@ -10,6 +10,7 @@ import APIClientInterface
 import UserServiceInterface
 import CatServiceInterface
 import UserNotificationClientInterface
+import DatabaseClientInterface
 import DesignSystem
 
 import RiveRuntime
@@ -19,27 +20,27 @@ import ComposableArchitecture
 public struct SelectCatCore {
   @ObservableState
   public struct State: Equatable {
-    public init(selectedCat: AnyCat? = nil, route: Route) {
-      self.selectedCat = selectedCat
-      self.route = route
-    }
     var route: Route
-    var catList: [AnyCat] = []
-    var selectedCat: AnyCat?
+    var catList: [SomeCat] = []
+    var selectedCat: SomeCat?
     var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
     @Presents var namingCat: NamingCatCore.State?
+    
+    public init(route: Route) {
+      self.route = route
+    }
   }
   
   public enum Action: BindableAction {
     case onAppear
-    case selectCat(AnyCat)
+    case selectCat(SomeCat)
     case setRivTrigger
     case selectButtonTapped
-    case saveChangedCat(AnyCat)
+    case saveChangedCat(SomeCat)
     case _setNextAction
     case _moveToNamingCat
     case _fetchCatListRequest
-    case _fetchCatListResponse(CatList)
+    case _fetchCatListResponse(Result<[Cat], Error>)
     case binding(BindingAction<State>)
     case namingCat(PresentationAction<NamingCatCore.Action>)
   }
@@ -55,6 +56,7 @@ public struct SelectCatCore {
   @Dependency(UserService.self) var userService
   @Dependency(CatService.self) var catService
   @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(DatabaseClient.self) var databaseClient
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -70,10 +72,13 @@ public struct SelectCatCore {
       state.catRiv.stop()
       return .run { send in
         await send(._fetchCatListRequest)
+        if let myCat = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
+          await send(.set(\.selectedCat, SomeCat(baseInfo: myCat)))
+        }
         await send(.setRivTrigger)
       }
 
-    case .selectCat(let selectedCat):
+    case let .selectCat(selectedCat):
       state.selectedCat = (state.selectedCat == selectedCat) ? nil : selectedCat
       state.catRiv.stop()
       return .run { send in await send(.setRivTrigger) }
@@ -88,8 +93,10 @@ public struct SelectCatCore {
 
     case .selectButtonTapped:
       guard let selectedCat = state.selectedCat else { return .none }
+      let request = SelectCatRequest(catNo: selectedCat.baseInfo.no)
       return .run { send in
-        _ = try await userService.selectCat(selectedCat.no, apiClient)
+        try await userService.selectCat(apiClient: self.apiClient, request: request)
+        try await userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
         await send(._setNextAction)
       }
 
@@ -111,27 +118,25 @@ public struct SelectCatCore {
       }
 
     case ._moveToNamingCat:
-      guard let selectedCat = state.selectedCat else { return .none }
-      state.namingCat = NamingCatCore.State(
-        selectedCat: selectedCat,
-        route: .onboarding
-      )
+      state.namingCat = NamingCatCore.State(route: .onboarding)
       return .none
 
     case ._fetchCatListRequest:
       return .run { send in
-        let response = try await catService.fetchCatLists(apiClient)
-        await send(._fetchCatListResponse(response))
-      }
-
-    case ._fetchCatListResponse(let catList):
-      state.catList = catList.map { cat in
-        CatFactory.makeCat(
-          type: CatType(rawValue: cat.type.camelCased()) ?? .cheese,
-          no: cat.no,
-          name: cat.name
+        await send(
+          ._fetchCatListResponse(
+            Result {
+              try await catService.getCatList(apiClient)
+            }
+          )
         )
       }
+
+    case let ._fetchCatListResponse(.success(response)):
+      state.catList = response.map { SomeCat(baseInfo: $0) }
+      return .none
+      
+    case ._fetchCatListResponse(.failure):
       return .none
 
     case .binding:

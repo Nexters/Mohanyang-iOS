@@ -14,9 +14,10 @@ import UserServiceInterface
 import CatServiceInterface
 import APIClientInterface
 import UserDefaultsClientInterface
+import DatabaseClientInterface
 import NetworkTrackingInterface
-import DesignSystem
 import UserNotificationClientInterface
+import DesignSystem
 
 import ComposableArchitecture
 
@@ -24,7 +25,7 @@ import ComposableArchitecture
 public struct MyPageCore {
   @ObservableState
   public struct State: Equatable {
-    var cat: AnyCat? = nil
+    var cat: SomeCat?
     var isTimerAlarmOn: Bool = false
     var isDisturbAlarmOn: Bool = false
     var isNetworkConnected: Bool = false
@@ -42,7 +43,6 @@ public struct MyPageCore {
     case disturbAlarmToggleButtonTapped(Bool)
     case sendFeedbackButtonTapped
     case _goToNotificationSettings
-    case _responseUserInfo(UserDTO.Response.GetUserInfoResponseDTO)
     case _fetchNetworkConntection(Bool)
     case myCat(PresentationAction<MyCatCore.Action>)
     case binding(BindingAction<State>)
@@ -54,6 +54,7 @@ public struct MyPageCore {
   @Dependency(NetworkTracking.self) var networkTracking
   @Dependency(UserNotificationClient.self) var userNotificationClient
   @Dependency(\.openURL) var openURL
+  @Dependency(DatabaseClient.self) var databaseClient
 
   public init() {}
   
@@ -71,8 +72,9 @@ public struct MyPageCore {
       state.isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
       state.isDisturbAlarmOn = getDisturbAlarm(userDefaultsClient: self.userDefaultsClient)
       return .run { send in
-        let data = try await userService.getUserInfo(apiClient: apiClient)
-        await send(._responseUserInfo(data))
+        if let myCat = try await userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
+          await send(.set(\.cat, SomeCat(baseInfo: myCat)))
+        }
       }
 
     case .task:
@@ -83,8 +85,7 @@ public struct MyPageCore {
       }
 
     case .myCatDetailTapped:
-      guard let cat = state.cat else { return .none }
-      state.myCat = MyCatCore.State(cat: cat)
+      state.myCat = MyCatCore.State()
       return .none
       
     case let .timerAlarmToggleButtonTapped(isOn):
@@ -150,14 +151,6 @@ public struct MyPageCore {
       return .run { _ in
         await self.openURL(notificationSettingsURL)
       }
-      
-    case ._responseUserInfo(let data):
-      state.cat = CatFactory.makeCat(
-        type: CatType(rawValue: data.cat.type.camelCased()) ?? .cheese,
-        no: data.cat.no,
-        name: data.cat.name
-      )
-      return .none
 
     case ._fetchNetworkConntection(let isConntected):
       state.isNetworkConnected = isConntected

@@ -41,7 +41,7 @@ public struct FocusPomodoroView: View {
           store.catRiv.view()
             .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
             .onTapGesture {
-              store.catRiv.triggerInput(store.selectedCat.rivTriggerName)
+              store.send(.catTapped)
             }
             .frame(width: 240, height: 240)
 

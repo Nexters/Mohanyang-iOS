@@ -10,6 +10,8 @@ import UserDefaultsClientInterface
 import APIClientInterface
 import CatServiceInterface
 import DesignSystem
+import UserServiceInterface
+import DatabaseClientInterface
 
 import ComposableArchitecture
 import RiveRuntime
@@ -18,26 +20,26 @@ import RiveRuntime
 public struct NamingCatCore {
   @ObservableState
   public struct State: Equatable {
-    public init(selectedCat: AnyCat, route: Route) {
-      self.selectedCat = selectedCat
-      self.route = route
-    }
-
     var route: Route
-    var selectedCat: AnyCat
+    var selectedCat: SomeCat?
     var text: String = ""
     var isButtonDisabled: Bool = false
     var inputFieldError: NamingCatError?
     var tooltip: DownDirectionTooltip? = .init()
     var catRiv: RiveViewModel = Rive.catSelectRiv(stateMachineName: "State Machine_selectCat")
+    
+    public init(route: Route) {
+      self.route = route
+    }
   }
   
   public enum Action: BindableAction {
     case onAppear
     case namedButtonTapped
+    case triggerCatAnimation
     case moveToHome
     case setTooltip(DownDirectionTooltip?)
-    case saveChangedCatName(String)
+    case saveChangedCat(SomeCat)
     case _setNextAction
     case binding(BindingAction<State>)
   }
@@ -50,6 +52,9 @@ public struct NamingCatCore {
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(APIClient.self) var apiClient
   @Dependency(CatService.self) var catService
+  @Dependency(UserService.self) var userService
+  @Dependency(DatabaseClient.self) var databaseClient
+  let isOnboardedKey = "mohanyang_userdefaults_isOnboarded"
 
   public init() {}
 
@@ -59,26 +64,36 @@ public struct NamingCatCore {
   }
 
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
-    let isOnboardedKey = "mohanyang_userdefaults_isOnboarded"
-
     switch action {
     case .onAppear:
       if state.route == .myPage {
         state.isButtonDisabled = true
       }
-      state.catRiv.stop()
-      state.catRiv.triggerInput(state.selectedCat.rivTriggerName)
-      return .none
+      return .run { send in
+        if let myCat = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
+          await send(.set(\.selectedCat, SomeCat(baseInfo: myCat)))
+        }
+        await send(.triggerCatAnimation)
+      }
 
     case .namedButtonTapped:
-      let catName = state.text == "" ? state.selectedCat.name : state.text
+      guard let selectedCat = state.selectedCat else { return .none }
+      let catName = state.text == "" ? selectedCat.baseInfo.name : state.text
+      let request = ChangeCatNameRequest(name: catName)
       return .run { send in
-        _ = try await catService.changeCatName(
+        try await catService.changeCatName(
           apiClient: apiClient,
-          name: catName
+          request: request
         )
+        try await self.userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
         await send(._setNextAction)
       }
+      
+    case .triggerCatAnimation:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.catRiv.stop()
+      state.catRiv.triggerInput(selectedCat.rivTriggerName)
+      return .none
 
     case .moveToHome:
       return .none
@@ -86,18 +101,18 @@ public struct NamingCatCore {
     case .setTooltip:
       return .none
 
-    case .saveChangedCatName:
+    case .saveChangedCat:
       return .none
-
+      
     case ._setNextAction:
-      if state.route == .onboarding {
-        return .run { send in
+      return .run { [state] send in
+        if state.route == .onboarding {
           await userDefaultsClient.setBool(true, key: isOnboardedKey)
           await send(.moveToHome)
-        }
-      } else {
-        return .run { [name = state.text] send in
-          await send(.saveChangedCatName(name))
+        } else {
+          if let selectedCat = state.selectedCat {
+            await send(.saveChangedCat(selectedCat))
+          }
         }
       }
 

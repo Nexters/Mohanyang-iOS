@@ -46,7 +46,6 @@ public struct SomeCat: CatTemplate, Identifiable {
     lhs.rivInputName == rhs.rivInputName &&
     lhs.focusEndPushTitle == rhs.focusEndPushTitle &&
     lhs.restEndPushTitle == rhs.restEndPushTitle &&
-    lhs.disturbPushTitle == rhs.disturbPushTitle &&
-    lhs.tooltipMessage == rhs.tooltipMessage
+    lhs.disturbPushTitle == rhs.disturbPushTitle
   }
 }

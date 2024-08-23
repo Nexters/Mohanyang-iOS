@@ -10,6 +10,7 @@ import Foundation
 
 import CatServiceInterface
 import PomodoroServiceInterface
+import UserServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
@@ -29,7 +30,7 @@ public struct FocusPomodoroCore {
     var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
 
     // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
-    var selectedCat: AnyCat = CatFactory.makeCat(type: .threeColor, no: 0, name: "치즈냥")
+    var selectedCat: SomeCat?
 
     var catRiv: RiveViewModel = Rive.catFocusRiv(stateMachineName: "State Machine_Focus")
 
@@ -55,7 +56,9 @@ public struct FocusPomodoroCore {
     
     case takeRestButtonTapped
     case endFocusButtonTapped
+    case catTapped
     case setupFocusTime
+    case catSetInput
     
     case goToHome
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
@@ -68,6 +71,7 @@ public struct FocusPomodoroCore {
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(APIClient.self) var apiClient
+  @Dependency(UserService.self) var userService
   
   public init() {}
   
@@ -85,8 +89,12 @@ public struct FocusPomodoroCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
-      state.catRiv.setInput(state.selectedCat.rivInputName, value: true)
-      return .none
+      return .run { send in
+        if let myCat = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
+          await send(.set(\.selectedCat, SomeCat(baseInfo: myCat)))
+        }
+        await send(.catSetInput)
+      }
 
     case .binding:
       return .none
@@ -116,9 +124,20 @@ public struct FocusPomodoroCore {
         await send(.goToHome)
       }
       
+    case .catTapped:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.catRiv.triggerInput(selectedCat.rivTriggerName)
+      return .none
+      
     case .setupFocusTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
       state.focusTimeBySeconds = selectedCategory.focusTimeMinute * 60
+      return .none
+      
+    case .catSetInput:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.catRiv.reset()
+      state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
       
     case .goToHome:

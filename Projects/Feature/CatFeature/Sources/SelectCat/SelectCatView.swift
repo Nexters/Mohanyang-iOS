@@ -54,7 +54,7 @@ public struct SelectCatView: View {
         HStack {
           ForEach(store.catList) { cat in
             Button(
-              title: LocalizedStringKey(cat.name),
+              title: LocalizedStringKey(cat.baseInfo.name),
               subtitle: LocalizedStringKey(cat.keyword),
               rightIcon: cat.keywordImage,
               action: { store.send(.selectCat(cat)) }
@@ -90,7 +90,7 @@ public struct SelectCatView: View {
 }
 
 struct CatPushNotificationExampleView: View {
-  @Binding var selectedCat: AnyCat?
+  @Binding var selectedCat: SomeCat?
 
   var body: some View {
     ZStack {
@@ -98,7 +98,7 @@ struct CatPushNotificationExampleView: View {
         .foregroundStyle(Alias.Color.Background.secondary)
 
       if let selectedCat = selectedCat {
-        HStack(spacing: 10){
+        HStack(spacing: 10) {
           DesignSystemAsset.Image.appIconExample.swiftUIImage
             .cornerRadius(8.5, corners: .allCorners)
 

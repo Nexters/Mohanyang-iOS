@@ -13,6 +13,7 @@ import NetworkTrackingInterface
 import PushService
 import CatServiceInterface
 import PomodoroServiceInterface
+import UserServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
@@ -31,8 +32,7 @@ public struct HomeCore {
     var homeTimeGuideTooltip: HomeTimeGuideTooltip?
     
     var selectedCategory: PomodoroCategory?
-    // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
-    var selectedCat: AnyCat = CatFactory.makeCat(type: .threeColor, no: 0, name: "치즈냥")
+    var selectedCat: SomeCat?
 
     var isNetworkConnected: Bool = false
 
@@ -62,10 +62,10 @@ public struct HomeCore {
     case restTimeButtonTapped
     case mypageButtonTappd
     case playButtonTapped
+    case catTapped
+    case catSetInput
     case _fetchNetworkConnection(Bool)
-
     case syncCategory
-    
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
     case focusPomodoro(PresentationAction<FocusPomodoroCore.Action>)
@@ -77,6 +77,7 @@ public struct HomeCore {
   @Dependency(APIClient.self) var apiClient
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(NetworkTracking.self) var networkTracking
+  @Dependency(UserService.self) var userService
   let isHomeGuideCompletedKey = "mohanyang_userdefaults_isHomeGuideCompleted"
   
   public init() {}
@@ -112,7 +113,6 @@ public struct HomeCore {
 
     case .onLoad:
       return .run { send in
-        await send(.setHomeCatTooltip(nil))
         if self.userDefaultsClient.boolForKey(isHomeGuideCompletedKey) == false {
           await self.userDefaultsClient.setBool(true, key: isHomeGuideCompletedKey)
           await send(.setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip()))
@@ -120,13 +120,21 @@ public struct HomeCore {
       }
       
     case .onAppear:
-      state.catRiv.setInput(state.selectedCat.rivInputName, value: true)
       return .run { send in
         await send(.syncCategory)
+        if let myCat = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
+          await send(.set(\.selectedCat, SomeCat(baseInfo: myCat)))
+        }
+        await send(.catSetInput)
+        await send(.setHomeCatTooltip(nil))
       }
       
     case .setHomeCatTooltip:
-      state.homeCatTooltip = .init(title: state.selectedCat.tooltipMessage)
+      guard let selectedCat = state.selectedCat else {
+        state.homeCatTooltip = nil
+        return .none
+      }
+      state.homeCatTooltip = .init(title: selectedCat.tooltipMessage)
       return .none
       
     case let .setHomeCategoryGuideTooltip(tooltip):
@@ -158,6 +166,17 @@ public struct HomeCore {
       
     case .playButtonTapped:
       state.focusPomodoro = .init()
+      return .none
+      
+    case .catTapped:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.catRiv.triggerInput(selectedCat.rivTriggerName)
+      return .none
+      
+    case .catSetInput:
+      guard let selectedCat = state.selectedCat else { return .none }
+      state.catRiv.reset()
+      state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
 
     case let ._fetchNetworkConnection(isConnected):
