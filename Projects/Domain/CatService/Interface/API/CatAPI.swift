@@ -16,7 +16,7 @@ public enum CatAPI {
 
 extension CatAPI: APIBaseRequest {
   public var baseURL: String {
-    return API.apiBaseURL
+    return API.apiBaseHost
   }
   
   public var path: String {

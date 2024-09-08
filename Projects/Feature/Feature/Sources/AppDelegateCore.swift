@@ -14,10 +14,13 @@ import UserNotificationClientInterface
 import KeychainClientInterface
 import DatabaseClientInterface
 import AppService
+import APIClientInterface
 
 import ComposableArchitecture
 import FirebaseCore
 import FirebaseMessaging
+import DatadogCore
+import DatadogRUM
 
 @Reducer
 public struct AppDelegateCore {
@@ -48,10 +51,12 @@ public struct AppDelegateCore {
     switch action {
     case .didFinishLaunching:
       UIApplication.shared.applicationIconBadgeNumber = 0
-      FirebaseApp.configure()
-      let userNotificationEventStream = userNotificationClient.delegate()
+      firebaseInitilize()
+      datadogInitilize()
       
       Logger.shared.log("FCMToken: \(Messaging.messaging().fcmToken ?? "not generated")")
+      
+      let userNotificationEventStream = userNotificationClient.delegate()
       
       return .run { send in
         await withThrowingTaskGroup(of: Void.self) { group in
@@ -92,5 +97,49 @@ public struct AppDelegateCore {
     case .userNotifications:
       return .none
     }
+  }
+  
+  private func firebaseInitilize() {
+    FirebaseApp.configure()
+  }
+  
+  private func datadogInitilize() {
+    // TODO: - 환경 값 가져오는 부분 개선하기
+    guard let appID = Bundle.main.object(forInfoDictionaryKey: "DATADOG_APP_ID") as? String,
+          let clientToken = Bundle.main.object(forInfoDictionaryKey: "DATADOG_TOKEN") as? String
+    else { return }
+    
+#if DEV
+    let environment = "dev"
+#else
+    let environment = "prod"
+#endif
+    
+    Datadog.initialize(
+      with: Datadog.Configuration(
+        clientToken: clientToken,
+        env: environment,
+        site: .us5
+      ),
+      trackingConsent: .granted
+    )
+    
+    RUM.enable(
+      with: RUM.Configuration(
+        applicationID: appID,
+        uiKitViewsPredicate: DefaultUIKitRUMViewsPredicate(),
+        uiKitActionsPredicate: DefaultUIKitRUMActionsPredicate(),
+        urlSessionTracking: RUM.Configuration.URLSessionTracking(
+          firstPartyHostsTracing: .trace(hosts: [API.apiBaseHost], sampleRate: 20)
+        )
+      )
+    )
+    
+    URLSessionInstrumentation.enable(
+      with: URLSessionInstrumentation.Configuration(
+        delegateClass: APIClientURLSessionDelegate.self,
+        firstPartyHostsTracing: .trace(hosts: [API.apiBaseHost])
+      )
+    )
   }
 }

@@ -17,7 +17,7 @@ public enum CategoryAPI {
 
 extension CategoryAPI: APIBaseRequest {
   public var baseURL: String {
-    return API.apiBaseURL
+    return API.apiBaseHost
   }
   
   public var path: String {

@@ -45,7 +45,7 @@ struct TokenInterceptor {
       throw NetworkError.authorizationError
     }
 
-    var urlRequest = URLRequest(url: URL(string: "https://" + API.apiBaseURL)!)
+    var urlRequest = URLRequest(url: URL(string: "https://" + API.apiBaseHost)!)
     urlRequest.httpMethod = HTTPMethod.post.rawValue
     urlRequest.setValue(
       ContentType.json.rawValue,
