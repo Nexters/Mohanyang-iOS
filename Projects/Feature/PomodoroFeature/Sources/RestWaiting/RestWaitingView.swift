@@ -12,6 +12,7 @@ import DesignSystem
 
 import ComposableArchitecture
 import Lottie
+import DatadogRUM
 
 public struct RestWaitingView: View {
   @Bindable var store: StoreOf<RestWaitingCore>
@@ -118,5 +119,6 @@ public struct RestWaitingView: View {
     .task {
       await store.send(.task).finish()
     }
+    .trackRUMView(name: "휴식대기화면")
   }
 }

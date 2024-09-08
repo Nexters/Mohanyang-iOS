@@ -12,6 +12,7 @@ import DesignSystem
 
 import ComposableArchitecture
 import RiveRuntime
+import DatadogRUM
 
 public struct FocusPomodoroView: View {
   @Bindable var store: StoreOf<FocusPomodoroCore>
@@ -99,5 +100,6 @@ public struct FocusPomodoroView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "집중화면")
   }
 }

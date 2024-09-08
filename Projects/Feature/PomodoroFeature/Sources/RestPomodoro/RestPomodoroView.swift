@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct RestPomodoroView: View {
   @Bindable var store: StoreOf<RestPomodoroCore>
@@ -123,5 +124,6 @@ public struct RestPomodoroView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "휴식화면")
   }
 }

@@ -13,6 +13,7 @@ import DesignSystem
 
 import ComposableArchitecture
 import RiveRuntime
+import DatadogRUM
 
 public struct SelectCatView: View {
   @Bindable var store: StoreOf<SelectCatCore>
@@ -85,7 +86,10 @@ public struct SelectCatView: View {
     ) { store in
       NamingCatView(store: store)
     }
-    .onAppear { store.send(.onAppear) }
+    .onAppear {
+      store.send(.onAppear)
+    }
+    .trackRUMView(name: "고양이 선택")
   }
 }
 

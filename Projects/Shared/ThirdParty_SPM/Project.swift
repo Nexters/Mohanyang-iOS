@@ -13,6 +13,8 @@ let project: Project = .makeProject(
     DEP.SPMTarget.composableArchitecture,
     DEP.SPMTarget.dependencies,
     DEP.SPMTarget.riveRuntime,
-    DEP.SPMTarget.lottie
+    DEP.SPMTarget.lottie,
+    DEP.SPMTarget.datadogCore,
+    DEP.SPMTarget.datadogRUM
   ]
 )

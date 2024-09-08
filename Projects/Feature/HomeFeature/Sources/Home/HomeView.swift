@@ -14,6 +14,7 @@ import DesignSystem
 import Utils
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct HomeView: View {
   @Bindable var store: StoreOf<HomeCore>
@@ -171,5 +172,6 @@ public struct HomeView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "홈")
   }
 }

@@ -11,9 +11,11 @@ extension InfoPlist {
   public enum Mohanyang {
     public static var app: InfoPlist {
       return .dictionary([
-        // MARK: - Base URL
+        // MARK: - Environment Value
 
         "BASE_URL": "$(BASE_URL)",
+        "DATADOG_APP_ID": "$(DATADOG_APP_ID)",
+        "DATADOG_TOKEN": "$(DATADOG_TOKEN)",
         
 
         // MARK: - ThirdParty
