@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct MyPageView: View {
   @Bindable var store: StoreOf<MyPageCore>
@@ -101,6 +102,7 @@ public struct MyPageView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "마이페이지")
   }
 }
 

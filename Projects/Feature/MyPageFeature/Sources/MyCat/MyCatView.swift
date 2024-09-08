@@ -12,6 +12,7 @@ import CatFeature
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct MyCatView: View {
   @Bindable var store: StoreOf<MyCatCore>
@@ -67,5 +68,6 @@ public struct MyCatView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "나의 고양이")
   }
 }

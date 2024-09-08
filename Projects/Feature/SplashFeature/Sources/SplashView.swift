@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct SplashView: View {
   @Namespace var backgroundFrameID
@@ -39,5 +40,6 @@ public struct SplashView: View {
     .task {
       await store.send(.task).finish()
     }
+    .trackRUMView(name: "스플래시")
   }
 }

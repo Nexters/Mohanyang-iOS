@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct TimeSelectView: View {
   @Bindable var store: StoreOf<TimeSelectCore>
@@ -51,5 +52,6 @@ public struct TimeSelectView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "시간 변경")
   }
 }

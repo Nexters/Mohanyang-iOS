@@ -12,6 +12,7 @@ import DesignSystem
 
 import ComposableArchitecture
 import RiveRuntime
+import DatadogRUM
 
 public struct NamingCatView: View {
   @Bindable var store: StoreOf<NamingCatCore>
@@ -66,5 +67,6 @@ public struct NamingCatView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "고양이 이름짓기")
   }
 }

@@ -12,6 +12,7 @@ import CatFeature
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct OnboardingView: View {
   @Namespace var backgroundFrame
@@ -76,6 +77,7 @@ public struct OnboardingView: View {
     .onLoad {
       store.send(.onLoad)
     }
+    .trackRUMView(name: "온보딩")
   }
 }
 
