@@ -17,4 +17,6 @@ public extension DEP.SPMTarget {
   static let dependencies: TargetDependency = .external(name: "Dependencies")
   static let riveRuntime: TargetDependency = .external(name: "RiveRuntime")
   static let lottie: TargetDependency = .external(name: "Lottie")
+  static let datadogCore: TargetDependency = .external(name: "DatadogCore")
+  static let datadogRUM: TargetDependency = .external(name: "DatadogRUM")
 }
