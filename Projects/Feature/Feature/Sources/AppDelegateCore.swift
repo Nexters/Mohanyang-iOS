@@ -131,7 +131,8 @@ public struct AppDelegateCore {
         uiKitActionsPredicate: DefaultUIKitRUMActionsPredicate(),
         urlSessionTracking: RUM.Configuration.URLSessionTracking(
           firstPartyHostsTracing: .trace(hosts: [API.apiBaseHost], sampleRate: 20)
-        )
+        ),
+        trackBackgroundEvents: true
       )
     )
     
