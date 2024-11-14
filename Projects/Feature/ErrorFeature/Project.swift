@@ -6,7 +6,7 @@ import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Feature.CatFeature,
+  module: Feature.ErrorFeature,
   scripts: [],
   targets: [
     .sources,
@@ -15,8 +15,7 @@ let project: Project = .makeTMABasedProject(
   ],
   dependencies: [
     .sources: [
-      .dependency(rootModule: Domain.self),
-      .dependency(module: Feature.ErrorFeature)
-    ],
+      .dependency(rootModule: Domain.self)
+    ]
   ]
 )
