@@ -11,7 +11,8 @@ let project: Project = .makeTMABasedProject(
   targets: [
     .sources,
     .tests,
-    .testing
+    .testing,
+    .example
   ],
   dependencies: [
     .sources: [
