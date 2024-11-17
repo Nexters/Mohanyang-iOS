@@ -92,10 +92,7 @@ public struct SplashCore {
       return login(deviceID: deviceID)
 
     case .presentNetworkDialog:
-      state.dialog = DefaultDialog(
-        title: "네트워크 연결을 확인해주세요",
-        firstButton: DialogButtonModel(title: "확인")
-      )
+      state.dialog = networkErrorDialog()
       return .none
 
     case .moveToHome:
@@ -131,5 +128,13 @@ extension SplashCore {
       return ""
     }
     return uuid
+  }
+  
+  private func networkErrorDialog() -> DefaultDialog {
+    return DefaultDialog(
+      title: "네트워크 연결을 확인해주세요",
+      firstButton: DialogButtonModel(title: "확인"),
+      showCloseButton: false
+    )
   }
 }

@@ -269,11 +269,7 @@ public struct HomeCore {
       
     case .focusPomodoro(.presented(.restWaiting(.presented(.goToHomeByOver60Minute)))):
       state.focusPomodoro = nil
-      state.dialog = DefaultDialog(
-        title: "집중을 끝내고 돌아왔어요",
-        subTitle: "너무 오랜 시간동안 대기화면에 머물러서 홈화면으로 이동되었어요.",
-        firstButton: DialogButtonModel(title: "확인")
-      )
+      state.dialog = focusEndDialog()
       return .none
       
     case .focusPomodoro(.presented(.goToHome)),
@@ -304,6 +300,17 @@ public struct HomeCore {
       apiClient: self.apiClient,
       databaseClient: self.databaseClient,
       request: [request]
+    )
+  }
+}
+
+extension HomeCore {
+  private func focusEndDialog() -> DefaultDialog {
+    return DefaultDialog(
+      title: "집중을 끝내고 돌아왔어요",
+      subTitle: "너무 오랜 시간동안 대기화면에 머물러서 홈화면으로 이동되었어요.",
+      firstButton: DialogButtonModel(title: "확인"),
+      showCloseButton: false
     )
   }
 }
