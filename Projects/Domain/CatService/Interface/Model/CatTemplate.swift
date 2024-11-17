@@ -19,9 +19,10 @@ public protocol CatTemplate: Equatable {
   var focusEndPushTitle: String { get }
   var restEndPushTitle: String { get }
   var disturbPushTitle: String { get }
-  var tooltipMessage: String { get }
   
   init(baseInfo: Cat)
+  
+  mutating func generateTooltipMessage() -> String
 }
 
 
@@ -38,13 +39,17 @@ struct CheeseCat: CatTemplate {
   var restEndPushTitle: String = "이제 다시 집중해볼까냥?"
   var disturbPushTitle: String = "날 두고 어디갔냥.."
   
-  public var tooltipMessage: String {
-    let messages = ["나랑 함께할 시간이다냥!", "자주 와서 쓰다듬어 달라냥", "집중이 잘 될 거 같다냥"]
-    return messages.randomElement() ?? ""
-  }
+  let tooltipMessages = ["나랑 함께할 시간이다냥!", "자주 와서 쓰다듬어 달라냥", "집중이 잘 될 거 같다냥"]
+  var tooltipMessageCounter: Int = 0
   
   public init(baseInfo: Cat) {
     self.baseInfo = baseInfo
+  }
+  
+  mutating func generateTooltipMessage() -> String {
+    let index = tooltipMessageCounter % tooltipMessages.count
+    tooltipMessageCounter += 1
+    return tooltipMessages[index]
   }
 }
 
@@ -60,13 +65,17 @@ struct BlackCat: CatTemplate {
   var restEndPushTitle: String = "이제 다시 집중해볼까냥?"
   var disturbPushTitle: String = "날 두고 어디갔냥.."
   
-  public var tooltipMessage: String {
-    let messages = ["나랑 함께할 시간이다냥!", "자주 와서 쓰다듬어 달라냥", "집중이 잘 될 거 같다냥"]
-    return messages.randomElement() ?? ""
-  }
+  let tooltipMessages = ["나랑 함께할 시간이다냥!", "자주 와서 쓰다듬어 달라냥", "집중이 잘 될 거 같다냥"]
+  var tooltipMessageCounter: Int = 0
   
   public init(baseInfo: Cat) {
     self.baseInfo = baseInfo
+  }
+  
+  mutating func generateTooltipMessage() -> String {
+    let index = tooltipMessageCounter % tooltipMessages.count
+    tooltipMessageCounter += 1
+    return tooltipMessages[index]
   }
 }
 
@@ -82,12 +91,16 @@ struct ThreeColorCat: CatTemplate {
   var restEndPushTitle: String = "집중할 시간이다냥! 빨리 들어오라냥"
   var disturbPushTitle: String = "지금 뭐하고 있냥? 내가 감시하고 있다냥"
   
-  var tooltipMessage: String {
-    let messages = ["\"시간이 없어서\"는 변명이다냥", "휴대폰 그만보고 집중하라냥", "기회란 금새 왔다 사라진다냥"]
-    return messages.randomElement() ?? ""
-  }
+  let tooltipMessages = ["\"시간이 없어서\"는 변명이다냥", "휴대폰 그만보고 집중하라냥", "기회란 금새 왔다 사라진다냥"]
+  var tooltipMessageCounter: Int = 0
   
   init(baseInfo: Cat) {
     self.baseInfo = baseInfo
+  }
+  
+  mutating func generateTooltipMessage() -> String {
+    let index = tooltipMessageCounter % tooltipMessages.count
+    tooltipMessageCounter += 1
+    return tooltipMessages[index]
   }
 }

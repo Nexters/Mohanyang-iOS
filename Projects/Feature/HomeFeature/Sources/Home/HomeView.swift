@@ -41,11 +41,10 @@ public struct HomeView: View {
         VStack(spacing: Alias.Spacing.xLarge) {
           store.catRiv.view()
             .setTooltipTarget(tooltip: HomeCatDialogueTooltip.self)
+            .frame(width: 240, height: 240)
             .onTapGesture {
               store.send(.catTapped)
             }
-            .frame(width: 240, height: 240)
-          
           Text(store.selectedCat?.baseInfo.name ?? "")
             .font(Typography.header4)
             .foregroundStyle(Alias.Color.Text.secondary)
@@ -126,7 +125,7 @@ public struct HomeView: View {
         }
       }
     }
-    .tooltipDestination(tooltip: $store.homeCatTooltip.sending(\.setHomeCatTooltip))
+    .tooltipDestination(tooltip: .constant(store.homeCatTooltip), allowsHitTesting: false)
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
     .toastDestination(toast: $store.toast)

@@ -54,7 +54,7 @@ public struct HomeCore {
     case task
     case onLoad
     case onAppear
-    case setHomeCatTooltip(HomeCatDialogueTooltip?)
+    case changeHomeCatTooltipMessage
     case setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip?)
     case setHomeTimeGuideTooltip(HomeTimeGuideTooltip?)
     case categoryButtonTapped
@@ -126,15 +126,12 @@ public struct HomeCore {
           await send(.set(\.selectedCat, SomeCat(baseInfo: myCat)))
         }
         await send(.catSetInput)
-        await send(.setHomeCatTooltip(nil))
+        await send(.changeHomeCatTooltipMessage)
       }
       
-    case .setHomeCatTooltip:
-      guard let selectedCat = state.selectedCat else {
-        state.homeCatTooltip = nil
-        return .none
-      }
-      state.homeCatTooltip = .init(title: selectedCat.tooltipMessage)
+    case .changeHomeCatTooltipMessage:
+      let title = state.selectedCat?.generateTooltipMessage() ?? ""
+      state.homeCatTooltip = .init(title: title)
       return .none
       
     case let .setHomeCategoryGuideTooltip(tooltip):
@@ -171,7 +168,9 @@ public struct HomeCore {
     case .catTapped:
       guard let selectedCat = state.selectedCat else { return .none }
       state.catRiv.triggerInput(selectedCat.rivTriggerName)
-      return .none
+      return .run { send in
+        await send(.changeHomeCatTooltipMessage)
+      }
       
     case .catSetInput:
       guard let selectedCat = state.selectedCat else { return .none }
