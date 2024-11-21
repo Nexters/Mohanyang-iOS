@@ -1,21 +1,22 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-@_spi(Feature)
-@_spi(Domain)
+@_spi(Core)
+@_spi(Shared)
 import DependencyPlugin
 
 let project: Project = .makeTMABasedProject(
-  module: Feature.CatFeature,
+  module: Core.StreamListener,
   scripts: [],
   targets: [
     .sources,
+    .interface,
     .tests,
     .testing
   ],
   dependencies: [
-    .sources: [
-      .dependency(rootModule: Domain.self)
-    ],
+    .interface: [
+      .dependency(rootModule: Shared.self)
+    ]
   ]
 )
