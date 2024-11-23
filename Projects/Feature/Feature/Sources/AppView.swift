@@ -49,5 +49,22 @@ public struct AppView: View {
     .onLoad {
       store.send(.onLoad)
     }
+    .fullScreenCover(isPresented: $store.isLoading) {
+      VStack {
+        Spacer()
+        ZStack {
+          RoundedRectangle(cornerRadius: Alias.BorderRadius.medium)
+            .foregroundStyle(Alias.Color.Background.inverse)
+            .opacity(Global.Opacity._90d)
+          LottieView(animation: AnimationAsset.lotiSpinner.animation)
+            .playing(loopMode: .loop)
+        }
+        .frame(width: 82, height: 82)
+        Spacer()
+      }
+    }
+    .fullScreenCover(isPresented: $store.isErrorOccured) {
+      RequestErrorView()
+    }
   }
 }
