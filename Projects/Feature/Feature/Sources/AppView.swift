@@ -62,9 +62,18 @@ public struct AppView: View {
         .frame(width: 82, height: 82)
         Spacer()
       }
+      .presentationBackground(.clear)
+      // transaction으로 로딩뷰만 애니메이션을 disable하고싶은데 잘 안됨
+    }
+    .transaction(value: store.isLoading) { transaction in
+      transaction.disablesAnimations = true
     }
     .fullScreenCover(isPresented: $store.isErrorOccured) {
       RequestErrorView()
     }
+    .fullScreenCover(isPresented: $store.isNetworkDisabled) {
+      NetworkErrorView()
+    }
+
   }
 }

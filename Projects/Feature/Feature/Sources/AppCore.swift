@@ -34,6 +34,7 @@ public struct AppCore {
 
     var isLoading: Bool = false
     var isErrorOccured: Bool = false
+    var isNetworkDisabled: Bool = false
 
     public init() {}
   }
@@ -159,6 +160,9 @@ public struct AppCore {
       case .errorOccured:
         state.isLoading = false
         state.isErrorOccured = true
+      case .networkDisabled:
+        state.isLoading = false
+        state.isNetworkDisabled = true
       }
       return .none
     }

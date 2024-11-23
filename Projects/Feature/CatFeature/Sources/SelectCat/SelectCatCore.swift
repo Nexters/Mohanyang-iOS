@@ -11,6 +11,7 @@ import UserServiceInterface
 import CatServiceInterface
 import UserNotificationClientInterface
 import DatabaseClientInterface
+import StreamListenerInterface
 import DesignSystem
 
 import RiveRuntime
@@ -57,6 +58,7 @@ public struct SelectCatCore {
   @Dependency(CatService.self) var catService
   @Dependency(UserNotificationClient.self) var userNotificationClient
   @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(StreamListener.self) var streamListener
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -123,6 +125,7 @@ public struct SelectCatCore {
 
     case ._fetchCatListRequest:
       return .run { send in
+        await streamListener.sendServerState(state: .requestStarted)
         await send(
           ._fetchCatListResponse(
             Result {
@@ -134,10 +137,26 @@ public struct SelectCatCore {
 
     case let ._fetchCatListResponse(.success(response)):
       state.catList = response.map { SomeCat(baseInfo: $0) }
-      return .none
-      
-    case ._fetchCatListResponse(.failure):
-      return .none
+      return .run { send in
+        await streamListener.sendServerState(state: .requestCompleted)
+      }
+
+    // TODO: 리팩토링 필요
+    case let ._fetchCatListResponse(.failure(error)):
+      if let networkError = error as? URLError, networkError.code == .notConnectedToInternet {
+        return .run { send in
+          await streamListener.sendServerState(state: .networkDisabled)
+        }
+      }
+      guard let error = error as? NetworkError else { return .none }
+      switch error {
+      case .apiError(_):
+        return .run { send in
+          await streamListener.sendServerState(state: .errorOccured)
+        }
+      default:
+        return .none
+      }
 
     case .binding:
       return .none

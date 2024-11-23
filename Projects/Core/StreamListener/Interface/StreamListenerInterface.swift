@@ -31,4 +31,5 @@ public enum ServerState {
   case requestStarted
   case requestCompleted
   case errorOccured
+  case networkDisabled
 }
