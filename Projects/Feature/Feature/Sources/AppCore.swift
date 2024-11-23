@@ -19,6 +19,7 @@ import UserNotificationClientInterface
 import CatServiceInterface
 import UserServiceInterface
 import DatabaseClientInterface
+import StreamListenerInterface
 
 import ComposableArchitecture
 
@@ -30,27 +31,34 @@ public struct AppCore {
     var splash: SplashCore.State?
     var home: HomeCore.State?
     var onboarding: OnboardingCore.State?
-    
+
+    var isLoading: Bool = false
+    var isErrorOccured: Bool = false
+
     public init() {}
   }
   
-  public enum Action {
+  public enum Action: BindableAction {
+    case binding(BindingAction<State>)
     case onLoad
     case appDelegate(AppDelegateCore.Action)
     case didChangeScenePhase(ScenePhase)
     case splash(SplashCore.Action)
     case home(HomeCore.Action)
     case onboarding(OnboardingCore.Action)
+    case serverState(ServerState)
   }
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(UserNotificationClient.self) var userNotificationClient
   @Dependency(UserService.self) var userService
   @Dependency(DatabaseClient.self) var databaseClient
-  
+  @Dependency(StreamListener.self) var streamListener
+
   public init() {}
   
   public var body: some ReducerOf<Self> {
+    BindingReducer()
     Scope(state: \.appDelegate, action: \.appDelegate) {
       AppDelegateCore()
     }
@@ -68,10 +76,17 @@ public struct AppCore {
   
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
-    case .onLoad:
-      state.splash = SplashCore.State()
+    case .binding:
       return .none
       
+    case .onLoad:
+      state.splash = SplashCore.State()
+      return .run { send in
+        for await serverState in streamListener.updateServerState() {
+          await send(.serverState(serverState))
+        }
+      }
+
     case .appDelegate:
       return .none
       
@@ -131,6 +146,20 @@ public struct AppCore {
       return .none
 
     case .onboarding:
+      return .none
+
+    case .serverState(let serverState):
+      switch serverState {
+      case .requestStarted:
+        state.isErrorOccured = false
+        state.isLoading = true
+      case .requestCompleted:
+        state.isErrorOccured = false
+        state.isLoading = false
+      case .errorOccured:
+        state.isLoading = false
+        state.isErrorOccured = true
+      }
       return .none
     }
   }

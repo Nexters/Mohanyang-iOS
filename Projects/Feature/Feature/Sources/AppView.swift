@@ -12,12 +12,14 @@ import DesignSystem
 import SplashFeature
 import HomeFeature
 import OnboardingFeature
+import ErrorFeature
 
 import ComposableArchitecture
+import Lottie
 
 public struct AppView: View {
-  let store: StoreOf<AppCore>
-  
+  @Bindable var store: StoreOf<AppCore>
+
   public init(store: StoreOf<AppCore>) {
     self.store = store
   }
