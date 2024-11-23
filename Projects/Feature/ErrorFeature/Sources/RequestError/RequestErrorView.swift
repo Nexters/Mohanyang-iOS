@@ -24,7 +24,7 @@ public struct RequestErrorView: View {
       VStack(spacing: Alias.Spacing.xxxLarge) {
         Spacer()
 
-        DesignSystemAsset.Image.imgOnboarding1.swiftUIImage
+        DesignSystemAsset.Image.error.swiftUIImage
 
         VStack(spacing: Alias.Spacing.small) {
           Text("문제가 발생했어요")

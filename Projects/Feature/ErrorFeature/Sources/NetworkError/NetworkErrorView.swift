@@ -24,7 +24,7 @@ public struct NetworkErrorView: View {
       VStack(spacing: Alias.Spacing.xxxLarge) {
         Spacer()
 
-        DesignSystemAsset.Image.imgOnboarding1.swiftUIImage
+        DesignSystemAsset.Image.noInternet.swiftUIImage
 
         VStack(spacing: Alias.Spacing.small) {
           Text("인터넷 연결이 불안정해요")
