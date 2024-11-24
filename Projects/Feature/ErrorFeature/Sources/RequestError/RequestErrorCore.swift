@@ -35,8 +35,8 @@ public struct RequestErrorCore {
     case .moveToHome:
       return .none
     case .moveToCustomerService:
-      guard let feedbackURL = URL(string: "https://forms.gle/wEUPH9Tvxgua4hCZ9") else { return .none }
-      return .run { _ in await self.openURL(feedbackURL) }
+      guard let kakaoChannelURL = URL(string: "http://pf.kakao.com/_FvuAn") else { return .none }
+      return .run { _ in await self.openURL(kakaoChannelURL) }
     }
   }
 }

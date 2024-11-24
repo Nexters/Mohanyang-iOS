@@ -28,6 +28,7 @@ public struct NetworkErrorCore {
   private func core(_ state: inout State, _ action: Action) -> EffectOf<Self> {
     switch action {
     case .tryAgain:
+      //TODO: 11.25 재시도 로직
       return .none
     }
   }
