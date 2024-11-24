@@ -10,11 +10,15 @@ import SwiftUI
 
 import DesignSystem
 
+import ComposableArchitecture
+
 public struct RequestErrorView: View {
   @Environment(\.dismiss) var dismiss
 
-  public init() {
+  let store: StoreOf<RequestErrorCore>
 
+  public init(store: StoreOf<RequestErrorCore>) {
+    self.store = store
   }
 
   public var body: some View {
@@ -39,13 +43,15 @@ public struct RequestErrorView: View {
 
         VStack(spacing: Alias.Spacing.large) {
           Button(title: "홈으로 이동") {
+            store.send(.moveToHome)
             dismiss()
           }
           .buttonStyle(.box(level: .primary, size: .large, width: .medium))
 
           Button(
             action: {
-              print("고객센터 문의")
+              store.send(.moveToCustomerService)
+              dismiss()
             },
             label: {
               Text("고객센터 문의")

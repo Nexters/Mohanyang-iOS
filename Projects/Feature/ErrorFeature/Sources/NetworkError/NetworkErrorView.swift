@@ -10,11 +10,15 @@ import SwiftUI
 
 import DesignSystem
 
+import ComposableArchitecture
+
 public struct NetworkErrorView: View {
   @Environment(\.dismiss) var dismiss
 
-  public init() {
+  let store: StoreOf<NetworkErrorCore>
 
+  public init(store: StoreOf<NetworkErrorCore>) {
+    self.store = store
   }
 
   public var body: some View {
@@ -38,6 +42,7 @@ public struct NetworkErrorView: View {
         .padding(.bottom, 34)
 
         Button(title: "다시 시도하기") {
+          store.send(.tryAgain)
           dismiss()
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .medium))

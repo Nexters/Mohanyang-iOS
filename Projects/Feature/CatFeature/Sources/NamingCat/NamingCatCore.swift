@@ -12,6 +12,7 @@ import CatServiceInterface
 import DesignSystem
 import UserServiceInterface
 import DatabaseClientInterface
+import StreamListenerInterface
 
 import ComposableArchitecture
 import RiveRuntime
@@ -41,6 +42,8 @@ public struct NamingCatCore {
     case setTooltip(DownDirectionTooltip?)
     case saveChangedCat(SomeCat)
     case _setNextAction
+    case _postNamedCatRequest(ChangeCatNameRequest)
+    case _postNamedCatResponse(Result<Void, Error>)
     case binding(BindingAction<State>)
   }
 
@@ -54,6 +57,7 @@ public struct NamingCatCore {
   @Dependency(CatService.self) var catService
   @Dependency(UserService.self) var userService
   @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(StreamListener.self) var streamListener
   let isOnboardedKey = "mohanyang_userdefaults_isOnboarded"
 
   public init() {}
@@ -81,12 +85,7 @@ public struct NamingCatCore {
       let catName = state.text == "" ? selectedCat.baseInfo.name : state.text
       let request = ChangeCatNameRequest(name: catName)
       return .run { send in
-        try await catService.changeCatName(
-          apiClient: apiClient,
-          request: request
-        )
-        try await self.userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
-        await send(._setNextAction)
+        await send(._postNamedCatRequest(request))
       }
       
     case .catSetInput:
@@ -107,7 +106,7 @@ public struct NamingCatCore {
     case ._setNextAction:
       return .run { [state] send in
         if state.route == .onboarding {
-          await userDefaultsClient.setBool(true, key: isOnboardedKey)
+          await self.userDefaultsClient.setBool(true, key: isOnboardedKey)
           await send(.moveToHome)
         } else {
           if let selectedCat = state.selectedCat {
@@ -115,6 +114,24 @@ public struct NamingCatCore {
           }
         }
       }
+
+    case let ._postNamedCatRequest(request):
+      return .run { send in
+        await self.streamListener.sendServerState(state: .requestStarted)
+        await send(._postNamedCatResponse(Result {
+          try await self.catService.changeCatName(apiClient: apiClient, request: request)
+        }))
+      }
+
+    case ._postNamedCatResponse(.success(_)):
+      return .run { send in
+        try await self.userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
+        await self.streamListener.sendServerState(state: .requestCompleted)
+        await send(._setNextAction)
+      }
+
+    case let ._postNamedCatResponse(.failure(error)):
+      return self.handleError(error: error)
 
     case .binding(\.text):
       state.inputFieldError = setError(state.text)
@@ -146,5 +163,26 @@ public struct NamingCatCore {
     }
 
     return error
+  }
+}
+
+extension NamingCatCore {
+  private func handleError(error: any Error) -> EffectOf<NamingCatCore> {
+    if let networkError = error as? URLError,
+       networkError.code == .networkConnectionLost ||
+       networkError.code == .notConnectedToInternet {
+      return .run { send in
+        await streamListener.sendServerState(state: .networkDisabled)
+      }
+    }
+    guard let error = error as? NetworkError else { return .none }
+    switch error {
+    case .apiError(_):
+      return .run { send in
+        await streamListener.sendServerState(state: .errorOccured)
+      }
+    default:
+      return .none
+    }
   }
 }

@@ -63,17 +63,26 @@ public struct AppView: View {
         Spacer()
       }
       .presentationBackground(.clear)
-      // transaction으로 로딩뷰만 애니메이션을 disable하고싶은데 잘 안됨
+    }
+    .fullScreenCover(
+      item: $store.scope(
+        state: \.requestError,
+        action: \.requestError
+      )
+    ) { store in
+      RequestErrorView(store: store)
+    }
+    .fullScreenCover(
+      item: $store.scope(
+        state: \.networkError,
+        action: \.networkError
+      )
+    ) { store in
+      NetworkErrorView(store: store)
     }
     .transaction(value: store.isLoading) { transaction in
+      // TODO: 11/24, LoadingView 분리 + fullscreen animation disable
       transaction.disablesAnimations = true
     }
-    .fullScreenCover(isPresented: $store.isErrorOccured) {
-      RequestErrorView()
-    }
-    .fullScreenCover(isPresented: $store.isNetworkDisabled) {
-      NetworkErrorView()
-    }
-
   }
 }

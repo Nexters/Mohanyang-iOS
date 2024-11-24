@@ -42,6 +42,8 @@ public struct SelectCatCore {
     case _moveToNamingCat
     case _fetchCatListRequest
     case _fetchCatListResponse(Result<[Cat], Error>)
+    case _postSelectedCatRequest(SelectCatRequest)
+    case _postSelectedCatResponse(Result<Void, Error>)
     case binding(BindingAction<State>)
     case namingCat(PresentationAction<NamingCatCore.Action>)
   }
@@ -97,9 +99,7 @@ public struct SelectCatCore {
       guard let selectedCat = state.selectedCat else { return .none }
       let request = SelectCatRequest(catNo: selectedCat.baseInfo.no)
       return .run { send in
-        try await userService.selectCat(apiClient: self.apiClient, request: request)
-        try await userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
-        await send(._setNextAction)
+        await send(._postSelectedCatRequest(request))
       }
 
     case .saveChangedCat:
@@ -126,13 +126,9 @@ public struct SelectCatCore {
     case ._fetchCatListRequest:
       return .run { send in
         await streamListener.sendServerState(state: .requestStarted)
-        await send(
-          ._fetchCatListResponse(
-            Result {
-              try await catService.getCatList(apiClient)
-            }
-          )
-        )
+        await send(._fetchCatListResponse(Result {
+          try await catService.getCatList(apiClient)
+        }))
       }
 
     case let ._fetchCatListResponse(.success(response)):
@@ -141,27 +137,53 @@ public struct SelectCatCore {
         await streamListener.sendServerState(state: .requestCompleted)
       }
 
-    // TODO: 리팩토링 필요
     case let ._fetchCatListResponse(.failure(error)):
-      if let networkError = error as? URLError, networkError.code == .notConnectedToInternet {
-        return .run { send in
-          await streamListener.sendServerState(state: .networkDisabled)
-        }
+      return handleError(error: error)
+
+    case let ._postSelectedCatRequest(request):
+      return .run { send in
+        await streamListener.sendServerState(state: .requestStarted)
+        await send(._postSelectedCatResponse(Result {
+          try await userService.selectCat(apiClient: self.apiClient, request: request)
+        }))
       }
-      guard let error = error as? NetworkError else { return .none }
-      switch error {
-      case .apiError(_):
-        return .run { send in
-          await streamListener.sendServerState(state: .errorOccured)
-        }
-      default:
-        return .none
+
+    case ._postSelectedCatResponse(.success(_)):
+      return .run { send in
+        try await userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
+        await streamListener.sendServerState(state: .requestCompleted)
+        await send(._setNextAction)
       }
+
+    case let ._postSelectedCatResponse(.failure(error)):
+      return handleError(error: error)
 
     case .binding:
       return .none
 
     case .namingCat:
+      return .none
+    }
+  }
+}
+
+extension SelectCatCore {
+  // TODO: 다른 곳에서도 사용될 코드인데 따로 뺄 방법 ..
+  private func handleError(error: any Error) -> EffectOf<SelectCatCore> {
+    if let networkError = error as? URLError,
+       networkError.code == .networkConnectionLost ||
+       networkError.code == .notConnectedToInternet {
+      return .run { send in
+        await streamListener.sendServerState(state: .networkDisabled)
+      }
+    }
+    guard let error = error as? NetworkError else { return .none }
+    switch error {
+    case .apiError(_):
+      return .run { send in
+        await streamListener.sendServerState(state: .errorOccured)
+      }
+    default:
       return .none
     }
   }

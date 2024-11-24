@@ -20,12 +20,12 @@ struct ContentView: View {
 
       Spacer()
     }
-    .fullScreenCover(isPresented: $isNetworkErrorViewPresented) {
-      NetworkErrorView()
-    }
-    .fullScreenCover(isPresented: $isRequestErrorViewPresented) {
-      RequestErrorView()
-    }
+//    .fullScreenCover(isPresented: $isNetworkErrorViewPresented) {
+//      NetworkErrorView()
+//    }
+//    .fullScreenCover(isPresented: $isRequestErrorViewPresented) {
+//      RequestErrorView()
+//    }
   }
 }
 

@@ -11,6 +11,7 @@ import SwiftUI
 import SplashFeature
 import HomeFeature
 import OnboardingFeature
+import ErrorFeature
 import MyPageFeature
 import PushService
 import AppService
@@ -31,10 +32,10 @@ public struct AppCore {
     var splash: SplashCore.State?
     var home: HomeCore.State?
     var onboarding: OnboardingCore.State?
+    @Presents var networkError: NetworkErrorCore.State?
+    @Presents var requestError: RequestErrorCore.State?
 
     var isLoading: Bool = false
-    var isErrorOccured: Bool = false
-    var isNetworkDisabled: Bool = false
 
     public init() {}
   }
@@ -47,6 +48,8 @@ public struct AppCore {
     case splash(SplashCore.Action)
     case home(HomeCore.Action)
     case onboarding(OnboardingCore.Action)
+    case networkError(PresentationAction<NetworkErrorCore.Action>)
+    case requestError(PresentationAction<RequestErrorCore.Action>)
     case serverState(ServerState)
   }
   
@@ -72,6 +75,12 @@ public struct AppCore {
       }
       .ifLet(\.onboarding, action: \.onboarding) {
         OnboardingCore()
+      }
+      .ifLet(\.$networkError, action: \.networkError) {
+        NetworkErrorCore()
+      }
+      .ifLet(\.$requestError, action: \.requestError) {
+        RequestErrorCore()
       }
   }
   
@@ -149,20 +158,33 @@ public struct AppCore {
     case .onboarding:
       return .none
 
+    case .networkError:
+      return .none
+
+      // TODO: state 초기화 방법 변경 필요 + 온보딩 첫페이지로 돌아가면 온보딩 carousel 이미지 안뜸
+    case .requestError(.presented(.moveToHome)):
+      if state.onboarding != nil {
+        state.onboarding = OnboardingCore.State()
+      } else if state.home != nil {
+        state.home = HomeCore.State()
+      }
+      return .none
+
+    case .requestError:
+      return .none
+
     case .serverState(let serverState):
       switch serverState {
       case .requestStarted:
-        state.isErrorOccured = false
         state.isLoading = true
       case .requestCompleted:
-        state.isErrorOccured = false
         state.isLoading = false
       case .errorOccured:
         state.isLoading = false
-        state.isErrorOccured = true
+        state.requestError = RequestErrorCore.State()
       case .networkDisabled:
         state.isLoading = false
-        state.isNetworkDisabled = true
+        state.networkError = NetworkErrorCore.State()
       }
       return .none
     }
