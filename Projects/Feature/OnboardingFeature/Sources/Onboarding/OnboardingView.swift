@@ -66,6 +66,10 @@ public struct OnboardingView: View {
     .background(Alias.Color.Background.primary)
     .setFrameMeasure(space: .global, identifier: backgroundFrame)
     .getFrameMeasure { value in
+      /* TODO: 11.25
+       Onboarding 재 초기화 시 FrameMeasure 관련 모디파이어를 안거침 . ,, 파악중
+       getFrameMeasure -> OnDisappear 시에도 거치는 이유는 ?
+      */
       guard let background = value[backgroundFrame] else { return }
       store.width = background.width
     }

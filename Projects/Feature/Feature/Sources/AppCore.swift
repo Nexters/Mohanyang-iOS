@@ -161,7 +161,6 @@ public struct AppCore {
     case .networkError:
       return .none
 
-      // TODO: state 초기화 방법 변경 필요 + 온보딩 첫페이지로 돌아가면 온보딩 carousel 이미지 안뜸
     case .requestError(.presented(.moveToHome)):
       if state.onboarding != nil {
         state.onboarding = OnboardingCore.State()
