@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum NetworkError: Error {
+public enum NetworkError: Error, Equatable {
   case requestError(_ description: String)
   case apiError(_ description: String)
   case noResponseError

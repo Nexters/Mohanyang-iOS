@@ -12,12 +12,14 @@ import DesignSystem
 import SplashFeature
 import HomeFeature
 import OnboardingFeature
+import ErrorFeature
 
 import ComposableArchitecture
+import Lottie
 
 public struct AppView: View {
-  let store: StoreOf<AppCore>
-  
+  @Bindable var store: StoreOf<AppCore>
+
   public init(store: StoreOf<AppCore>) {
     self.store = store
   }
@@ -46,6 +48,41 @@ public struct AppView: View {
     .animation(.easeInOut, value: store.home == nil)
     .onLoad {
       store.send(.onLoad)
+    }
+    .fullScreenCover(isPresented: $store.isLoading) {
+      VStack {
+        Spacer()
+        ZStack {
+          RoundedRectangle(cornerRadius: Alias.BorderRadius.medium)
+            .foregroundStyle(Alias.Color.Background.inverse)
+            .opacity(Global.Opacity._90d)
+          LottieView(animation: AnimationAsset.lotiSpinner.animation)
+            .playing(loopMode: .loop)
+        }
+        .frame(width: 82, height: 82)
+        Spacer()
+      }
+      .presentationBackground(.clear)
+    }
+    .fullScreenCover(
+      item: $store.scope(
+        state: \.requestError,
+        action: \.requestError
+      )
+    ) { store in
+      RequestErrorView(store: store)
+    }
+    .fullScreenCover(
+      item: $store.scope(
+        state: \.networkError,
+        action: \.networkError
+      )
+    ) { store in
+      NetworkErrorView(store: store)
+    }
+    .transaction(value: store.isLoading) { transaction in
+      // TODO: 11/24, LoadingView 분리 + fullscreen animation disable
+      transaction.disablesAnimations = true
     }
   }
 }
