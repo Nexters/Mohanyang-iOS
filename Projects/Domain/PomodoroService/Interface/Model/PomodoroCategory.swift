@@ -15,7 +15,13 @@ import DatabaseClientInterface
 
 import RealmSwift
 
-public struct PomodoroCategory: Persistable, Equatable, Identifiable, Codable {
+public struct PomodoroCategory:
+  Persistable,
+  Equatable,
+  Identifiable,
+  Codable,
+  Hashable {
+  
   public var id: Int {
     return no
   }

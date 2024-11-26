@@ -13,10 +13,7 @@ import DependenciesMacros
 
 @DependencyClient
 public struct APIClient {
-  public var apiRequest: @Sendable (
-    _ request: APIBaseRequest,
-    _ isWithInterceptor: Bool
-  ) async throws -> (Data, URLResponse)
+  public var apiRequest: @Sendable (_ request: APIBaseRequest, _ isWithInterceptor: Bool) async throws -> (Data, URLResponse)
 
   public func apiRequest<T: Decodable>(
     request: APIBaseRequest,
