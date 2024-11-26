@@ -100,37 +100,6 @@ public struct AppCore {
     case .appDelegate:
       return .none
       
-    case .didChangeScenePhase(.background):
-      let isDisturbAlarmEnabled = getDisturbAlarm(userDefaultsClient: self.userDefaultsClient)
-      return .run { send in
-        if isDisturbAlarmEnabled,
-           let myCatInfo = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
-          let trigger = UNTimeIntervalNotificationTrigger(
-            timeInterval: TimeInterval(10),
-            repeats: false
-          )
-          try await scheduleNotification(
-            userNotificationClient: self.userNotificationClient,
-            contentType: .disturb(SomeCat(baseInfo: myCatInfo)),
-            trigger: trigger
-          )
-        }
-      }
-      
-    case .didChangeScenePhase(.active):
-      return .merge(
-        .run { send in
-          let settings = await self.userNotificationClient.getNotificationSettings()
-          if settings.authorizationStatus != .authorized {
-            await setTimerAlarm(userDefaultsClient: self.userDefaultsClient, isEnabled: false)
-            await setDisturbAlarm(userDefaultsClient: self.userDefaultsClient, isEnabled: false)
-          }
-        },
-        .run { _ in
-          await removePendingNotification(userNotificationClient: self.userNotificationClient, identifier: ["disturb"])
-        }
-      )
-      
     case .didChangeScenePhase:
       return .none
 

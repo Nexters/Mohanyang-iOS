@@ -15,7 +15,13 @@ import DatabaseClientInterface
 
 import RealmSwift
 
-public struct PomodoroCategory: Persistable, Equatable, Identifiable, Codable {
+public struct PomodoroCategory:
+  Persistable,
+  Equatable,
+  Identifiable,
+  Codable,
+  Hashable {
+  
   public var id: Int {
     return no
   }
@@ -25,6 +31,22 @@ public struct PomodoroCategory: Persistable, Equatable, Identifiable, Codable {
   public let position: Int
   public var focusTime: String
   public var restTime: String
+  
+  public init(
+    no: Int,
+    baseCategoryCode: PomodoroCategoryCode,
+    title: String,
+    position: Int,
+    focusTime: String,
+    restTime: String
+  ) {
+    self.no = no
+    self.baseCategoryCode = baseCategoryCode
+    self.title = title
+    self.position = position
+    self.focusTime = focusTime
+    self.restTime = restTime
+  }
   
   @_spi(Internal)
   public init(managedObject: PomodoroCategoryObject) {

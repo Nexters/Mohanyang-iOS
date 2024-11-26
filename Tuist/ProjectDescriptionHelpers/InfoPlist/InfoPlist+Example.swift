@@ -29,6 +29,11 @@ extension InfoPlist {
         "LSRequiresIPhoneOS": true,
         
         
+        // MARK: - Live Activities
+        
+        "NSSupportsLiveActivities": true,
+        
+        
         // MARK: - Cocoa
         
         "NSAppTransportSecurity": [

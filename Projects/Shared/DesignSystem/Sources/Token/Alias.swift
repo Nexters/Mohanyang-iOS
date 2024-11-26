@@ -42,6 +42,7 @@ public enum Alias {
   
   public enum Spacing {
     public static let xSmall = Global.Dimension._4f
+    public static let xxSmall = Global.Dimension._2f
     public static let small = Global.Dimension._8f
     public static let medium = Global.Dimension._12f
     public static let large = Global.Dimension._16f

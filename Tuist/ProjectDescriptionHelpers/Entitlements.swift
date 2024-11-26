@@ -16,5 +16,9 @@ extension Entitlements {
         "com.apple.developer.associated-domains": []
       ])
     }
+    
+    public static var widgetExtension: Entitlements {
+      return .dictionary([:])
+    }
   }
 }

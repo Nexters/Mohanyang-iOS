@@ -65,3 +65,19 @@ public func getTimerAlarm(
 ) -> Bool {
   return userDefaultsClient.boolForKey(isTimerAlarmOnKey)
 }
+
+
+let isLiveActivityOnKey = "mohanyang_userdefaults_isLiveActivityOnKey"
+
+public func setLiveActivityState(
+  userDefaultsClient: UserDefaultsClient,
+  isEnabled: Bool
+) async -> Void {
+  await userDefaultsClient.setBool(isEnabled, isLiveActivityOnKey)
+}
+
+public func getLiveActivityState(
+  userDefaultsClient: UserDefaultsClient
+) -> Bool {
+  return userDefaultsClient.boolForKey(isLiveActivityOnKey)
+}

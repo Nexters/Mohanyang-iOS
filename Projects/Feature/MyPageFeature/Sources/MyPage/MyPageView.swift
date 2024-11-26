@@ -60,6 +60,11 @@ public struct MyPageView: View {
               subTitle: "다른 앱을 사용하면 고양이가 방해해요",
               isOn: $store.isDisturbAlarmOn.sending(\.disturbAlarmToggleButtonTapped)
             )
+            AlarmSectionView(
+              title: "잠금화면 표시하기",
+              subTitle: "잠금화면에 집중•휴식시간을 표시해요",
+              isOn: $store.isLiveActivityOn.sending(\.liveActivityToggleButtonTapped)
+            )
           }
           .padding(.all, Alias.Spacing.xLarge)
           .background(

@@ -44,7 +44,7 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
               Text(subTitle)
                 .font(Typography.subBodyR)
                 .foregroundStyle(Alias.Color.Text.secondary)
-                .lineLimit(2)
+                .lineLimit(4)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
           }

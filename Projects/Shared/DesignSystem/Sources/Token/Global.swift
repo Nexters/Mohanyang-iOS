@@ -50,6 +50,7 @@ public enum Global {
   }
   
   public enum Dimension {
+    public static let _2f: CGFloat = 2
     public static let _4f: CGFloat = 4
     public static let _8f: CGFloat = 8
     public static let _12f: CGFloat = 12

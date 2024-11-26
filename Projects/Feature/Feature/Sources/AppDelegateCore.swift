@@ -13,8 +13,10 @@ import Logger
 import UserNotificationClientInterface
 import KeychainClientInterface
 import DatabaseClientInterface
+import LiveActivityClientInterface
 import AppService
 import APIClientInterface
+import PomodoroServiceInterface
 
 import ComposableArchitecture
 import FirebaseCore
@@ -33,10 +35,12 @@ public struct AppDelegateCore {
     case didFinishLaunching
     case didRegisterForRemoteNotifications(Result<Data, Error>)
     case userNotifications(UserNotificationClient.DelegateEvent)
+    case willTerminate
   }
   
   @Dependency(KeychainClient.self) var keychainClient
   @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(LiveActivityClient.self) var liveActivityClient
   
   public init() {}
   
@@ -96,6 +100,11 @@ public struct AppDelegateCore {
       
     case .userNotifications:
       return .none
+      
+    case .willTerminate:
+      return .run { send in
+        await liveActivityClient.protocolAdapter.endAllActivityImmediately(type: PomodoroActivityAttributes.self)
+      }
     }
   }
   

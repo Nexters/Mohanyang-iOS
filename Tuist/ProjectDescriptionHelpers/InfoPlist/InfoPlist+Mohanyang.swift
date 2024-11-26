@@ -12,12 +12,12 @@ extension InfoPlist {
     public static var app: InfoPlist {
       return .dictionary([
         // MARK: - Environment Value
-
+        
         "BASE_URL": "$(BASE_URL)",
         "DATADOG_APP_ID": "$(DATADOG_APP_ID)",
         "DATADOG_TOKEN": "$(DATADOG_TOKEN)",
         
-
+        
         // MARK: - ThirdParty
         
         
@@ -44,6 +44,11 @@ extension InfoPlist {
         
         "LSRequiresIPhoneOS": true,
         "LSApplicationQueriesSchemes": [],
+        
+        
+        // MARK: - Live Activities
+        
+        "NSSupportsLiveActivities": true,
         
         
         // MARK: - Cocoa
@@ -77,6 +82,17 @@ extension InfoPlist {
         "UIStatusBarStyle": "UIStatusBarStyleLightContent",
         "UISupportedInterfaceOrientations~iphone": ["UIInterfaceOrientationPortrait"],
         "UIUserInterfaceStyle": "Light"
+      ])
+    }
+    
+    public static var widgetExtension: InfoPlist {
+      return .extendingDefault(with: [
+        "CFBundleDisplayName": "$(APP_NAME)",
+        "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+        "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+        "NSExtension": [
+          "NSExtensionPointIdentifier": "com.apple.widgetkit-extension",
+        ]
       ])
     }
   }
