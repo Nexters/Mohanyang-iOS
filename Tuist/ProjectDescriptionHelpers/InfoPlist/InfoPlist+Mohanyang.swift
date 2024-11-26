@@ -87,12 +87,6 @@ extension InfoPlist {
     
     public static var widgetExtension: InfoPlist {
       return .extendingDefault(with: [
-        // MARK: - Keychain Access Group ID
-//        "KeychainAccessGroupId": AppEnv.Kimcaddie.keychainAccessGroupId,
-        
-        // MARK: - App Group ID
-//        "AppGroupId": AppEnv.Kimcaddie.appGroupId,
-        
         "CFBundleDisplayName": "$(APP_NAME)",
         "CFBundleShortVersionString": "$(MARKETING_VERSION)",
         "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",

@@ -19,13 +19,6 @@ extension Entitlements {
     
     public static var widgetExtension: Entitlements {
       return .dictionary([:])
-//        "com.apple.security.application-groups": [
-//          AppEnv.Kimcaddie.appGroupId
-//        ],
-//        "keychain-access-groups": [
-//          AppEnv.Kimcaddie.keychainAccessGroupId
-//        ]
-//      ])
     }
   }
 }

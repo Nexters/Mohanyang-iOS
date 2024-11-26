@@ -23,10 +23,7 @@ struct TimerLockScreenCore {
     }
   }
   
-  enum Action {
-    case stateUpdated(PomodoroActivityAttributes.ContentState)
-    case updateTime
-  }
+  enum Action {}
   
   @Dependency(\.suspendingClock) var continuousClock
   
@@ -37,15 +34,6 @@ struct TimerLockScreenCore {
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
-    switch action {
-    case let .stateUpdated(contentState):
-      state.contentState = contentState
-      return .run { send in await send(.updateTime) }
-      
-    case .updateTime:
-//      guard let contentState = state.contentState else { return .none }
-//      state.timerText = timeDifferenceBetween(Date.now, contentState.goalDatetime)
-      return .none
-    }
+    return .none
   }
 }

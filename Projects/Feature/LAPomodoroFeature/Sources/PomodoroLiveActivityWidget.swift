@@ -15,14 +15,7 @@ import DesignSystem
 import ComposableArchitecture
 
 public struct PomodoroLiveActivityWidget: Widget {
-  @Bindable var store: StoreOf<PomodoroLiveActivityWidgetCore>
-  
-  public init() {
-    store = .init(
-      initialState: PomodoroLiveActivityWidgetCore.State(),
-      reducer: { PomodoroLiveActivityWidgetCore() }
-    )
-  }
+  public init() {}
   
   public var body: some WidgetConfiguration {
     ActivityConfiguration(for: PomodoroActivityAttributes.self) { context in
