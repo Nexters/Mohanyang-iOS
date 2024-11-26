@@ -8,16 +8,17 @@
 
 import Foundation
 
-import CatServiceInterface
-import PomodoroServiceInterface
-import UserServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
-import DesignSystem
+import LiveActivityClientInterface
 import UserNotificationClientInterface
+import CatServiceInterface
+import UserServiceInterface
+import PomodoroServiceInterface
 import PushService
 import AppService
+import DesignSystem
 
 import ComposableArchitecture
 import RiveRuntime
@@ -27,28 +28,24 @@ public struct RestPomodoroCore {
   @ObservableState
   public struct State: Equatable {
     let focusedTimeBySeconds: Int
+    var goalDatetime: Date?
     var selectedCategory: PomodoroCategory?
     var restTimeBySeconds: Int = 0
     var overTimeBySeconds: Int = 0
     var changeRestTimeByMinute: Int = 0
-    
-    var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
     var toast: DefaultToast?
-
-    // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
     var selectedCat: SomeCat?
-
-    var catRiv: RiveViewModel = Rive.catRestRiv(stateMachineName: "State Machine_Home")
-    
     var pushTriggered: Bool = false
-
+    var catRiv: RiveViewModel = Rive.catRestRiv(stateMachineName: "State Machine_Home")
+    var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
+    
     public init(focusedTimeBySeconds: Int) {
       self.focusedTimeBySeconds = focusedTimeBySeconds
     }
     
     var dialogueTooltip: PomodoroDialogueTooltip? {
       PomodoroDialogueTooltip(
-        title: overTimeBySeconds > 0 ? "이제 다시 사냥놀이 하자냥!" : "쉬는 게 제일 좋다냥" 
+        title: overTimeBySeconds > 0 ? "이제 다시 사냥놀이 하자냥!" : "쉬는 게 제일 좋다냥"
       )
     }
     var minus5MinuteButtonDisabled: Bool {
@@ -73,6 +70,7 @@ public struct RestPomodoroCore {
     case setupRestTime
     case catTapped
     case catSetInput
+    case setupLiveActivity
     
     case goToHome
     case goToFocus
@@ -120,6 +118,7 @@ public struct RestPomodoroCore {
         )
         await send(.set(\.selectedCategory, selectedCategory))
         await send(.setupRestTime)
+        await send(.setupLiveActivity)
         await send(.timer(.start))
       }
       
@@ -163,6 +162,7 @@ public struct RestPomodoroCore {
       
     case .setupRestTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
+      state.goalDatetime = Date().addingTimeInterval(Double(selectedCategory.focusTimeSeconds))
       state.restTimeBySeconds = selectedCategory.restTimeSeconds
       return .none
       
@@ -176,6 +176,36 @@ public struct RestPomodoroCore {
       state.catRiv.reset()
       state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
+      
+    case .setupLiveActivity:
+      let isLiveActivityAllowed = getLiveActivityState(userDefaultsClient: self.userDefaultsClient)
+      guard isLiveActivityAllowed,
+            let category = state.selectedCategory,
+            let goalDatetime = state.goalDatetime
+      else { return .none }
+      
+      let activity = try? LiveActivityManager.shared.startActivity(
+        attributes: PomodoroActivityAttributes(),
+        content: .init(
+          state: .init(category: category, goalDatetime: goalDatetime, isRest: true),
+          staleDate: nil
+        ),
+        pushType: nil
+      )
+      return .run { _ in
+        do {
+          try await Task.never()
+        } catch {
+          if let currentActivityID = activity?.id {
+            await LiveActivityManager.shared.endActivity(
+              PomodoroActivityAttributes.self,
+              id: currentActivityID,
+              content: nil,
+              dismissalPolicy: .immediate
+            )
+          }
+        }
+      }
       
     case .goToHome:
       return .none
@@ -204,6 +234,11 @@ public struct RestPomodoroCore {
       }
       
     case .timer(.tick):
+      // date 처이 계산
+      guard let goalDatetime = state.goalDatetime else { return .none }
+      
+      let timeDifference = timeDifferenceInSeconds(from: Date.now, to: goalDatetime)
+      
       if state.restTimeBySeconds == 0 {
         if !state.pushTriggered {
           state.pushTriggered = true
@@ -218,10 +253,10 @@ public struct RestPomodoroCore {
             await send(.goToHome)
           }
         } else {
-          state.overTimeBySeconds += 1
+          state.overTimeBySeconds = timeDifference
         }
       } else {
-        state.restTimeBySeconds -= 1
+        state.restTimeBySeconds = timeDifference
       }
       return .none
       
@@ -248,5 +283,10 @@ public struct RestPomodoroCore {
       apiClient: self.apiClient,
       databaseClient: self.databaseClient
     )
+  }
+  
+  func timeDifferenceInSeconds(from startDate: Date, to endDate: Date) -> Int {
+    let difference = Int(endDate.timeIntervalSince(startDate))
+    return difference
   }
 }

@@ -7,17 +7,20 @@
 //
 
 import Foundation
+import SwiftUI
 
-import CatServiceInterface
-import PomodoroServiceInterface
-import UserServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
-import DesignSystem
-import PushService
 import UserNotificationClientInterface
+import LiveActivityClientInterface
+import CatServiceInterface
+import PomodoroServiceInterface
+import UserServiceInterface
+import PushService
 import AppService
+
+import DesignSystem
 
 import ComposableArchitecture
 import RiveRuntime
@@ -27,18 +30,13 @@ public struct FocusPomodoroCore {
   @ObservableState
   public struct State: Equatable {
     var selectedCategory: PomodoroCategory?
+    var goalDatetime: Date?
     var focusTimeBySeconds: Int = 0
     var overTimeBySeconds: Int = 0
-    
     var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
-
-    // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
     var selectedCat: SomeCat?
-
     var catRiv: RiveViewModel = Rive.catFocusRiv(stateMachineName: "State Machine_Focus")
-    
     var pushTriggered: Bool = false
-
     @Presents var restWaiting: RestWaitingCore.State?
     
     public init() {}
@@ -65,6 +63,7 @@ public struct FocusPomodoroCore {
     case setupFocusTime
     case catSetInput
     case _pushNotificationTrigger
+    case setupLiveActivity
     
     case goToHome
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
@@ -114,6 +113,7 @@ public struct FocusPomodoroCore {
         )
         await send(.set(\.selectedCategory, selectedCategory))
         await send(.setupFocusTime)
+        await send(.setupLiveActivity)
         await send(.timer(.start))
       }
       
@@ -138,6 +138,7 @@ public struct FocusPomodoroCore {
       
     case .setupFocusTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
+      state.goalDatetime = Date().addingTimeInterval(Double(selectedCategory.focusTimeSeconds))
       state.focusTimeBySeconds = selectedCategory.focusTimeSeconds
       return .none
       
@@ -164,6 +165,36 @@ public struct FocusPomodoroCore {
         )
       }
       
+    case .setupLiveActivity:
+      let isLiveActivityAllowed = getLiveActivityState(userDefaultsClient: self.userDefaultsClient)
+      guard isLiveActivityAllowed,
+            let category = state.selectedCategory,
+            let goalDatetime = state.goalDatetime
+      else { return .none }
+      
+      let activity = try? LiveActivityManager.shared.startActivity(
+        attributes: PomodoroActivityAttributes(),
+        content: .init(
+          state: .init(category: category, goalDatetime: goalDatetime, isRest: false),
+          staleDate: nil
+        ),
+        pushType: nil
+      )
+      return .run { _ in
+        do {
+          try await Task.never()
+        } catch {
+          if let currentActivityID = activity?.id {
+            await LiveActivityManager.shared.endActivity(
+              PomodoroActivityAttributes.self,
+              id: currentActivityID,
+              content: nil,
+              dismissalPolicy: .immediate
+            )
+          }
+        }
+      }
+      
     case .goToHome:
       return .none
       
@@ -171,6 +202,10 @@ public struct FocusPomodoroCore {
       return .none
       
     case .timer(.tick):
+      guard let goalDatetime = state.goalDatetime else { return .none }
+      
+      let timeDifference = timeDifferenceInSeconds(from: Date.now, to: goalDatetime)
+      
       if state.focusTimeBySeconds == 0 {
         if !state.pushTriggered {
           state.pushTriggered = true
@@ -189,10 +224,10 @@ public struct FocusPomodoroCore {
             await send(.set(\.restWaiting, restWaitingState))
           }
         } else {
-          state.overTimeBySeconds += 1
+          state.overTimeBySeconds = timeDifference
         }
       } else {
-        state.focusTimeBySeconds -= 1
+        state.focusTimeBySeconds = timeDifference
       }
       return .none
       
@@ -206,5 +241,10 @@ public struct FocusPomodoroCore {
     case .restWaiting:
       return .none
     }
+  }
+  
+  func timeDifferenceInSeconds(from startDate: Date, to endDate: Date) -> Int {
+    let difference = Int(endDate.timeIntervalSince(startDate))
+    return difference
   }
 }
