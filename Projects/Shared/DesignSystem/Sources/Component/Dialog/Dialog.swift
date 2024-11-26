@@ -40,6 +40,7 @@ public protocol Dialog: Equatable {
   var subTitle: String? { get }
   var firstButton: DialogButtonModel { get }
   var secondButton: DialogButtonModel? { get }
+  var showCloseButton: Bool { get }
 }
 
 public struct DefaultDialog: Dialog {
@@ -47,16 +48,19 @@ public struct DefaultDialog: Dialog {
   public var subTitle: String?
   public var firstButton: DialogButtonModel
   public var secondButton: DialogButtonModel?
+  public var showCloseButton: Bool
 
   public init(
     title: String,
     subTitle: String? = nil,
     firstButton: DialogButtonModel,
-    secondButton: DialogButtonModel? = nil
+    secondButton: DialogButtonModel? = nil,
+    showCloseButton: Bool
   ) {
     self.title = title
     self.subTitle = subTitle
     self.firstButton = firstButton
     self.secondButton = secondButton
+    self.showCloseButton = showCloseButton
   }
 }

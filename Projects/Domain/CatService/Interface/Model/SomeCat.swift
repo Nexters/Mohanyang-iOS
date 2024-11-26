@@ -15,7 +15,7 @@ public struct SomeCat: CatTemplate, Identifiable {
     return baseInfo.no
   }
   
-  private let template: any CatTemplate
+  private var template: any CatTemplate
   
   public var baseInfo: Cat { template.baseInfo }
   public var keyword: String { template.keyword }
@@ -25,7 +25,6 @@ public struct SomeCat: CatTemplate, Identifiable {
   public var focusEndPushTitle: String { template.focusEndPushTitle }
   public var restEndPushTitle: String { template.restEndPushTitle }
   public var disturbPushTitle: String { template.disturbPushTitle }
-  public var tooltipMessage: String { template.tooltipMessage }
   
   public init(baseInfo data: Cat) {
     switch data.type {
@@ -36,6 +35,10 @@ public struct SomeCat: CatTemplate, Identifiable {
     case .threeColor:
       self.template = ThreeColorCat(baseInfo: data)
     }
+  }
+  
+  public mutating func generateTooltipMessage() -> String {
+    template.generateTooltipMessage()
   }
   
   public static func == (lhs: SomeCat, rhs: SomeCat) -> Bool {

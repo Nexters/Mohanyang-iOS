@@ -96,15 +96,9 @@ public struct MyPageCore {
             await send(.set(\.isTimerAlarmOn, true))
           } else {
             await send(.set(\.isTimerAlarmOn, false))
-            let notificationSettingDialog = DefaultDialog(
-              title: "설정에서 알림을 켜주세요",
-              subTitle: "모하냥 앱의 알림 표시를 허용하면 Push 알림을 받을 수 있어요. 지금 설정하시겠어요?",
-              firstButton: .init(title: "다음에"),
-              secondButton: .init(
-                title: "설정으로 이동",
-                action: { await send(._goToNotificationSettings) }
-              )
-            )
+            let notificationSettingDialog = turnOnNotificationSettingDialog {
+              await send(._goToNotificationSettings)
+            }
             await send(.set(\.dialog, notificationSettingDialog))
           }
         } else {
@@ -120,15 +114,9 @@ public struct MyPageCore {
             await send(.set(\.isDisturbAlarmOn, true))
           } else {
             await send(.set(\.isDisturbAlarmOn, false))
-            let notificationSettingDialog = DefaultDialog(
-              title: "설정에서 알림을 켜주세요",
-              subTitle: "모하냥 앱의 알림 표시를 허용하면 Push 알림을 받을 수 있어요.\n지금 설정하시겠어요?",
-              firstButton: .init(title: "다음에"),
-              secondButton: .init(
-                title: "설정으로 이동",
-                action: { await send(._goToNotificationSettings) }
-              )
-            )
+            let notificationSettingDialog = turnOnNotificationSettingDialog {
+              await send(._goToNotificationSettings)
+            }
             await send(.set(\.dialog, notificationSettingDialog))
           }
         } else {
@@ -178,5 +166,20 @@ public struct MyPageCore {
     case .binding:
       return .none
     }
+  }
+}
+
+extension MyPageCore {
+  private func turnOnNotificationSettingDialog(action: @escaping () async -> Void) -> DefaultDialog {
+    return DefaultDialog(
+      title: "설정에서 알림을 켜주세요",
+      subTitle: "모하냥 앱의 알림 표시를 허용하면 Push 알림을 받을 수 있어요. 지금 설정하시겠어요?",
+      firstButton: .init(title: "다음에"),
+      secondButton: .init(
+        title: "설정으로 이동",
+        action: action
+      ),
+      showCloseButton: false
+    )
   }
 }
