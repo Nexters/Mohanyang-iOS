@@ -42,6 +42,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
   ) {
     self.store.send(.appDelegate(.didRegisterForRemoteNotifications(.failure(error))))
   }
+  
+  func applicationWillTerminate(_ application: UIApplication) {
+    self.store.send(.appDelegate(.willTerminate))
+  }
 }
 
 @main

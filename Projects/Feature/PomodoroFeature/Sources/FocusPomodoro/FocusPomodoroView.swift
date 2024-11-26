@@ -16,6 +16,7 @@ import DatadogRUM
 
 public struct FocusPomodoroView: View {
   @Bindable var store: StoreOf<FocusPomodoroCore>
+  @Environment(\.scenePhase) var scenePhase
   
   public init(store: StoreOf<FocusPomodoroCore>) {
     self.store = store
@@ -99,6 +100,9 @@ public struct FocusPomodoroView: View {
     }
     .onAppear {
       store.send(.onAppear)
+    }
+    .onChange(of: scenePhase) { _, newValue in
+      store.send(.didChangeScenePhase(newValue))
     }
     .trackRUMView(name: "집중화면")
   }
