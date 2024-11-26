@@ -79,6 +79,7 @@ public struct FocusPomodoroCore {
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
   @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(LiveActivityClient.self) var liveActivityClient
   
   public init() {}
   
@@ -207,7 +208,7 @@ public struct FocusPomodoroCore {
             let goalDatetime = state.goalDatetime
       else { return .none }
       
-      let activity = try? LiveActivityManager.shared.startActivity(
+      let activity = try? liveActivityClient.protocolAdapter.startActivity(
         attributes: PomodoroActivityAttributes(),
         content: .init(
           state: .init(category: category, goalDatetime: goalDatetime, isRest: false),
@@ -220,7 +221,7 @@ public struct FocusPomodoroCore {
           try await Task.never()
         } catch {
           if let currentActivityID = activity?.id {
-            await LiveActivityManager.shared.endActivity(
+            await liveActivityClient.protocolAdapter.endActivity(
               PomodoroActivityAttributes.self,
               id: currentActivityID,
               content: nil,

@@ -58,6 +58,7 @@ public struct MyPageCore {
   @Dependency(UserNotificationClient.self) var userNotificationClient
   @Dependency(\.openURL) var openURL
   @Dependency(DatabaseClient.self) var databaseClient
+  @Dependency(LiveActivityClient.self) var liveActivityClient
   
   public init() {}
   
@@ -131,7 +132,7 @@ public struct MyPageCore {
     case let .liveActivityToggleButtonTapped(isOn):
       return .run { send in
         if isOn {
-          let isLiveActivityAllowed = LiveActivityManager.shared.isLiveActivityAllowed()
+          let isLiveActivityAllowed = liveActivityClient.protocolAdapter.isLiveActivityAllowed()
           if isLiveActivityAllowed {
             await send(.set(\.isLiveActivityOn, true))
           } else {

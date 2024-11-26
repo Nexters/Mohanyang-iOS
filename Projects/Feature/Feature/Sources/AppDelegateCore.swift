@@ -40,6 +40,7 @@ public struct AppDelegateCore {
   
   @Dependency(KeychainClient.self) var keychainClient
   @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(LiveActivityClient.self) var liveActivityClient
   
   public init() {}
   
@@ -102,7 +103,7 @@ public struct AppDelegateCore {
       
     case .willTerminate:
       return .run { send in
-        await LiveActivityManager.shared.endAllActivityImmediately(type: PomodoroActivityAttributes.self)
+        await liveActivityClient.protocolAdapter.endAllActivityImmediately(type: PomodoroActivityAttributes.self)
       }
     }
   }

@@ -1,49 +1,47 @@
 //
-//  LiveActivityClientInterface.swift
-//  LiveActivityClient
+//  TestKey.swift
+//  LiveActivityClientInterface
 //
-//  Created by MinseokKang on 11/23/24.
+//  Created by devMinseok on 11/27/24.
+//  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
-import Foundation
 import ActivityKit
 
 import Dependencies
 
-public struct LiveActivityClient {
-  public var protocolAdapter: LiveActivityClientProtocol
-  
-  public init(protocolAdapter: LiveActivityClientProtocol) {
-    self.protocolAdapter = protocolAdapter
-  }
+extension LiveActivityClient: TestDependencyKey {
+  public static let previewValue = Self(protocolAdapter: LiveActivityClientImplTest())
+  public static let testValue = Self(protocolAdapter: LiveActivityClientImplTest())
 }
 
-
-// MARK: - Protocol 추상화
-
-public protocol LiveActivityClientProtocol {
-  func isLiveActivityAllowed() -> Bool
+class LiveActivityClientImplTest: LiveActivityClientProtocol {
+  func isLiveActivityAllowed() -> Bool {
+    return false
+  }
   
   func startActivity<T: ActivityAttributes>(
     attributes: T,
     content: ActivityContent<Activity<T>.ContentState>,
     pushType: PushType?
-  ) throws -> Activity<T>?
+  ) throws -> Activity<T>? {
+    return nil
+  }
   
   func updateActivity<T: ActivityAttributes>(
     _ activity: T.Type,
     id: String,
     content: ActivityContent<Activity<T>.ContentState>
-  ) async
+  ) async {}
   
   func endActivity<T: ActivityAttributes>(
     _ activity: T.Type,
     id: String,
     content: ActivityContent<Activity<T>.ContentState>?,
     dismissalPolicy: ActivityUIDismissalPolicy
-  ) async
+  ) async {}
   
   func endAllActivityImmediately<T: ActivityAttributes>(
     type: T.Type
-  ) async
+  ) async {}
 }
