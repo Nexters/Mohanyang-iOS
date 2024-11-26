@@ -2,7 +2,7 @@
 //  LAPomodoroFeatureApp.swift
 //  LAPomodoroFeature
 //
-//  Created by <#T##Author name#> on 11/23/24.
+//  Created by MinseokKang on 11/23/24.
 //
 
 import SwiftUI
