@@ -71,11 +71,11 @@ public struct RestPomodoroCore {
     case catTapped
     case catSetInput
     case setupLiveActivity
+    case setupPushNotification
     
     case goToHome
     case goToFocus
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
-    case _pushNotificationTrigger
     
     case timer(TimerCore.Action)
   }
@@ -120,6 +120,7 @@ public struct RestPomodoroCore {
         await send(.set(\.selectedCategory, selectedCategory))
         await send(.setupRestTime)
         await send(.setupLiveActivity)
+        await send(.setupPushNotification)
         await send(.timer(.start))
       }
       
@@ -208,6 +209,33 @@ public struct RestPomodoroCore {
         }
       }
       
+    case .setupPushNotification:
+      let isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
+      guard isTimerAlarmOn,
+            let selectedCat = state.selectedCat,
+            let timeInterval = state.goalDatetime?.timeIntervalSinceNow
+      else { return .none }
+      return .run { _ in
+        let trigger = UNTimeIntervalNotificationTrigger(
+          timeInterval: timeInterval,
+          repeats: false
+        )
+        try await scheduleNotification(
+          userNotificationClient: self.userNotificationClient,
+          contentType: .restEnd(selectedCat),
+          trigger: trigger
+        )
+        
+        do {
+          try await Task.never()
+        } catch {
+          await removePendingNotification(
+            userNotificationClient: self.userNotificationClient,
+            identifier: ["restEnd"]
+          )
+        }
+      }
+      
     case .goToHome:
       return .none
       
@@ -217,23 +245,6 @@ public struct RestPomodoroCore {
     case .saveHistory:
       return .none
       
-    case ._pushNotificationTrigger:
-      let isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
-      guard isTimerAlarmOn,
-            let selectedCat = state.selectedCat
-      else { return .none }
-      return .run { _ in
-        let trigger = UNTimeIntervalNotificationTrigger(
-          timeInterval: 0.1,
-          repeats: false
-        )
-        try await scheduleNotification(
-          userNotificationClient: self.userNotificationClient,
-          contentType: .restEnd(selectedCat),
-          trigger: trigger
-        )
-      }
-      
     case .timer(.tick):
       // date 처이 계산
       guard let goalDatetime = state.goalDatetime else { return .none }
@@ -241,12 +252,6 @@ public struct RestPomodoroCore {
       let timeDifference = timeDifferenceInSeconds(from: Date.now, to: goalDatetime)
       
       if state.restTimeBySeconds == 0 {
-        if !state.pushTriggered {
-          state.pushTriggered = true
-          return .run { send in
-            await send(._pushNotificationTrigger)
-          }
-        }
         if state.overTimeBySeconds == 1800 { // 30분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
