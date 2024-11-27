@@ -8,12 +8,14 @@
 
 import Foundation
 import SwiftUI
+import DesignSystem
 
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
 import UserNotificationClientInterface
 import LiveActivityClientInterface
+import AudioClientInterface
 import CatServiceInterface
 import PomodoroServiceInterface
 import UserServiceInterface
@@ -80,6 +82,7 @@ public struct FocusPomodoroCore {
   @Dependency(UserService.self) var userService
   @Dependency(UserNotificationClient.self) var userNotificationClient
   @Dependency(LiveActivityClient.self) var liveActivityClient
+  @Dependency(AudioClient.self) var audioClient
   
   public init() {}
   
@@ -247,6 +250,7 @@ public struct FocusPomodoroCore {
           state.pushTriggered = true
           return .run { send in
             await send(._pushNotificationTrigger)
+            try await self.audioClient.playSound(fileURL: Files.timerEndSoundMp3.url) // 개선
           }
         }
         if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
