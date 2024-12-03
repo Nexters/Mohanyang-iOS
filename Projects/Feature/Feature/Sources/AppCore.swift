@@ -92,8 +92,8 @@ public struct AppCore {
     case .onLoad:
       state.splash = SplashCore.State()
       return .run { send in
-        await streamListener.initStream(type: .serverState)
-        for await serverState in streamListener.updateServerState() {
+        let serverStateStream: AsyncStream<ServerState> = streamListener.protocolAdapter.receive(type: .serverState)
+        for await serverState in serverStateStream {
           await send(.serverState(serverState))
         }
       }
