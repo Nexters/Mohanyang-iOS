@@ -92,6 +92,7 @@ public struct AppCore {
     case .onLoad:
       state.splash = SplashCore.State()
       return .run { send in
+        await streamListener.initStream(type: .serverState)
         for await serverState in streamListener.updateServerState() {
           await send(.serverState(serverState))
         }

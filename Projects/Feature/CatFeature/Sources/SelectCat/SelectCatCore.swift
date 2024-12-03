@@ -125,7 +125,7 @@ public struct SelectCatCore {
 
     case ._fetchCatListRequest:
       return .run { send in
-        await streamListener.sendServerState(state: .requestStarted)
+        await streamListener.sendValue(.serverState(.requestStarted))
         await send(._fetchCatListResponse(Result {
           try await catService.getCatList(apiClient)
         }))
@@ -134,7 +134,7 @@ public struct SelectCatCore {
     case let ._fetchCatListResponse(.success(response)):
       state.catList = response.map { SomeCat(baseInfo: $0) }
       return .run { send in
-        await streamListener.sendServerState(state: .requestCompleted)
+        await streamListener.sendValue(.serverState(.requestCompleted))
       }
 
     case let ._fetchCatListResponse(.failure(error)):
@@ -142,7 +142,7 @@ public struct SelectCatCore {
 
     case let ._postSelectedCatRequest(request):
       return .run { send in
-        await streamListener.sendServerState(state: .requestStarted)
+        await streamListener.sendValue(.serverState(.requestStarted))
         await send(._postSelectedCatResponse(Result {
           try await userService.selectCat(apiClient: self.apiClient, request: request)
         }))
@@ -151,7 +151,7 @@ public struct SelectCatCore {
     case ._postSelectedCatResponse(.success(_)):
       return .run { send in
         try await userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
-        await streamListener.sendServerState(state: .requestCompleted)
+        await streamListener.sendValue(.serverState(.requestCompleted))
         await send(._setNextAction)
       }
 
@@ -174,14 +174,14 @@ extension SelectCatCore {
        networkError.code == .networkConnectionLost ||
        networkError.code == .notConnectedToInternet {
       return .run { send in
-        await streamListener.sendServerState(state: .networkDisabled)
+        await streamListener.sendValue(.serverState(.networkDisabled))
       }
     }
     guard let error = error as? NetworkError else { return .none }
     switch error {
     case .apiError(_):
       return .run { send in
-        await streamListener.sendServerState(state: .errorOccured)
+        await streamListener.sendValue(.serverState(.errorOccured))
       }
     default:
       return .none
