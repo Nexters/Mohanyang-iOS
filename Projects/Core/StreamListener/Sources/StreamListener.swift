@@ -11,83 +11,44 @@ import StreamListenerInterface
 
 import Dependencies
 
-//extension StreamListener: DependencyKey {
-//  public static let liveValue: StreamListener = .live()
-//
-//  public static func live() -> StreamListener {
-//
-//    actor ContinuationActor {
-//      var continuation: AsyncStream<ServerState>.Continuation?
-//
-//      func set(_ newContinuation: AsyncStream<ServerState>.Continuation) {
-//        continuation = newContinuation
-//      }
-//
-//      func yield(_ state: ServerState) {
-//        continuation?.yield(state)
-//      }
-//    }
-//
-//    let continuationActor = ContinuationActor()
-//    let asyncStream = AsyncStream<ServerState> { continuation in
-//      Task { await continuationActor.set(continuation) }
-//    }
-//
-//    return StreamListener(
-//      sendServerState: { state in
-//        await continuationActor.yield(state)
-//      },
-//      updateServerState: {
-//        return asyncStream
-//      }
-//    )
-//  }
-//}
+extension StreamListener: DependencyKey {
+    public static let liveValue: StreamListener = .live()
+    
+    public static func live() -> StreamListener {
+        return .init(protocolAdapter: StreamListenerImpl())
+    }
+}
 
- extension StreamListener: DependencyKey {
-   public static let liveValue: StreamListener = .live()
+final class StreamListenerImpl: StreamListenerProtocol {
+    private let actor = ContinuationActor()
 
-   public static func live() -> StreamListener {
-     actor ContinuationActor {
-       var continuations: [StreamType: AsyncStream<AnyHashable>.Continuation] = [:]
+    func send<T: Hashable>(value: T, for type: StreamType) async {
+        await actor.yield(type: type, value: value)
+    }
 
-       func set(_ type: StreamType, continuation: AsyncStream<AnyHashable>.Continuation) {
-         continuations[type] = continuation
-       }
+    func receive<T: Hashable>(type: StreamType) -> AsyncStream<T> {
+        let (stream, continuation) = AsyncStream<T>.makeStream()
 
-       func yield(_ type: StreamType, value: AnyHashable) {
-         continuations[type]?.yield(value)
-       }
-     }
+        Task {
+            await actor.set(type: type, continuation: continuation)
+        }
 
-     actor StreamActor {
-       var streams: [StreamType: AsyncStream<AnyHashable>] = [:]
+        return stream
+    }
+}
 
-       func set(_ type: StreamType, stream: AsyncStream<AnyHashable>) {
-         streams[type] = stream
-       }
+private actor ContinuationActor {
+    private var continuations: [StreamType: AsyncStream<Any>.Continuation] = [:]
 
-       func get(_ type: StreamType) -> AsyncStream<AnyHashable> {
-         return streams[type] ?? .never
-       }
-     }
+    func set<T>(type: StreamType, continuation: AsyncStream<T>.Continuation) {
+        continuations[type] = continuation as? AsyncStream<Any>.Continuation
+    }
 
-     let continuationActor = ContinuationActor()
-     let streamActor = StreamActor()
+    func yield<T>(type: StreamType, value: T) {
+        continuations[type]?.yield(value)
+    }
 
-     return StreamListener(
-       initStream: { type in
-         let stream = AsyncStream<AnyHashable> { continuation in
-           Task { await continuationActor.set(type, continuation: continuation) }
-         }
-         await streamActor.set(type, stream: stream)
-       },
-       sendValue: { type in
-         await continuationActor.yield(type, value: type.hashValue)//스트림타입의 밸류 자료형)
-       },
-       receiveStream: { type in
-         return await streamActor.get(type)
-       }
-     )
-   }
- }
+    func remove(type: StreamType) {
+        continuations[type] = nil
+    }
+}

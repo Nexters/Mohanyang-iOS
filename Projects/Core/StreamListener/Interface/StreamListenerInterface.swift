@@ -10,65 +10,39 @@ import Foundation
 import Dependencies
 import DependenciesMacros
 
-/*
- TODO:
- StreamListener를 토스트나 다이얼로그, 에러뷰 등 다양한 상황의 스트림을 만들 수 있도록 둘 것인지, serverState 추적만을 하도록 둘 것인지 정해야함 (네이밍 다시 해야함)
- ++ NetworkTracking도 그 목적이 StreamListener와 유사함
- */
-
-//@DependencyClient
-//public struct StreamListener {
-//  public var sendServerState: @Sendable (_ state: ServerState) async -> Void
-//  public var updateServerState: @Sendable () -> AsyncStream<ServerState> = { .never }
-//}
-//
-//extension StreamListener: TestDependencyKey {
-//  public static let previewValue = Self()
-//  public static let testValue = Self()
-//}
-//
-//public enum ServerState {
-//  case requestStarted
-//  case requestCompleted
-//  case errorOccured
-//  case networkDisabled
-//}
+public protocol StreamListenerProtocol {
+    func send<T: Hashable>(value: T, for type: StreamType) async
+    func receive<T: Hashable>(type: StreamType) -> AsyncStream<T>
+}
 
 @DependencyClient
 public struct StreamListener {
-  public var initStream: @Sendable (_ type: StreamType) async -> Void
-  public var sendValue: @Sendable (_ type: StreamType) async -> Void
-  public var receiveStream: @Sendable (_ type: StreamType) async -> AsyncStream<AnyHashable> = { _ in .never }
+    public var protocolAdapter: StreamListenerProtocol
+    
+    public init(protocolAdapter: StreamListenerProtocol) {
+        self.protocolAdapter = protocolAdapter
+    }
 }
 
 extension StreamListener: TestDependencyKey {
-  public static let previewValue = Self()
-  public static let testValue = Self()
+    public static let previewValue = Self(protocolAdapter: StreamListenerTestImpl())
+    public static let testValue = Self(protocolAdapter: StreamListenerTestImpl())
 }
 
-public enum ServerState: Hashable {
-  case requestStarted
-  case requestCompleted
-  case errorOccured
-  case networkDisabled
-}
-
-public protocol StreamKey: Hashable {
-  associatedtype Value
+private struct StreamListenerTestImpl: StreamListenerProtocol {
+    func send<T: Hashable>(value: T, for type: StreamType) async {}
+    func receive<T: Hashable>(type: StreamType) -> AsyncStream<T> { .never }
 }
 
 public enum StreamType: Hashable {
-  public typealias Value = AnyHashable
+    case serverState
+    case retry
+    case toast
+}
 
-  case serverState(ServerState)
-  case retry
-
-  public var value: Value {
-    switch self {
-    case .serverState(let state):
-      return state
-    case .retry:
-      return "retry"
-    }
-  }
+public enum ServerState: Hashable {
+    case requestStarted
+    case requestCompleted
+    case errorOccured
+    case networkDisabled
 }
