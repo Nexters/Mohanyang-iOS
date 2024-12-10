@@ -12,43 +12,42 @@ import StreamListenerInterface
 import Dependencies
 
 extension StreamListener: DependencyKey {
-    public static let liveValue: StreamListener = .live()
-    
-    public static func live() -> StreamListener {
-        return .init(protocolAdapter: StreamListenerImpl())
-    }
+  public static let liveValue: StreamListener = .live()
+
+  public static func live() -> StreamListener {
+    return .init(protocolAdapter: StreamListenerImpl())
+  }
 }
 
 final class StreamListenerImpl: StreamListenerProtocol {
-    private let actor = ContinuationActor()
+  private let actor = StreamActor()
 
-    func send<T: Hashable>(value: T, for type: StreamType) async {
-        await actor.yield(type: type, value: value)
+  func send<T: StreamTypeProtocol>(_ state: T) async {
+    await actor.yield(type: T.key, value: T.self)
+  }
+
+  func receive<T: StreamTypeProtocol>(_ type: T.Type) -> AsyncStream<T> {
+    let (stream, continuation) = AsyncStream<T>.makeStream()
+    Task {
+      await actor.register(key: T.key, continuation: continuation)
     }
-
-    func receive<T: Hashable>(type: StreamType) -> AsyncStream<T> {
-        let (stream, continuation) = AsyncStream<T>.makeStream()
-
-        Task {
-            await actor.set(type: type, continuation: continuation)
-        }
-
-        return stream
-    }
+    return stream
+  }
 }
 
-private actor ContinuationActor {
-    private var continuations: [StreamType: AsyncStream<Any>.Continuation] = [:]
+private actor StreamActor {
+  private var streams: [StreamType: AnyStreamContinuation] = [:]
 
-    func set<T>(type: StreamType, continuation: AsyncStream<T>.Continuation) {
-        continuations[type] = continuation as? AsyncStream<Any>.Continuation
-    }
+  func register<T: StreamTypeProtocol>(key: StreamType, continuation: AsyncStream<T>.Continuation) {
+    streams[key] = AnyStreamContinuation(continuation)
+  }
 
-    func yield<T>(type: StreamType, value: T) {
-        continuations[type]?.yield(value)
-    }
+  func yield<T: StreamTypeProtocol>(type: StreamType, value: T.Type) {
+    guard let continuation = streams[type] else { return }
+    continuation.yield(value)
+  }
 
-    func remove(type: StreamType) {
-        continuations[type] = nil
-    }
+  func remove(type: StreamType) {
+    streams[type] = nil
+  }
 }

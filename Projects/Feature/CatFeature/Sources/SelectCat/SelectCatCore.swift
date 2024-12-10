@@ -125,7 +125,7 @@ public struct SelectCatCore {
 
     case ._fetchCatListRequest:
       return .run { send in
-        await self.streamListener.protocolAdapter.send(value: ServerState.requestStarted, for: .serverState)
+        await self.streamListener.protocolAdapter.send(ServerState.requestStarted)
         await send(._fetchCatListResponse(Result {
           try await catService.getCatList(apiClient)
         }))
@@ -134,7 +134,7 @@ public struct SelectCatCore {
     case let ._fetchCatListResponse(.success(response)):
       state.catList = response.map { SomeCat(baseInfo: $0) }
       return .run { send in
-        await self.streamListener.protocolAdapter.send(value: ServerState.requestCompleted, for: .serverState)
+        await self.streamListener.protocolAdapter.send(ServerState.requestCompleted)
       }
 
     case let ._fetchCatListResponse(.failure(error)):
@@ -142,7 +142,7 @@ public struct SelectCatCore {
 
     case let ._postSelectedCatRequest(request):
       return .run { send in
-        await self.streamListener.protocolAdapter.send(value: ServerState.requestStarted, for: .serverState)
+        await self.streamListener.protocolAdapter.send(ServerState.requestStarted)
         await send(._postSelectedCatResponse(Result {
           try await userService.selectCat(apiClient: self.apiClient, request: request)
         }))
@@ -151,7 +151,7 @@ public struct SelectCatCore {
     case ._postSelectedCatResponse(.success(_)):
       return .run { send in
         try await userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
-        await self.streamListener.protocolAdapter.send(value: ServerState.requestCompleted, for: .serverState)
+        await self.streamListener.protocolAdapter.send(ServerState.requestCompleted)
         await send(._setNextAction)
       }
 
@@ -174,14 +174,14 @@ extension SelectCatCore {
        networkError.code == .networkConnectionLost ||
        networkError.code == .notConnectedToInternet {
       return .run { send in
-        await self.streamListener.protocolAdapter.send(value: ServerState.networkDisabled, for: .serverState)
+        await self.streamListener.protocolAdapter.send(ServerState.networkDisabled)
       }
     }
     guard let error = error as? NetworkError else { return .none }
     switch error {
     case .apiError(_):
       return .run { send in
-        await self.streamListener.protocolAdapter.send(value: ServerState.errorOccured, for: .serverState)
+        await self.streamListener.protocolAdapter.send(ServerState.errorOccured)
       }
     default:
       return .none
