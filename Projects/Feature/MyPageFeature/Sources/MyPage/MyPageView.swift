@@ -156,7 +156,7 @@ struct StatisticSectionView: View {
   }
 
   @ViewBuilder private func content(image: Image, title: String, subTitle: String) -> some View {
-   image.resizable()
+    image.resizable()
       .frame(width: 96, height: 96)
 
     VStack(spacing: Alias.Spacing.xSmall) {
@@ -167,6 +167,7 @@ struct StatisticSectionView: View {
         .font(Typography.subBodyR)
         .foregroundStyle(Alias.Color.Text.secondary)
         .multilineTextAlignment(.center)
+    }
   }
 
 }
