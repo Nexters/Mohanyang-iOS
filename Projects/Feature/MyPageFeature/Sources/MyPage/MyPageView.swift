@@ -134,20 +134,17 @@ struct StatisticSectionView: View {
   var body: some View {
     VStack(spacing: Alias.Spacing.large) {
       if isNetworkConnected {
-        DesignSystemAsset.Image.imgUpdateStatistics.swiftUIImage.resizable()
-          .frame(width: 96, height: 96)
+        content(
+          image: DesignSystemAsset.Image.imgUpdateStatistics.swiftUIImage,
+          title: "통계 기능을 준비하고 있어요",
+          subTitle: "집중시간을 모아보는 통계가\n곧업데이트될 예정이에요"
+        )
       } else {
-        DesignSystemAsset.Image.imgOfflineStatistics.swiftUIImage.resizable()
-          .frame(width: 96, height: 96)
-      }
-      VStack(spacing: Alias.Spacing.xSmall) {
-        Text("통계 기능을 준비하고 있어요")
-          .font(Typography.bodySB)
-          .foregroundStyle(Alias.Color.Text.secondary)
-        Text("집중시간을 모아보는 통계가\n곧업데이트될 예정이에요")
-          .font(Typography.subBodyR)
-          .foregroundStyle(Alias.Color.Text.secondary)
-          .multilineTextAlignment(.center)
+        content(
+          image: DesignSystemAsset.Image.imgOfflineStatistics.swiftUIImage,
+          title: "지금은 통계를 확인할 수 없어요",
+          subTitle: "인터넷에 연결하면 통계를 볼 수 있어요"
+        )
       }
     }
     .frame(maxWidth: .infinity)
@@ -157,6 +154,21 @@ struct StatisticSectionView: View {
         .foregroundStyle(Alias.Color.Background.secondary)
     )
   }
+
+  @ViewBuilder private func content(image: Image, title: String, subTitle: String) -> some View {
+   image.resizable()
+      .frame(width: 96, height: 96)
+
+    VStack(spacing: Alias.Spacing.xSmall) {
+      Text(title)
+        .font(Typography.bodySB)
+        .foregroundStyle(Alias.Color.Text.secondary)
+      Text(subTitle)
+        .font(Typography.subBodyR)
+        .foregroundStyle(Alias.Color.Text.secondary)
+        .multilineTextAlignment(.center)
+  }
+
 }
 
 struct AlarmSectionView: View {
