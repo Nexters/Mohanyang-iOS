@@ -204,7 +204,7 @@ extension MyPageCore {
   private func turnOnNotificationSettingDialog(action: @escaping () async -> Void) -> DefaultDialog {
     return DefaultDialog(
       title: "설정에서 알림을 켜주세요",
-      subTitle: "모하냥 앱의 알림 표시를 허용하면 Push 알림을 받을 수 있어요. 지금 설정하시겠어요?",
+      subTitle: "알림 표시를 허용하면 Push 알림을 받을 수 있어요.",
       firstButton: .init(title: "다음에"),
       secondButton: .init(
         title: "설정으로 이동",
