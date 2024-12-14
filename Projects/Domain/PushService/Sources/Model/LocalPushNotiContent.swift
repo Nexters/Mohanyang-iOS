@@ -6,13 +6,15 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import UserNotifications.UNNotificationSound
+
 import CatServiceInterface
 
 public enum LocalPushNotiContent {
   case focusEnd(SomeCat)
   case restEnd(SomeCat)
   case disturb(SomeCat)
-
+  
   public var title: String {
     return ""
   }
@@ -40,6 +42,19 @@ public enum LocalPushNotiContent {
       
     case .disturb:
       return "disturb"
+    }
+  }
+  
+  public var sound: UNNotificationSound {
+    switch self {
+    case .focusEnd:
+      return .init(named: UNNotificationSoundName("timer_end_sound.caf"))
+      
+    case .restEnd:
+      return .init(named: UNNotificationSoundName("timer_end_sound.caf"))
+      
+    case .disturb:
+      return .default
     }
   }
 }

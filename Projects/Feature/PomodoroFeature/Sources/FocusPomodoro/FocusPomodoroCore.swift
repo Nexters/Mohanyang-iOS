@@ -8,12 +8,14 @@
 
 import Foundation
 import SwiftUI
+import DesignSystem
 
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
 import UserNotificationClientInterface
 import LiveActivityClientInterface
+import AudioClientInterface
 import CatServiceInterface
 import PomodoroServiceInterface
 import UserServiceInterface
@@ -63,8 +65,8 @@ public struct FocusPomodoroCore {
     case catTapped
     case setupFocusTime
     case catSetInput
-    case _pushNotificationTrigger
     case setupLiveActivity
+    case setupPushNotification
     
     case goToHome
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
@@ -80,6 +82,7 @@ public struct FocusPomodoroCore {
   @Dependency(UserService.self) var userService
   @Dependency(UserNotificationClient.self) var userNotificationClient
   @Dependency(LiveActivityClient.self) var liveActivityClient
+  @Dependency(AudioClient.self) var audioClient
   
   public init() {}
   
@@ -150,6 +153,7 @@ public struct FocusPomodoroCore {
         await send(.set(\.selectedCategory, selectedCategory))
         await send(.setupFocusTime)
         await send(.setupLiveActivity)
+        await send(.setupPushNotification)
         await send(.timer(.start))
       }
       
@@ -184,23 +188,6 @@ public struct FocusPomodoroCore {
       state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
       
-    case ._pushNotificationTrigger:
-      let isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
-      guard isTimerAlarmOn,
-            let selectedCat = state.selectedCat
-      else { return .none }
-      return .run { _ in
-        let trigger = UNTimeIntervalNotificationTrigger(
-          timeInterval: 0.1,
-          repeats: false
-        )
-        try await scheduleNotification(
-          userNotificationClient: self.userNotificationClient,
-          contentType: .focusEnd(selectedCat),
-          trigger: trigger
-        )
-      }
-      
     case .setupLiveActivity:
       let isLiveActivityAllowed = getLiveActivityState(userDefaultsClient: self.userDefaultsClient)
       guard isLiveActivityAllowed,
@@ -231,6 +218,33 @@ public struct FocusPomodoroCore {
         }
       }
       
+    case .setupPushNotification:
+      let isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
+      guard isTimerAlarmOn,
+            let selectedCat = state.selectedCat,
+            let timeInterval = state.goalDatetime?.timeIntervalSinceNow
+      else { return .none }
+      return .run { _ in
+        let trigger = UNTimeIntervalNotificationTrigger(
+          timeInterval: timeInterval,
+          repeats: false
+        )
+        try await scheduleNotification(
+          userNotificationClient: self.userNotificationClient,
+          contentType: .focusEnd(selectedCat),
+          trigger: trigger
+        )
+        
+        do {
+          try await Task.never()
+        } catch {
+          await removePendingNotification(
+            userNotificationClient: self.userNotificationClient,
+            identifier: ["focusEnd"]
+          )
+        }
+      }
+      
     case .goToHome:
       return .none
       
@@ -243,12 +257,6 @@ public struct FocusPomodoroCore {
       let timeDifference = timeDifferenceInSeconds(from: Date.now, to: goalDatetime)
       
       if state.focusTimeBySeconds == 0 {
-        if !state.pushTriggered {
-          state.pushTriggered = true
-          return .run { send in
-            await send(._pushNotificationTrigger)
-          }
-        }
         if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
