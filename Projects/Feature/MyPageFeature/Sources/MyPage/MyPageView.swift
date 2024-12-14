@@ -43,11 +43,6 @@ public struct MyPageView: View {
           }
 
           StatisticSectionView(isNetworkConnected: $store.isNetworkConnected)
-            .padding(.all, Alias.Spacing.xLarge)
-            .background(
-              RoundedRectangle(cornerRadius: Alias.BorderRadius.medium)
-                .foregroundStyle(Alias.Color.Background.secondary)
-            )
 
           VStack(spacing: Alias.Spacing.large) {
             AlarmSectionView(
@@ -137,28 +132,30 @@ struct StatisticSectionView: View {
   @Binding var isNetworkConnected: Bool
 
   var body: some View {
-    ZStack {
-      VStack(spacing: Alias.Spacing.medium) {
-        Spacer()
-        if isNetworkConnected {
-          DesignSystemAsset.Image.imgUpdateStatistics.swiftUIImage
-        } else {
-          DesignSystemAsset.Image.imgOfflineStatistics.swiftUIImage
-        }
-        VStack(spacing: Alias.Spacing.xSmall) {
-          Text("통계 기능을 준비하고 있어요")
-            .font(Typography.header4)
-            .foregroundStyle(Alias.Color.Text.primary)
-          Text("집중시간을 모아보는 통계가\n곧업데이트될 예정이에요")
-            .font(Typography.subBodyR)
-            .foregroundStyle(Alias.Color.Text.secondary)
-            .multilineTextAlignment(.center)
-        }
-        Spacer()
+    VStack(spacing: Alias.Spacing.large) {
+      if isNetworkConnected {
+        DesignSystemAsset.Image.imgUpdateStatistics.swiftUIImage.resizable()
+          .frame(width: 96, height: 96)
+      } else {
+        DesignSystemAsset.Image.imgOfflineStatistics.swiftUIImage.resizable()
+          .frame(width: 96, height: 96)
+      }
+      VStack(spacing: Alias.Spacing.xSmall) {
+        Text("통계 기능을 준비하고 있어요")
+          .font(Typography.bodySB)
+          .foregroundStyle(Alias.Color.Text.secondary)
+        Text("집중시간을 모아보는 통계가\n곧업데이트될 예정이에요")
+          .font(Typography.subBodyR)
+          .foregroundStyle(Alias.Color.Text.secondary)
+          .multilineTextAlignment(.center)
       }
     }
     .frame(maxWidth: .infinity)
-    .frame(minHeight: 375)
+    .padding(.all, Alias.Spacing.xxLarge)
+    .background(
+      RoundedRectangle(cornerRadius: Alias.BorderRadius.medium)
+        .foregroundStyle(Alias.Color.Background.secondary)
+    )
   }
 }
 
