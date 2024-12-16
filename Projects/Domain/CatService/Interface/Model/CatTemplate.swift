@@ -12,6 +12,7 @@ import DesignSystem
 
 public protocol CatTemplate: Equatable {
   var baseInfo: Cat { get }
+  var defaultName: String { get }
   var keyword: String { get }
   var keywordImage: Image { get }
   var rivTriggerName: String { get }
@@ -30,7 +31,8 @@ public protocol CatTemplate: Equatable {
 
 struct CheeseCat: CatTemplate {
   public let baseInfo: Cat
-  
+
+  var defaultName: String = "치즈냥"
   var keyword: String = "응원"
   var keywordImage: Image = DesignSystemAsset.Image._16Star.swiftUIImage
   var rivTriggerName: String = "Click_Cheese Cat"
@@ -56,7 +58,8 @@ struct CheeseCat: CatTemplate {
 
 struct BlackCat: CatTemplate {
   public let baseInfo: Cat
-  
+
+  var defaultName: String = "까만냥"
   var keyword: String = "긍정"
   var keywordImage: Image = DesignSystemAsset.Image._16Heart.swiftUIImage
   var rivTriggerName: String = "Click_Black Cat"
@@ -82,7 +85,8 @@ struct BlackCat: CatTemplate {
 
 struct ThreeColorCat: CatTemplate {
   let baseInfo: Cat
-  
+
+  var defaultName: String = "삼색냥"
   var keyword: String = "자극"
   var keywordImage: Image = DesignSystemAsset.Image._16Focus.swiftUIImage
   var rivTriggerName: String = "Click_Calico Cat"

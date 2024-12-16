@@ -42,7 +42,7 @@ public struct NamingCatView: View {
             Spacer()
           }
           InputField(
-            placeholder: store.selectedCat?.baseInfo.name ?? "",
+            placeholder: store.selectedCat?.defaultName ?? "",
             text: $store.text,
             fieldError: $store.inputFieldError
           )
