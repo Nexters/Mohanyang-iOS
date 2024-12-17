@@ -164,7 +164,7 @@ public struct RestPomodoroCore {
       
     case .setupRestTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
-      state.goalDatetime = Date().addingTimeInterval(Double(selectedCategory.focusTimeSeconds))
+      state.goalDatetime = Date().addingTimeInterval(Double(selectedCategory.restTimeSeconds))
       state.restTimeBySeconds = selectedCategory.restTimeSeconds
       return .none
       
@@ -259,7 +259,7 @@ public struct RestPomodoroCore {
             await send(.goToHome)
           }
         } else {
-          state.overTimeBySeconds = timeDifference
+          state.overTimeBySeconds = -(timeDifference)
         }
       } else {
         state.restTimeBySeconds = timeDifference
