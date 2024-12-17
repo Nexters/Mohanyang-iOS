@@ -16,15 +16,21 @@ public struct InputField<T: InputFieldErrorProtocol>: View {
   var placeholder: String
   @Binding var text: String
   @Binding var fieldError: T?
+  var onSubmit: (() -> Void)?
+  var submitLabel: SubmitLabel
 
   public init(
     placeholder: String,
     text: Binding<String>,
-    fieldError: Binding<T?> = .constant(nil)
+    fieldError: Binding<T?> = .constant(nil),
+    submitLabel: SubmitLabel = .return,
+    onSubmit: (() -> Void)? = nil
   ) {
     self.placeholder = placeholder
     self._text = text
     self._fieldError = fieldError
+    self.submitLabel = submitLabel
+    self.onSubmit = onSubmit
   }
 
   public var body: some View {
@@ -36,6 +42,10 @@ public struct InputField<T: InputFieldErrorProtocol>: View {
           .foregroundStyle(Alias.Color.Text.disabled)
       )
       .textFieldStyle(.inputField($text, isError: fieldError != nil))
+      .submitLabel(submitLabel)
+      .onSubmit {
+        onSubmit?()
+      }
 
       HStack {
         Text(fieldError?.message ?? "")
