@@ -32,6 +32,7 @@ public struct MyPageCore {
     var isLiveActivityOn: Bool = false
     var isNetworkConnected: Bool = false
     var dialog: DefaultDialog?
+    var lastToggledAlarmType: AlarmType?
     @Presents var myCat: MyCatCore.State?
     
     public init() {}
@@ -44,13 +45,19 @@ public struct MyPageCore {
     case timerAlarmToggleButtonTapped(Bool)
     case disturbAlarmToggleButtonTapped(Bool)
     case liveActivityToggleButtonTapped(Bool)
+    case scenePhaseActive
     case sendFeedbackButtonTapped
-    case _goToNotificationSettings
+    case _goToNotificationSettings(AlarmType?)
     case _fetchNetworkConntection(Bool)
     case myCat(PresentationAction<MyCatCore.Action>)
     case binding(BindingAction<State>)
   }
-  
+
+  public enum AlarmType {
+      case timer
+      case disturb
+  }
+
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -102,7 +109,7 @@ public struct MyPageCore {
           } else {
             await send(.set(\.isTimerAlarmOn, false))
             let notificationSettingDialog = turnOnNotificationSettingDialog {
-              await send(._goToNotificationSettings)
+              await send(._goToNotificationSettings(.timer))
             }
             await send(.set(\.dialog, notificationSettingDialog))
           }
@@ -120,7 +127,7 @@ public struct MyPageCore {
           } else {
             await send(.set(\.isDisturbAlarmOn, false))
             let notificationSettingDialog = turnOnNotificationSettingDialog {
-              await send(._goToNotificationSettings)
+              await send(._goToNotificationSettings(.disturb))
             }
             await send(.set(\.dialog, notificationSettingDialog))
           }
@@ -128,7 +135,16 @@ public struct MyPageCore {
           await send(.set(\.isDisturbAlarmOn, false))
         }
       }
-      
+
+    case .scenePhaseActive:
+      return .run { [type = state.lastToggledAlarmType] send in
+        let settings = await userNotificationClient.getNotificationSettings()
+        if settings.authorizationStatus == .authorized {
+          await send(.set(type == .timer ? \.isTimerAlarmOn : \.isDisturbAlarmOn, true))
+        }
+        await send(.set(\.lastToggledAlarmType, nil))
+      }
+
     case let .liveActivityToggleButtonTapped(isOn):
       return .run { send in
         if isOn {
@@ -138,7 +154,7 @@ public struct MyPageCore {
           } else {
             await send(.set(\.isLiveActivityOn, false))
             let notificationSettingDialog = turnOnLiveActivitySettingDialog {
-              await send(._goToNotificationSettings)
+              await send(._goToNotificationSettings(nil))
             }
             await send(.set(\.dialog, notificationSettingDialog))
           }
@@ -146,14 +162,15 @@ public struct MyPageCore {
           await send(.set(\.isLiveActivityOn, false))
         }
       }
-      
+
     case .sendFeedbackButtonTapped:
       guard let feedbackURL = URL(string: "https://forms.gle/wEUPH9Tvxgua4hCZ9") else { return .none }
       return .run { _ in
         await self.openURL(feedbackURL)
       }
       
-    case ._goToNotificationSettings:
+    case let ._goToNotificationSettings(type):
+      state.lastToggledAlarmType = type
       guard let notificationSettingsURL = URL(
         string: UIApplication.openNotificationSettingsURLString
       ) else {

@@ -14,6 +14,7 @@ import ComposableArchitecture
 import DatadogRUM
 
 public struct MyPageView: View {
+  @Environment(\.scenePhase) private var scenePhase
   @Bindable var store: StoreOf<MyPageCore>
 
   public init(store: StoreOf<MyPageCore>) {
@@ -98,6 +99,11 @@ public struct MyPageView: View {
     }
     .task {
       await store.send(.task).finish()
+    }
+    .onChange(of: scenePhase) {
+      if scenePhase == .active {
+        store.send(.scenePhaseActive)
+      }
     }
     .onAppear {
       store.send(.onAppear)
