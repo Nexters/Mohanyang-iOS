@@ -125,7 +125,7 @@ public struct HomeView: View {
         }
       }
     }
-    .tooltipDestination(tooltip: .constant(store.homeCatTooltip), allowsHitTesting: false)
+    .tooltipDestination(tooltip: .constant(store.homeCatTooltip))
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
     .toastDestination(toast: $store.toast)
