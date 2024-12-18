@@ -55,7 +55,7 @@ public struct SelectCatView: View {
         HStack {
           ForEach(store.catList) { cat in
             Button(
-              title: LocalizedStringKey(cat.baseInfo.name),
+              title: LocalizedStringKey(cat.defaultName),
               subtitle: LocalizedStringKey(cat.keyword),
               rightIcon: cat.keywordImage,
               action: { store.send(.selectCat(cat)) }

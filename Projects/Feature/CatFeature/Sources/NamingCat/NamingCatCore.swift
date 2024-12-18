@@ -29,6 +29,8 @@ public struct NamingCatCore {
     var tooltip: DownDirectionTooltip? = .init()
     var catRiv: RiveViewModel = Rive.catRenameRiv(stateMachineName: "State Machine_Rename")
 
+    var height: CGFloat = .zero
+
     public init(route: Route) {
       self.route = route
     }

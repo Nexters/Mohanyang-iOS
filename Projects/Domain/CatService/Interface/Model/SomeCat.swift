@@ -18,6 +18,7 @@ public struct SomeCat: CatTemplate, Identifiable {
   private var template: any CatTemplate
   
   public var baseInfo: Cat { template.baseInfo }
+  public var defaultName: String { template.defaultName }
   public var keyword: String { template.keyword }
   public var keywordImage: Image { template.keywordImage }
   public var rivTriggerName: String { template.rivTriggerName }

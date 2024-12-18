@@ -32,6 +32,7 @@ public struct MyPageCore {
     var isLiveActivityOn: Bool = false
     var isNetworkConnected: Bool = false
     var dialog: DefaultDialog?
+    var lastToggledAlarmType: AlarmType?
     @Presents var myCat: MyCatCore.State?
     
     public init() {}
@@ -44,13 +45,19 @@ public struct MyPageCore {
     case timerAlarmToggleButtonTapped(Bool)
     case disturbAlarmToggleButtonTapped(Bool)
     case liveActivityToggleButtonTapped(Bool)
+    case scenePhaseActive
     case sendFeedbackButtonTapped
-    case _goToNotificationSettings
+    case _goToNotificationSettings(AlarmType?)
     case _fetchNetworkConntection(Bool)
     case myCat(PresentationAction<MyCatCore.Action>)
     case binding(BindingAction<State>)
   }
-  
+
+  public enum AlarmType {
+      case timer
+      case disturb
+  }
+
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -73,6 +80,7 @@ public struct MyPageCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
+      // TODO: userDefault get bool 은 옵셔널 값이 아니어서, 다른 방법을 사용해서 default setting 값 부여해야할듯
       state.isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
       state.isDisturbAlarmOn = getDisturbAlarm(userDefaultsClient: self.userDefaultsClient)
       state.isLiveActivityOn =  getLiveActivityState(userDefaultsClient: self.userDefaultsClient)
@@ -102,7 +110,7 @@ public struct MyPageCore {
           } else {
             await send(.set(\.isTimerAlarmOn, false))
             let notificationSettingDialog = turnOnNotificationSettingDialog {
-              await send(._goToNotificationSettings)
+              await send(._goToNotificationSettings(.timer))
             }
             await send(.set(\.dialog, notificationSettingDialog))
           }
@@ -120,7 +128,7 @@ public struct MyPageCore {
           } else {
             await send(.set(\.isDisturbAlarmOn, false))
             let notificationSettingDialog = turnOnNotificationSettingDialog {
-              await send(._goToNotificationSettings)
+              await send(._goToNotificationSettings(.disturb))
             }
             await send(.set(\.dialog, notificationSettingDialog))
           }
@@ -128,7 +136,16 @@ public struct MyPageCore {
           await send(.set(\.isDisturbAlarmOn, false))
         }
       }
-      
+
+    case .scenePhaseActive:
+      return .run { [type = state.lastToggledAlarmType] send in
+        let settings = await userNotificationClient.getNotificationSettings()
+        if settings.authorizationStatus == .authorized {
+          await send(.set(type == .timer ? \.isTimerAlarmOn : \.isDisturbAlarmOn, true))
+        }
+        await send(.set(\.lastToggledAlarmType, nil))
+      }
+
     case let .liveActivityToggleButtonTapped(isOn):
       return .run { send in
         if isOn {
@@ -138,7 +155,7 @@ public struct MyPageCore {
           } else {
             await send(.set(\.isLiveActivityOn, false))
             let notificationSettingDialog = turnOnLiveActivitySettingDialog {
-              await send(._goToNotificationSettings)
+              await send(._goToNotificationSettings(nil))
             }
             await send(.set(\.dialog, notificationSettingDialog))
           }
@@ -146,14 +163,15 @@ public struct MyPageCore {
           await send(.set(\.isLiveActivityOn, false))
         }
       }
-      
+
     case .sendFeedbackButtonTapped:
       guard let feedbackURL = URL(string: "https://forms.gle/wEUPH9Tvxgua4hCZ9") else { return .none }
       return .run { _ in
         await self.openURL(feedbackURL)
       }
       
-    case ._goToNotificationSettings:
+    case let ._goToNotificationSettings(type):
+      state.lastToggledAlarmType = type
       guard let notificationSettingsURL = URL(
         string: UIApplication.openNotificationSettingsURLString
       ) else {
@@ -204,7 +222,7 @@ extension MyPageCore {
   private func turnOnNotificationSettingDialog(action: @escaping () async -> Void) -> DefaultDialog {
     return DefaultDialog(
       title: "설정에서 알림을 켜주세요",
-      subTitle: "모하냥 앱의 알림 표시를 허용하면 Push 알림을 받을 수 있어요. 지금 설정하시겠어요?",
+      subTitle: "알림 표시를 허용하면 Push 알림을 받을 수 있어요.",
       firstButton: .init(title: "다음에"),
       secondButton: .init(
         title: "설정으로 이동",
