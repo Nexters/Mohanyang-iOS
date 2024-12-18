@@ -24,6 +24,8 @@ import StreamListenerInterface
 
 import ComposableArchitecture
 
+import BackgroundTasks
+
 @Reducer
 public struct AppCore {
   @ObservableState
@@ -99,6 +101,16 @@ public struct AppCore {
       }
 
     case .appDelegate:
+      return .none
+      
+    case .didChangeScenePhase(.background):
+//      let request = BGAppRefreshTaskRequest(identifier: "com.pomonyang.mohanyang.update_LiveActivity")
+//      request.earliestBeginDate = Date(timeIntervalSinceNow: 60)
+//      do {
+//        try BGTaskScheduler.shared.submit(request)
+//      } catch {
+//        print("BGTaskScheduler not submitted")
+//      }
       return .none
       
     case .didChangeScenePhase:

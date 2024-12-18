@@ -19,33 +19,9 @@ public struct PomodoroLiveActivityWidget: Widget {
   
   public var body: some WidgetConfiguration {
     ActivityConfiguration(for: PomodoroActivityAttributes.self) { context in
-      TimerLockScreenView(
-        store: .init(
-          initialState: .init(contentState: context.state),
-          reducer: { TimerLockScreenCore() })
-      )
+      TimerLockScreenView(context: context)
     } dynamicIsland: { context in
-      DynamicIsland {
-        DynamicIslandExpandedRegion(.leading) {
-          Text("Leading")
-        }
-        DynamicIslandExpandedRegion(.trailing) {
-          Text("Trailing")
-        }
-        DynamicIslandExpandedRegion(.center) {
-          Text("Center")
-        }
-        DynamicIslandExpandedRegion(.bottom) {
-          Text("Bottom")
-        }
-      } compactLeading: {
-        Text("Leading")
-      } compactTrailing: {
-        Text("Trailing")
-      } minimal: {
-        Text("Minimal")
-      }
-      .keylineTint(Alias.Color.Background.accent2)
+      TimerDynamicIsland(context: context).body
     }
   }
 }

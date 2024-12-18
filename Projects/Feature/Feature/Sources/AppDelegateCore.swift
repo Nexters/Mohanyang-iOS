@@ -14,8 +14,9 @@ import UserNotificationClientInterface
 import KeychainClientInterface
 import DatabaseClientInterface
 import LiveActivityClientInterface
-import AppService
+import BackgroundTaskClientInterface
 import APIClientInterface
+import AppService
 import PomodoroServiceInterface
 
 import ComposableArchitecture
@@ -41,6 +42,8 @@ public struct AppDelegateCore {
   @Dependency(KeychainClient.self) var keychainClient
   @Dependency(UserNotificationClient.self) var userNotificationClient
   @Dependency(LiveActivityClient.self) var liveActivityClient
+  @Dependency(PomodoroService.self) var pomodoroService
+  @Dependency(BackgroundTaskClient.self) var backgroundTaskClient
   
   public init() {}
   
@@ -60,6 +63,11 @@ public struct AppDelegateCore {
       Logger.shared.log("FCMToken: \(Messaging.messaging().fcmToken ?? "not generated")")
       
       let userNotificationEventStream = userNotificationClient.delegate()
+      
+//      pomodoroService.registerTimerOverTime(
+//        bgTaskClient: backgroundTaskClient,
+//        liveActivityClient: liveActivityClient
+//      )
       
       return .run { send in
         try await userNotificationClient.setBadgeCount(0)
@@ -102,12 +110,14 @@ public struct AppDelegateCore {
       return .none
       
     case .willTerminate:
-      return .run { send in
+      return .run { _ in
         await liveActivityClient.protocolAdapter.endAllActivityImmediately(type: PomodoroActivityAttributes.self)
       }
     }
   }
-  
+}
+
+extension AppDelegateCore {
   private func firebaseInitilize() {
     FirebaseApp.configure()
   }
