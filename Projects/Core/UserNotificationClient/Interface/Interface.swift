@@ -21,6 +21,7 @@ public struct UserNotificationClient {
   public var removeDeliveredNotificationsWithIdentifiers: @Sendable ([String]) async -> Void
   public var removePendingNotificationRequestsWithIdentifiers: @Sendable ([String]) async -> Void
   public var requestAuthorization: @Sendable (UNAuthorizationOptions) async throws -> Bool
+  public var setBadgeCount: @Sendable (Int) async throws -> Void
   
   @CasePathable
   public enum DelegateEvent {

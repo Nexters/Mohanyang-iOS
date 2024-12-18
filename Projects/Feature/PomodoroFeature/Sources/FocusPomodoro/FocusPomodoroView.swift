@@ -57,10 +57,12 @@ public struct FocusPomodoroView: View {
             Text(formatTime(from: store.focusTimeBySeconds))
               .foregroundStyle(Alias.Color.Text.primary)
               .font(Typography.header1)
+              .monospacedDigit()
             if store.overTimeBySeconds > 0 {
               Text("\(formatTime(from: store.overTimeBySeconds)) 초과")
                 .foregroundStyle(Alias.Color.Accent.red)
                 .font(Typography.header4)
+                .monospacedDigit()
             } else {
               Spacer()
                 .frame(height: 25)

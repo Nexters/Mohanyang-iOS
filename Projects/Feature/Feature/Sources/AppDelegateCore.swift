@@ -54,7 +54,6 @@ public struct AppDelegateCore {
   ) -> EffectOf<Self> {
     switch action {
     case .didFinishLaunching:
-      UIApplication.shared.applicationIconBadgeNumber = 0
       firebaseInitilize()
       datadogInitilize()
       
@@ -63,6 +62,7 @@ public struct AppDelegateCore {
       let userNotificationEventStream = userNotificationClient.delegate()
       
       return .run { send in
+        try await userNotificationClient.setBadgeCount(0)
         await withThrowingTaskGroup(of: Void.self) { group in
           group.addTask {
             for await event in userNotificationEventStream {
