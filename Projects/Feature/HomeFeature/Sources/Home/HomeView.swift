@@ -108,7 +108,7 @@ public struct HomeView: View {
       if !store.isNetworkConnected {
         VStack {
           HStack(spacing: Alias.Spacing.small) {
-            DesignSystemAsset.Image._16NullPrimary.swiftUIImage
+            DesignSystemAsset.Image._16Offline.swiftUIImage
             Text("오프라인 모드")
               .font(Typography.bodySB)
               .foregroundStyle(Alias.Color.Text.secondary)
