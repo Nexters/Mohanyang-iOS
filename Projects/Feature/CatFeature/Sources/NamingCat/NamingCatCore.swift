@@ -119,7 +119,7 @@ public struct NamingCatCore {
 
     case let ._postNamedCatRequest(request):
       return .run { send in
-        await self.streamListener.sendServerState(state: .requestStarted)
+        await self.streamListener.protocolAdapter.send(ServerState.requestStarted)
         await send(._postNamedCatResponse(Result {
           try await self.catService.changeCatName(apiClient: apiClient, request: request)
         }))
@@ -128,7 +128,7 @@ public struct NamingCatCore {
     case ._postNamedCatResponse(.success(_)):
       return .run { send in
         try await self.userService.syncUserInfo(apiClient: self.apiClient, databaseClient: self.databaseClient)
-        await self.streamListener.sendServerState(state: .requestCompleted)
+        await self.streamListener.protocolAdapter.send(ServerState.requestCompleted)
         await send(._setNextAction)
       }
 
@@ -174,14 +174,14 @@ extension NamingCatCore {
        networkError.code == .networkConnectionLost ||
        networkError.code == .notConnectedToInternet {
       return .run { send in
-        await streamListener.sendServerState(state: .networkDisabled)
+        await self.streamListener.protocolAdapter.send(ServerState.networkDisabled)
       }
     }
     guard let error = error as? NetworkError else { return .none }
     switch error {
     case .apiError(_):
       return .run { send in
-        await streamListener.sendServerState(state: .errorOccured)
+        await self.streamListener.protocolAdapter.send(ServerState.errorOccured)
       }
     default:
       return .none

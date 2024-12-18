@@ -15,32 +15,39 @@ extension StreamListener: DependencyKey {
   public static let liveValue: StreamListener = .live()
 
   public static func live() -> StreamListener {
+    return .init(protocolAdapter: StreamListenerImpl())
+  }
+}
 
-    // 네이밍 추천 plz .,
-    actor ContinuationActor {
-      var continuation: AsyncStream<ServerState>.Continuation?
+final class StreamListenerImpl: StreamListenerProtocol {
+  private let actor = StreamActor()
 
-      func set(_ newContinuation: AsyncStream<ServerState>.Continuation) {
-        continuation = newContinuation
-      }
+  func send<T: StreamTypeProtocol>(_ state: T) async {
+    await actor.yield(type: T.key, value: T.self)
+  }
 
-      func yield(_ state: ServerState) {
-        continuation?.yield(state)
-      }
+  func receive<T: StreamTypeProtocol>(_ type: T.Type) -> AsyncStream<T> {
+    let (stream, continuation) = AsyncStream<T>.makeStream()
+    Task {
+      await actor.register(key: T.key, continuation: continuation)
     }
+    return stream
+  }
+}
 
-    let continuationActor = ContinuationActor()
-    let asyncStream = AsyncStream<ServerState> { continuation in
-      Task { await continuationActor.set(continuation) }
-    }
+private actor StreamActor {
+  private var streams: [StreamType: AnyStreamContinuation] = [:]
 
-    return StreamListener(
-      sendServerState: { state in
-        await continuationActor.yield(state)
-      },
-      updateServerState: {
-        return asyncStream
-      }
-    )
+  func register<T: StreamTypeProtocol>(key: StreamType, continuation: AsyncStream<T>.Continuation) {
+    streams[key] = AnyStreamContinuation(continuation)
+  }
+
+  func yield<T: StreamTypeProtocol>(type: StreamType, value: T.Type) {
+    guard let continuation = streams[type] else { return }
+    continuation.yield(value)
+  }
+
+  func remove(type: StreamType) {
+    streams[type] = nil
   }
 }
