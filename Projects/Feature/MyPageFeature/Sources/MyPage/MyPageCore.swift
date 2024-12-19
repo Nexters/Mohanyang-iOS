@@ -80,7 +80,6 @@ public struct MyPageCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
-      // TODO: userDefault get bool 은 옵셔널 값이 아니어서, 다른 방법을 사용해서 default setting 값 부여해야할듯
       state.isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
       state.isDisturbAlarmOn = getDisturbAlarm(userDefaultsClient: self.userDefaultsClient)
       state.isLiveActivityOn =  getLiveActivityState(userDefaultsClient: self.userDefaultsClient)
