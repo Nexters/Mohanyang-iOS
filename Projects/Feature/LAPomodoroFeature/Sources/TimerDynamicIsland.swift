@@ -31,7 +31,7 @@ struct TimerDynamicIsland {
   @DynamicIslandExpandedContentBuilder
   var expanded: DynamicIslandExpandedContent<some View> {
     DynamicIslandExpandedRegion(.leading, priority: 1.0) {
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading, spacing: 2) {
         HStack(alignment: .center, spacing: Alias.Spacing.xSmall) {
           if context.state.isRest {
             DesignSystemAsset.Image._20Rest.swiftUIImage
@@ -50,20 +50,19 @@ struct TimerDynamicIsland {
         }
         
         Text(
-          timerInterval: Date()...context.state.goalDatetime,
-          countsDown: true,
-          showsHours: false
+          context.state.goalDatetime,
+          style: .timer
         )
         .monospacedDigit()
         .foregroundStyle(Alias.Color.Text.inverse)
         .font(context.state.isTimerOver() ? Typography.header2 : Typography.header1)
+        .frame(width: 200)
         
         if context.state.isTimerOver() {
           SingleLineText {
             Text(
-              timerInterval: Date()...Date().addingTimeInterval(3600),
-              countsDown: false,
-              showsHours: false
+              Date().addingTimeInterval(3600),
+              style: .timer
             )
             Text(" 초과")
           }
@@ -71,10 +70,14 @@ struct TimerDynamicIsland {
           .font(Typography.header5)
         }
       }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     DynamicIslandExpandedRegion(.trailing) {
-      DesignSystemAsset.Image.hairBall.swiftUIImage
+      VStack(alignment: .center) {
+        DesignSystemAsset.Image.hairBall.swiftUIImage
+      }
+      .frame(maxHeight: .infinity)
     }
   }
   
@@ -91,14 +94,13 @@ struct TimerDynamicIsland {
       DesignSystemAsset.Image._20CheckCircle.swiftUIImage
     } else {
       Text(
-        timerInterval: Date()...context.state.goalDatetime,
-        countsDown: true,
-        showsHours: false
+        context.state.goalDatetime,
+        style: .timer
       )
       .font(Typography.subBodySB)
       .foregroundStyle(Alias.Color.Text.inverse)
       .monospacedDigit()
-      .frame(maxWidth: 32)
+      .frame(maxWidth: 40)
     }
   }
   
