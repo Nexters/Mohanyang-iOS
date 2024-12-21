@@ -111,6 +111,7 @@ public struct AppDelegateCore {
       
     case .willTerminate:
       return .run { _ in
+        await userNotificationClient.removeAllPendingNotificationRequests()
         await liveActivityClient.protocolAdapter.endAllActivityImmediately(type: PomodoroActivityAttributes.self)
       }
     }

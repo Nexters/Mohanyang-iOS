@@ -38,6 +38,9 @@ extension UserNotificationClient: DependencyKey {
     removePendingNotificationRequestsWithIdentifiers: {
       UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: $0)
     },
+    removeAllPendingNotificationRequests: {
+      UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    },
     requestAuthorization: {
       try await UNUserNotificationCenter.current().requestAuthorization(options: $0)
     },
