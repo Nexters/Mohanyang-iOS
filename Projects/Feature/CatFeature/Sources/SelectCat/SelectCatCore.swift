@@ -6,10 +6,12 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import AppService
 import APIClientInterface
 import UserServiceInterface
 import CatServiceInterface
 import UserNotificationClientInterface
+import UserDefaultsClientInterface
 import DatabaseClientInterface
 import StreamListenerInterface
 import DesignSystem
@@ -59,6 +61,7 @@ public struct SelectCatCore {
   @Dependency(UserService.self) var userService
   @Dependency(CatService.self) var catService
   @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(UserDefaultsClient.self) var userDefaultClient
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(StreamListener.self) var streamListener
 
@@ -108,8 +111,10 @@ public struct SelectCatCore {
     case ._setNextAction:
       if state.route == .onboarding {
         return .run { send in
-          // user notification 요청
-          _ = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
+          let isGranted = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
+          await setTimerAlarm(userDefaultsClient: self.userDefaultClient, isEnabled: isGranted)
+          await setDisturbAlarm(userDefaultsClient: self.userDefaultClient, isEnabled: isGranted)
+
           await send(._moveToNamingCat)
         }
       } else {
