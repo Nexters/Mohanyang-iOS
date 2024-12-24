@@ -64,10 +64,10 @@ public struct AppDelegateCore {
       
       let userNotificationEventStream = userNotificationClient.delegate()
       
-//      pomodoroService.registerTimerOverTime(
-//        bgTaskClient: backgroundTaskClient,
-//        liveActivityClient: liveActivityClient
-//      )
+      _ = pomodoroService.registerBGTaskToUpdateTimer(
+        bgTaskClient: backgroundTaskClient,
+        liveActivityClient: liveActivityClient
+      )
       
       return .run { send in
         try await userNotificationClient.setBadgeCount(0)

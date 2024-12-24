@@ -21,6 +21,7 @@ import CatServiceInterface
 import UserServiceInterface
 import DatabaseClientInterface
 import StreamListenerInterface
+import BackgroundTaskClientInterface
 
 import ComposableArchitecture
 
@@ -60,6 +61,7 @@ public struct AppCore {
   @Dependency(UserService.self) var userService
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(StreamListener.self) var streamListener
+  @Dependency(BackgroundTaskClient.self) var backgroundTaskClient
 
   public init() {}
   
@@ -104,14 +106,20 @@ public struct AppCore {
       return .none
       
     case .didChangeScenePhase(.background):
-//      let request = BGAppRefreshTaskRequest(identifier: "com.pomonyang.mohanyang.update_LiveActivity")
-//      request.earliestBeginDate = Date(timeIntervalSinceNow: 60)
-//      do {
-//        try BGTaskScheduler.shared.submit(request)
-//      } catch {
-//        print("BGTaskScheduler not submitted")
-//      }
-      return .none
+      let request = BGAppRefreshTaskRequest(identifier: "com.pomonyang.mohanyang.update_LiveActivity")
+      request.earliestBeginDate = Date(timeIntervalSinceNow: 60)
+      
+      
+      do {
+        try BGTaskScheduler.shared.submit(request)
+      } catch {
+        print("BGTaskScheduler not submitted")
+      }
+      return .run { send in
+        // 현재 타이머가 실행중이면 submit 해야함
+        //
+        
+      }
       
     case .didChangeScenePhase:
       return .none

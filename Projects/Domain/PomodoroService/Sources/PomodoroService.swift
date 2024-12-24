@@ -55,44 +55,28 @@ extension PomodoroService: DependencyKey {
         let api = FocusTimeAPI.getSummaries
         return try await apiClient.apiRequest(request: api, as: FocusTimeSummary.self)
       },
-      registerTimerOverTime: { bgTaskClient, liveActivityClient in
-//        bgTaskClient.registerTask(
-//          identifier: "com.pomonyang.mohanyang.update_LiveActivity",
-//          queue: nil
-//        ) { task in
-//          print("BackgroundTask 호출!!")
-//          task.expirationHandler = {
-//            print("BackgroundTask 끝!!")
-//            task.setTaskCompleted(success: false)
-//          }
-//          Task {
-//            await liveActivityClient.protocolAdapter.endAllActivityImmediately(type: PomodoroActivityAttributes.self)
-//            task.setTaskCompleted(success: true)
-//          }
-          
-//          let category = PomodoroCategory(no: 507, baseCategoryCode: .study, title: "작업", position: 3, focusTime: "PT1H", restTime: "PT15M")
-//          do {
-//            try liveActivityClient.protocolAdapter.startActivity(
-//              attributes: PomodoroActivityAttributes(),
-//              content: .init(
-//                state: .init(category: category, goalDatetime: Date().addingTimeInterval(1000), isRest: false),
-//                staleDate: nil
-//              ),
-//              pushType: nil
-//            )
-//          } catch {
-//            print("startActivity fail")
-//          }
-//          task.setTaskCompleted(success: true)
-        }
-      },
-      registerTimerEnd: { bgTaskClient, liveActivityClient in
+      registerBGTaskToUpdateTimer: { bgTaskClient, liveActivityClient in
         bgTaskClient.registerTask(
           identifier: "com.pomonyang.mohanyang.update_LiveActivity",
           queue: nil
         ) { task in
-          task.expirationHandler = {}
-          task.setTaskCompleted(success: true)
+          print("BackgroundTask 호출!!")
+          task.expirationHandler = {
+            print("BackgroundTask 끝!!")
+            task.setTaskCompleted(success: false)
+          }
+          
+          let pomodoroActivities = liveActivityClient.protocolAdapter.getActivities(type: PomodoroActivityAttributes.self)
+          Task {
+            for activity in pomodoroActivities {
+              await liveActivityClient.protocolAdapter.updateActivity(
+                type(of: activity.attributes),
+                id: activity.id,
+                content: activity.content
+              )
+            }
+            task.setTaskCompleted(success: true)
+          }
         }
       }
     )

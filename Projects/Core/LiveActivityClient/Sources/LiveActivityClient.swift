@@ -66,4 +66,8 @@ final class LiveActivityClientImpl: LiveActivityClientProtocol {
       await activity.end(nil, dismissalPolicy: .immediate)
     }
   }
+  
+  func getActivities<T: ActivityAttributes>(type: T.Type) -> [Activity<T>] {
+    return Activity<T>.activities
+  }
 }
