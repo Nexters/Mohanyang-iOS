@@ -17,58 +17,65 @@ struct TimerDynamicIsland {
   
   var body: DynamicIsland {
     DynamicIsland {
-      expanded
+      expandedView
     } compactLeading: {
-      compactLeading
+      compactLeadingView
     } compactTrailing: {
-      compactTrailing
+      compactTrailingView
     } minimal: {
-      minimal
+      minimalView
     }
     .keylineTint(Alias.Color.Background.accent2)
   }
   
   @DynamicIslandExpandedContentBuilder
-  var expanded: DynamicIslandExpandedContent<some View> {
+  var expandedView: DynamicIslandExpandedContent<some View> {
     DynamicIslandExpandedRegion(.leading, priority: 1.0) {
       VStack(alignment: .leading, spacing: 2) {
         HStack(alignment: .center, spacing: Alias.Spacing.xSmall) {
           if context.state.isRest {
             DesignSystemAsset.Image._20Rest.swiftUIImage
             Text("휴식중")
-              .foregroundStyle(Alias.Color.Text.tertiary)
+              .foregroundStyle(Alias.Color.Text.disabled)
               .font(Typography.bodySB)
           } else {
             context.state.category.image
               .resizable()
               .frame(width: 20, height: 20)
             Text(context.state.category.title)
-              .foregroundStyle(Alias.Color.Text.tertiary)
+              .foregroundStyle(Alias.Color.Text.disabled)
               .font(Typography.bodySB)
           }
           Spacer()
         }
         
-        Text(
-          context.state.goalDatetime,
-          style: .timer
-        )
-        .monospacedDigit()
-        .foregroundStyle(Alias.Color.Text.inverse)
-        .font(context.state.isTimerOver() ? Typography.header2 : Typography.header1)
-        .frame(width: 200)
-        
-        if context.state.isTimerOver() {
-          SingleLineText {
+        Group {
+          if context.state.isTimerOver() {
+            Text("0:00")
+              .monospacedDigit()
+              .foregroundStyle(Alias.Color.Text.inverse)
+              .font(Typography.header2)
+            SingleLineText {
+              Text(
+                context.state.goalDatetime,
+                style: .timer
+              )
+              .monospacedDigit()
+              Text(" 초과")
+            }
+            .foregroundStyle(Alias.Color.Accent.red)
+            .font(Typography.header5)
+          } else {
             Text(
-              Date().addingTimeInterval(3600),
+              context.state.goalDatetime,
               style: .timer
             )
-            Text(" 초과")
+            .monospacedDigit()
+            .foregroundStyle(Alias.Color.Text.inverse)
+            .font(Typography.header1)
           }
-          .foregroundStyle(Alias.Color.Accent.red)
-          .font(Typography.header5)
         }
+        .frame(width: 200, alignment: .leading)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -82,14 +89,14 @@ struct TimerDynamicIsland {
   }
   
   @ViewBuilder
-  var compactLeading: some View {
+  var compactLeadingView: some View {
     context.state.category.image
       .resizable()
       .frame(width: 20, height: 20)
   }
   
   @ViewBuilder
-  var compactTrailing: some View {
+  var compactTrailingView: some View {
     if context.state.isTimerOver() {
       DesignSystemAsset.Image._20CheckCircle.swiftUIImage
     } else {
@@ -100,12 +107,12 @@ struct TimerDynamicIsland {
       .font(Typography.subBodySB)
       .foregroundStyle(Alias.Color.Text.inverse)
       .monospacedDigit()
-      .frame(maxWidth: 40)
+      .frame(maxWidth: 40, alignment: .leading)
     }
   }
   
   @ViewBuilder
-  var minimal: some View {
+  var minimalView: some View {
     DesignSystemAsset.Image._24Timer.swiftUIImage
   }
 }

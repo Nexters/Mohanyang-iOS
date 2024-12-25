@@ -44,7 +44,7 @@ struct TimerLockScreenView: View {
             .font(Typography.header2)
           SingleLineText {
             Text(
-              Date(),
+              context.state.goalDatetime,
               style: .timer
             )
             .monospacedDigit()
