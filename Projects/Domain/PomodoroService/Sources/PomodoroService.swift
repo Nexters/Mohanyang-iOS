@@ -18,8 +18,6 @@ extension PomodoroService: DependencyKey {
   public static let liveValue: PomodoroService = .live()
   
   private static func live() -> PomodoroService {
-    
-    
     return .init(
       syncCategoryList: {
         apiClient, databaseClient in
@@ -60,20 +58,13 @@ extension PomodoroService: DependencyKey {
           identifier: "com.pomonyang.mohanyang.update_LiveActivity",
           queue: nil
         ) { task in
-          print("BackgroundTask 호출!!")
           task.expirationHandler = {
-            print("BackgroundTask 끝!!")
             task.setTaskCompleted(success: false)
           }
-          
           let pomodoroActivities = liveActivityClient.protocolAdapter.getActivities(type: PomodoroActivityAttributes.self)
           Task {
-            for activity in pomodoroActivities {
-              await liveActivityClient.protocolAdapter.updateActivity(
-                type(of: activity.attributes),
-                id: activity.id,
-                content: activity.content
-              )
+            if let firstActivity = pomodoroActivities.first {
+              await firstActivity.update(firstActivity.content)
             }
             task.setTaskCompleted(success: true)
           }
