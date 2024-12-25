@@ -19,10 +19,15 @@ import UserDefaultsClientInterface
 import UserNotificationClientInterface
 import CatServiceInterface
 import UserServiceInterface
+import PomodoroServiceInterface
 import DatabaseClientInterface
 import StreamListenerInterface
+import BackgroundTaskClientInterface
+import LiveActivityClientInterface
 
 import ComposableArchitecture
+
+import BackgroundTasks
 
 @Reducer
 public struct AppCore {
@@ -34,9 +39,9 @@ public struct AppCore {
     var onboarding: OnboardingCore.State?
     @Presents var networkError: NetworkErrorCore.State?
     @Presents var requestError: RequestErrorCore.State?
-
+    
     var isLoading: Bool = false
-
+    
     public init() {}
   }
   
@@ -58,7 +63,9 @@ public struct AppCore {
   @Dependency(UserService.self) var userService
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(StreamListener.self) var streamListener
-
+  @Dependency(BackgroundTaskClient.self) var backgroundTaskClient
+  @Dependency(LiveActivityClient.self) var liveActivityClient
+  
   public init() {}
   
   public var body: some ReducerOf<Self> {
@@ -97,40 +104,62 @@ public struct AppCore {
           await send(.serverState(serverState))
         }
       }
-
+      
     case .appDelegate:
       return .none
       
+    case .didChangeScenePhase(.background):
+      return .run { send in
+        let pomodoroActivity = liveActivityClient.protocolAdapter.getActivities(type: PomodoroActivityAttributes.self).first
+        let pendingBGTaskRequest = await backgroundTaskClient.pendingTaskRequests().first
+        
+        if let pomodoroActivity {
+          if let pendingBGTaskRequest {
+            if pendingBGTaskRequest.earliestBeginDate != pomodoroActivity.content.state.goalDatetime {
+              backgroundTaskClient.cancel(identifier: pendingBGTaskRequest.identifier)
+              await pomodoroActivity.update(pomodoroActivity.content)
+              try submitUpdateLiveActivityBGTask(earliestBeginDate: pomodoroActivity.content.state.goalDatetime)
+            }
+          } else {
+            try submitUpdateLiveActivityBGTask(earliestBeginDate: pomodoroActivity.content.state.goalDatetime)
+          }
+        } else {
+          if let pendingBGTaskRequest {
+            backgroundTaskClient.cancel(identifier: pendingBGTaskRequest.identifier)
+          }
+        }
+      }
+      
     case .didChangeScenePhase:
       return .none
-
+      
     case .splash(.moveToHome):
       state.splash = nil
       state.home = HomeCore.State()
       return .none
-
+      
     case .splash(.moveToOnboarding):
       state.splash = nil
       state.onboarding = OnboardingCore.State()
       return .none
-
+      
     case .splash:
       return .none
-
+      
     case .home:
       return .none
-
+      
     case .onboarding(.selectCat(.presented(.namingCat(.presented(.moveToHome))))):
       state.onboarding = nil
       state.home = HomeCore.State()
       return .none
-
+      
     case .onboarding:
       return .none
-
+      
     case .networkError:
       return .none
-
+      
     case .requestError(.presented(.moveToHome)):
       if state.onboarding != nil {
         state.onboarding = OnboardingCore.State()
@@ -138,10 +167,10 @@ public struct AppCore {
         state.home = HomeCore.State()
       }
       return .none
-
+      
     case .requestError:
       return .none
-
+      
     case .serverState(let serverState):
       switch serverState {
       case .requestStarted:
@@ -157,5 +186,13 @@ public struct AppCore {
       }
       return .none
     }
+  }
+  
+  func submitUpdateLiveActivityBGTask(earliestBeginDate: Date) throws {
+    let request = BGProcessingTaskRequest(identifier: "com.pomonyang.mohanyang.update_LiveActivity")
+    request.requiresExternalPower = false
+    request.requiresNetworkConnectivity = false
+    request.earliestBeginDate = earliestBeginDate
+    try backgroundTaskClient.submit(taskRequest: request)
   }
 }

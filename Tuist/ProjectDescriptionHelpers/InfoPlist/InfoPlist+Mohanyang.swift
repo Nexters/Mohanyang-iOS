@@ -51,6 +51,17 @@ extension InfoPlist {
         "NSSupportsLiveActivities": true,
         
         
+        // MARK: - BGTask
+        
+        "BGTaskSchedulerPermittedIdentifiers": [
+          "\(AppEnv.bundleId).update_LiveActivity"
+        ],
+        "UIBackgroundModes": [
+          "fetch",
+          "processing"
+        ],
+        
+        
         // MARK: - Cocoa
         
         "NSAppTransportSecurity": [

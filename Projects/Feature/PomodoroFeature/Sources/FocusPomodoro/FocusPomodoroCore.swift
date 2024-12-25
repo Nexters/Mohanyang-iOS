@@ -268,7 +268,7 @@ public struct FocusPomodoroCore {
             await send(.set(\.restWaiting, restWaitingState))
           }
         } else {
-          state.overTimeBySeconds = timeDifference
+          state.overTimeBySeconds = -(timeDifference)
         }
       } else {
         state.focusTimeBySeconds = timeDifference

@@ -15,8 +15,8 @@ public struct PomodoroActivityAttributes: Equatable, ActivityAttributes {
     public var goalDatetime: Date
     public var isRest: Bool
     
-    public var dateRange: ClosedRange<Date> {
-      return Date.now...goalDatetime
+    public func isTimerOver() -> Bool {
+      return Date() >= goalDatetime
     }
     
     public init(

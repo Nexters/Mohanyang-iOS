@@ -46,4 +46,6 @@ public protocol LiveActivityClientProtocol {
   func endAllActivityImmediately<T: ActivityAttributes>(
     type: T.Type
   ) async
+  
+  func getActivities<T: ActivityAttributes>(type: T.Type) -> [Activity<T>]
 }

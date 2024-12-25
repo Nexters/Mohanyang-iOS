@@ -14,8 +14,9 @@ import UserNotificationClientInterface
 import KeychainClientInterface
 import DatabaseClientInterface
 import LiveActivityClientInterface
-import AppService
+import BackgroundTaskClientInterface
 import APIClientInterface
+import AppService
 import PomodoroServiceInterface
 
 import ComposableArchitecture
@@ -41,6 +42,8 @@ public struct AppDelegateCore {
   @Dependency(KeychainClient.self) var keychainClient
   @Dependency(UserNotificationClient.self) var userNotificationClient
   @Dependency(LiveActivityClient.self) var liveActivityClient
+  @Dependency(PomodoroService.self) var pomodoroService
+  @Dependency(BackgroundTaskClient.self) var backgroundTaskClient
   
   public init() {}
   
@@ -54,7 +57,6 @@ public struct AppDelegateCore {
   ) -> EffectOf<Self> {
     switch action {
     case .didFinishLaunching:
-      UIApplication.shared.applicationIconBadgeNumber = 0
       firebaseInitilize()
       datadogInitilize()
       
@@ -62,7 +64,13 @@ public struct AppDelegateCore {
       
       let userNotificationEventStream = userNotificationClient.delegate()
       
+      _ = pomodoroService.registerBGTaskToUpdateTimer(
+        bgTaskClient: backgroundTaskClient,
+        liveActivityClient: liveActivityClient
+      )
+      
       return .run { send in
+        try await userNotificationClient.setBadgeCount(0)
         await withThrowingTaskGroup(of: Void.self) { group in
           group.addTask {
             for await event in userNotificationEventStream {
@@ -102,12 +110,15 @@ public struct AppDelegateCore {
       return .none
       
     case .willTerminate:
-      return .run { send in
+      return .run { _ in
+        await userNotificationClient.removeAllPendingNotificationRequests()
         await liveActivityClient.protocolAdapter.endAllActivityImmediately(type: PomodoroActivityAttributes.self)
       }
     }
   }
-  
+}
+
+extension AppDelegateCore {
   private func firebaseInitilize() {
     FirebaseApp.configure()
   }

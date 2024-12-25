@@ -19,4 +19,5 @@ public enum Core: String, Modulable {
   case StreamListener
   case LiveActivityClient
   case AudioClient
+  case BackgroundTaskClient
 }
