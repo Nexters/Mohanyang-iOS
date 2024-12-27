@@ -23,7 +23,7 @@ final class StreamListenerImpl: StreamListenerProtocol {
   private let actor = StreamActor()
 
   func send<T: StreamType>(_ state: T) async {
-    await actor.yield(type: T.key, value: state)
+    await actor.yield(key: T.key, value: state)
   }
 
   func receive<T: StreamType>(_ type: T.Type) -> AsyncStream<T> {
@@ -36,18 +36,27 @@ final class StreamListenerImpl: StreamListenerProtocol {
 }
 
 private actor StreamActor {
-  private var streams: [StreamKey: StreamContinuation] = [:]
+  private var streams: [StreamKey: [StreamContinuation]] = [:]
 
   func register<T: StreamType>(key: StreamKey, continuation: AsyncStream<T>.Continuation) {
-    streams[key] = StreamContinuation(continuation)
+    let newContinuation = StreamContinuation(continuation)
+    if streams[key] == nil {
+      streams[key] = [newContinuation]
+    } else {
+      streams[key]?.append(newContinuation)
+    }
   }
 
-  func yield<T: StreamType>(type: StreamKey, value: T) {
-    guard let continuation = streams[type] else { return }
-    continuation.yield(value)
+  func yield<T: StreamType>(key: StreamKey, value: T) {
+    guard let continuations = streams[key] else { return }
+    continuations.forEach { $0.yield(value) }
   }
 
-  func remove(type: StreamKey) {
-    streams[type] = nil
+  func remove(key: StreamKey) {
+    streams[key]?.forEach { $0.finish() }
+    streams[key]?.removeAll()
+    if streams[key]?.isEmpty == true {
+      streams[key] = nil
+    }
   }
 }
