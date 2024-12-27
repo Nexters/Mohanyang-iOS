@@ -13,6 +13,7 @@ import DesignSystem
 import UserServiceInterface
 import DatabaseClientInterface
 import StreamListenerInterface
+import AppService
 
 import ComposableArchitecture
 import RiveRuntime

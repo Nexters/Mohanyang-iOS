@@ -10,9 +10,19 @@ import Foundation
 import Dependencies
 import DependenciesMacros
 
+// MARK: - Stream releated Protocol
+
+public typealias StreamKey = String
+
+public protocol StreamType: Hashable {
+  static var key: StreamKey { get }
+}
+
+// MARK: - StreamListener
+
 public protocol StreamListenerProtocol {
-  func send<T: StreamTypeProtocol>(_ state: T) async
-  func receive<T: StreamTypeProtocol>(_ type: T.Type) -> AsyncStream<T>
+  func send<T: StreamType>(_ state: T) async
+  func receive<T: StreamType>(_ type: T.Type) -> AsyncStream<T>
 }
 
 @DependencyClient
@@ -30,8 +40,8 @@ extension StreamListener: TestDependencyKey {
 }
 
 private struct StreamListenerTestImpl: StreamListenerProtocol {
-  func send<T: StreamTypeProtocol>(_ state: T) async {}
-  func receive<T: StreamTypeProtocol>(_ type: T.Type) -> AsyncStream<T> { .never }
+  func send<T: StreamType>(_ state: T) async {}
+  func receive<T: StreamType>(_ type: T.Type) -> AsyncStream<T> { .never }
 }
 
 /*
