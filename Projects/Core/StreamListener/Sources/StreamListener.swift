@@ -54,9 +54,6 @@ private actor StreamActor {
 
   func remove(key: StreamKey) {
     streams[key]?.forEach { $0.finish() }
-    streams[key]?.removeAll()
-    if streams[key]?.isEmpty == true {
-      streams[key] = nil
-    }
+    streams[key] = nil
   }
 }
