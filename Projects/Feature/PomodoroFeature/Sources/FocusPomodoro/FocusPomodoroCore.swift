@@ -155,6 +155,7 @@ public struct FocusPomodoroCore {
         await send(.setupLiveActivity)
         await send(.setupPushNotification)
         await send(.timer(.start))
+        await send(.timer(.tick))
       }
       
     case .takeRestButtonTapped:
@@ -253,11 +254,10 @@ public struct FocusPomodoroCore {
       
     case .timer(.tick):
       guard let goalDatetime = state.goalDatetime else { return .none }
-      
       let timeDifference = timeDifferenceInSeconds(from: Date.now, to: goalDatetime)
       
-      if state.focusTimeBySeconds == 0 {
-        if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
+      if state.focusTimeBySeconds <= 0 {
+        if state.overTimeBySeconds >= 3600 { // 60분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
             let restWaitingState = RestWaitingCore.State(
@@ -285,10 +285,5 @@ public struct FocusPomodoroCore {
     case .restWaiting:
       return .none
     }
-  }
-  
-  func timeDifferenceInSeconds(from startDate: Date, to endDate: Date) -> Int {
-    let difference = Int(endDate.timeIntervalSince(startDate))
-    return difference
   }
 }

@@ -34,7 +34,7 @@ public struct HomeCore {
     var selectedCategory: PomodoroCategory?
     var selectedCat: SomeCat?
 
-    var isNetworkConnected: Bool = false
+    var isNetworkConnected: Bool = true
 
     var toast: DefaultToast?
     var dialog: DefaultDialog?

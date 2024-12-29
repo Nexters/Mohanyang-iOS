@@ -20,13 +20,14 @@ import ComposableArchitecture
 public struct RestWaitingCore {
   @ObservableState
   public struct State: Equatable {
+    let restWaitingEndDate = Date().addingTimeInterval(3600)
     let source: Source
     let focusedTimeBySeconds: Int
     let overTimeBySeconds: Int
     var selectedCategory: PomodoroCategory?
     var changeFocusTimeByMinute: Int = 0
     
-    var timer: TimerCore.State = .init(interval: .seconds(3600), mode: .continuous)
+    var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
     var toast: DefaultToast?
     
     @Presents var restPomodoro: RestPomodoroCore.State?
@@ -152,8 +153,10 @@ public struct RestWaitingCore {
       return .none
       
     case .timer(.tick):
-      return .run { [state] send in
-        await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: 0))
+      guard state.restWaitingEndDate <= Date() else { return .none }
+      let focusedTimeBySeconds = state.focusedTimeBySeconds
+      return .run { send in
+        await send(.saveHistory(focusTimeBySeconds: focusedTimeBySeconds, restTimeBySeconds: 0))
         await send(.goToHomeByOver60Minute)
       }
       
