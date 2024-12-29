@@ -89,14 +89,6 @@ public struct FocusPomodoroView: View {
     }
     .background(Alias.Color.Background.primary)
     .tooltipDestination(tooltip: .constant(store.dialogueTooltip))
-    .navigationDestination(
-      item: $store.scope(
-        state: \.restWaiting,
-        action: \.restWaiting
-      )
-    ) { store in
-      RestWaitingView(store: store)
-    }
     .task {
       await store.send(.task).finish()
     }

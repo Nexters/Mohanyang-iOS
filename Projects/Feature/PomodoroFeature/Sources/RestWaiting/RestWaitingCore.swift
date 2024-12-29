@@ -30,8 +30,6 @@ public struct RestWaitingCore {
     var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
     var toast: DefaultToast?
     
-    @Presents var restPomodoro: RestPomodoroCore.State?
-    
     public init(
       source: Source,
       focusedTimeBySeconds: Int,
@@ -65,7 +63,7 @@ public struct RestWaitingCore {
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
-    case restPomodoro(PresentationAction<RestPomodoroCore.Action>)
+    case _moveToRestPomodoro(RestPomodoroCore.State)
   }
   
   public enum Source {
@@ -86,9 +84,6 @@ public struct RestWaitingCore {
       TimerCore()
     }
     Reduce(self.core)
-      .ifLet(\.$restPomodoro, action: \.restPomodoro) {
-        RestPomodoroCore()
-      }
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -131,9 +126,10 @@ public struct RestWaitingCore {
       return .none
       
     case .takeRestButtonTapped:
+      let restPomodoroState = RestPomodoroCore.State(focusedTimeBySeconds: state.focusedTimeBySeconds)
       return .run { [state] send in
         try await applyChangeFocusTime(state: state)
-        await send(.set(\.restPomodoro, RestPomodoroCore.State(focusedTimeBySeconds: state.focusedTimeBySeconds)))
+        await send(._moveToRestPomodoro(restPomodoroState))
       }
       
     case .endFocusButtonTapped:
@@ -163,7 +159,7 @@ public struct RestWaitingCore {
     case .timer:
       return .none
       
-    case .restPomodoro:
+    case ._moveToRestPomodoro:
       return .none
     }
   }

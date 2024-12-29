@@ -33,19 +33,19 @@ public struct HomeCore {
     
     var selectedCategory: PomodoroCategory?
     var selectedCat: SomeCat?
-
+    
     var isNetworkConnected: Bool = true
-
+    
     var toast: DefaultToast?
     var dialog: DefaultDialog?
-
+    
     var catRiv: RiveViewModel = Rive.catHomeRiv(stateMachineName: "State Machine_Home")
-
+    
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
-    @Presents var focusPomodoro: FocusPomodoroCore.State?
     @Presents var myPage: MyPageCore.State?
-
+    @Presents var pomodoro: PomodoroCore.State?
+    
     public init() {}
   }
   
@@ -68,8 +68,8 @@ public struct HomeCore {
     case syncCategory
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
-    case focusPomodoro(PresentationAction<FocusPomodoroCore.Action>)
     case myPage(PresentationAction<MyPageCore.Action>)
+    case pomodoro(PresentationAction<PomodoroCore.Action>)
   }
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -91,11 +91,11 @@ public struct HomeCore {
       .ifLet(\.$timeSelect, action: \.timeSelect) {
         TimeSelectCore()
       }
-      .ifLet(\.$focusPomodoro, action: \.focusPomodoro) {
-        FocusPomodoroCore()
-      }
       .ifLet(\.$myPage, action: \.myPage) {
         MyPageCore()
+      }
+      .ifLet(\.$pomodoro, action: \.pomodoro) {
+        PomodoroCore()
       }
   }
   
@@ -103,14 +103,14 @@ public struct HomeCore {
     switch action {
     case .binding:
       return .none
-
+      
     case .task:
       return .run { send in
         for await isConnected in networkTracking.updateNetworkConnected() {
           await send(._fetchNetworkConnection(isConnected))
         }
       }
-
+      
     case .onLoad:
       return .run { send in
         if self.userDefaultsClient.boolForKey(isHomeGuideCompletedKey) == false {
@@ -162,7 +162,7 @@ public struct HomeCore {
       return .none
       
     case .playButtonTapped:
-      state.focusPomodoro = .init()
+      state.pomodoro = .init()
       return .none
       
     case .catTapped:
@@ -177,11 +177,11 @@ public struct HomeCore {
       state.catRiv.reset()
       state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
-
+      
     case let ._fetchNetworkConnection(isConnected):
       state.isNetworkConnected = isConnected
       return .none
-
+      
     case .syncCategory:
       return .run { send in
         try await self.pomodoroService.syncCategoryList(
@@ -221,7 +221,9 @@ public struct HomeCore {
       return .none
       
     case .timeSelect(.presented(.bottomCheckButtonTapped)):
-      guard let mode = state.timeSelect?.mode else { return .none }
+      guard let mode = state.timeSelect?.mode,
+            state.timeSelect?.isTimeChanged == true
+      else { return .none }
       var message: String
       switch mode {
       case .focus:
@@ -246,9 +248,9 @@ public struct HomeCore {
     case .myPage:
       return .none
       
-    case let .focusPomodoro(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))), // FocusPomodoro
-      let .focusPomodoro(.presented(.restWaiting(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))))), // RestWaiting
-      let .focusPomodoro(.presented(.restWaiting(.presented(.restPomodoro(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))))))): // RestPomodoro
+    case let .pomodoro(.presented(.focusPomodoro(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))), // FocusPomodoro
+      let .pomodoro(.presented(.restWaiting(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))), // RestWaiting
+      let .pomodoro(.presented(.restPomodoro(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))): // RestPomodoro
       guard let selectedCategoryID = state.selectedCategory?.id else { return .none }
       if focusTimeBySeconds >= 60 {
         return .run { _ in
@@ -266,18 +268,11 @@ public struct HomeCore {
         return .none
       }
       
-    case .focusPomodoro(.presented(.restWaiting(.presented(.goToHomeByOver60Minute)))):
-      state.focusPomodoro = nil
+    case .pomodoro(.presented(.restWaiting(.goToHomeByOver60Minute))):
       state.dialog = focusEndDialog()
       return .none
       
-    case .focusPomodoro(.presented(.goToHome)),
-        .focusPomodoro(.presented(.restWaiting(.presented(.goToHome)))),
-        .focusPomodoro(.presented(.restWaiting(.presented(.restPomodoro(.presented(.goToHome)))))):
-      state.focusPomodoro = nil
-      return .none
-      
-    case .focusPomodoro:
+    case .pomodoro:
       return .none
     }
   }

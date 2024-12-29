@@ -39,7 +39,6 @@ public struct FocusPomodoroCore {
     var selectedCat: SomeCat?
     var catRiv: RiveViewModel = Rive.catFocusRiv(stateMachineName: "State Machine_Focus")
     var pushTriggered: Bool = false
-    @Presents var restWaiting: RestWaitingCore.State?
     
     public init() {}
     
@@ -72,7 +71,7 @@ public struct FocusPomodoroCore {
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
-    case restWaiting(PresentationAction<RestWaitingCore.Action>)
+    case _moveToRestWaiting(RestWaitingCore.State)
   }
   
   @Dependency(PomodoroService.self) var pomodoroService
@@ -91,10 +90,8 @@ public struct FocusPomodoroCore {
     Scope(state: \.timer, action: \.timer) {
       TimerCore()
     }
+    
     Reduce(self.core)
-      .ifLet(\.$restWaiting, action: \.restWaiting) {
-        RestWaitingCore()
-      }
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -159,12 +156,14 @@ public struct FocusPomodoroCore {
       }
       
     case .takeRestButtonTapped:
-      state.restWaiting = RestWaitingCore.State(
+      let restWaitingState = RestWaitingCore.State(
         source: .focusPomodoro,
         focusedTimeBySeconds: state.focusedTime,
         overTimeBySeconds: state.overTimeBySeconds
       )
-      return .none
+      return .run { send in
+        await send(._moveToRestWaiting(restWaitingState))
+      }
       
     case .endFocusButtonTapped:
       return .run { [focusedTime = state.focusedTime] send in
@@ -265,7 +264,7 @@ public struct FocusPomodoroCore {
               focusedTimeBySeconds: state.focusedTime,
               overTimeBySeconds: state.overTimeBySeconds
             )
-            await send(.set(\.restWaiting, restWaitingState))
+            await send(._moveToRestWaiting(restWaitingState))
           }
         } else {
           state.overTimeBySeconds = -(timeDifference)
@@ -278,11 +277,7 @@ public struct FocusPomodoroCore {
     case .timer:
       return .none
       
-    case .restWaiting(.presented(.restPomodoro(.presented(.goToFocus)))):
-      state.restWaiting = nil
-      return .none
-      
-    case .restWaiting:
+    case ._moveToRestWaiting:
       return .none
     }
   }
