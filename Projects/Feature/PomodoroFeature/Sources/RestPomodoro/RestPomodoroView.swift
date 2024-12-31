@@ -40,10 +40,10 @@ public struct RestPomodoroView: View {
         VStack(spacing: Alias.Spacing.xLarge) {
           store.catRiv.view()
             .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
+            .frame(width: 240, height: 240)
             .onTapGesture {
               store.send(.catTapped)
             }
-            .frame(width: 240, height: 240)
 
           VStack(spacing: .zero) {
             HStack(spacing: Alias.Spacing.xSmall) {

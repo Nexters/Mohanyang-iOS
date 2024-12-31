@@ -108,14 +108,6 @@ public struct RestWaitingView: View {
     }
     .background(Alias.Color.Background.primary)
     .toastDestination(toast: $store.toast)
-    .navigationDestination(
-      item: $store.scope(
-        state: \.restPomodoro,
-        action: \.restPomodoro
-      )
-    ) { store in
-      RestPomodoroView(store: store)
-    }
     .task {
       await store.send(.task).finish()
     }

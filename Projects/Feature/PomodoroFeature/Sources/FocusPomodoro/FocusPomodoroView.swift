@@ -42,11 +42,11 @@ public struct FocusPomodoroView: View {
         VStack(spacing: Alias.Spacing.xLarge) {
           store.catRiv.view()
             .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
+            .frame(width: 240, height: 240)
             .onTapGesture {
               store.send(.catTapped)
             }
-            .frame(width: 240, height: 240)
-
+          
           VStack(spacing: .zero) {
             HStack(spacing: Alias.Spacing.xSmall) {
               DesignSystemAsset.Image._20Focus.swiftUIImage
@@ -89,14 +89,6 @@ public struct FocusPomodoroView: View {
     }
     .background(Alias.Color.Background.primary)
     .tooltipDestination(tooltip: .constant(store.dialogueTooltip))
-    .navigationDestination(
-      item: $store.scope(
-        state: \.restWaiting,
-        action: \.restWaiting
-      )
-    ) { store in
-      RestWaitingView(store: store)
-    }
     .task {
       await store.send(.task).finish()
     }

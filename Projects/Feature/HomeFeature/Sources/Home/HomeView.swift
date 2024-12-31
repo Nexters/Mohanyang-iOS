@@ -148,11 +148,11 @@ public struct HomeView: View {
     }
     .navigationDestination(
       item: $store.scope(
-        state: \.focusPomodoro,
-        action: \.focusPomodoro
+        state: \.pomodoro,
+        action: \.pomodoro
       )
     ) { store in
-      FocusPomodoroView(store: store)
+      PomodoroView(store: store)
     }
     .navigationDestination(
       item: $store.scope(

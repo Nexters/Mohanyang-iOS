@@ -28,6 +28,15 @@ public struct TimeSelectCore {
     public init(mode: Mode) {
       self.mode = mode
     }
+    
+    var isTimeChanged: Bool {
+      switch mode {
+      case .focus:
+        return selectedCategory?.focusTimeMinutes != selectedTime?.minute
+      case .rest:
+        return selectedCategory?.restTimeMinutes != selectedTime?.minute
+      }
+    }
   }
   
   public enum Action {
@@ -93,12 +102,13 @@ public struct TimeSelectCore {
       return .none
       
     case .bottomCheckButtonTapped:
-      return .run { [
-        mode = state.mode,
-        selectedTime = state.selectedTime,
-        selectedCategory = state.selectedCategory
-      ] send in
-        if let selectedCategoryID = selectedCategory?.id,
+      let mode = state.mode
+      let selectedCategory = state.selectedCategory
+      let selectedTime = state.selectedTime
+      let isTimeChanged = state.isTimeChanged
+      return .run { send in
+        if isTimeChanged,
+           let selectedCategoryID = selectedCategory?.id,
            let selectedTime = selectedTime?.minute {
           let selectedTimeDuration = DateComponents(minute: selectedTime).to8601DurationString()
           var request: EditCategoryRequest
@@ -110,7 +120,8 @@ public struct TimeSelectCore {
             request = EditCategoryRequest(focusTime: nil, restTime: selectedTimeDuration)
           }
           
-          try await self.pomodoroService.changeCategoryTime(
+          // TODO: - 오프라인 대응 필요
+          try? await self.pomodoroService.changeCategoryTime(
             apiClient: self.apiClient,
             categoryID: selectedCategoryID,
             request: request
@@ -138,25 +149,5 @@ public struct TimeSelectCore {
       result.append(i)
     }
     return result.reversed()
-  }
-}
-
-public struct TimeItem: WheelPickerData {
-  let minute: Int
-  
-  init(minute: Int) {
-    self.minute = minute
-  }
-  
-  public var id: Int {
-    return minute
-  }
-  
-  var title: String {
-    return String(format: "%02d:00", minute)
-  }
-  
-  var data: Int {
-    return minute
   }
 }

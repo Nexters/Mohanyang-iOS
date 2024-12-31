@@ -39,7 +39,6 @@ public struct FocusPomodoroCore {
     var selectedCat: SomeCat?
     var catRiv: RiveViewModel = Rive.catFocusRiv(stateMachineName: "State Machine_Focus")
     var pushTriggered: Bool = false
-    @Presents var restWaiting: RestWaitingCore.State?
     
     public init() {}
     
@@ -72,7 +71,7 @@ public struct FocusPomodoroCore {
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
-    case restWaiting(PresentationAction<RestWaitingCore.Action>)
+    case _moveToRestWaiting(RestWaitingCore.State)
   }
   
   @Dependency(PomodoroService.self) var pomodoroService
@@ -91,10 +90,8 @@ public struct FocusPomodoroCore {
     Scope(state: \.timer, action: \.timer) {
       TimerCore()
     }
+    
     Reduce(self.core)
-      .ifLet(\.$restWaiting, action: \.restWaiting) {
-        RestWaitingCore()
-      }
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -155,15 +152,18 @@ public struct FocusPomodoroCore {
         await send(.setupLiveActivity)
         await send(.setupPushNotification)
         await send(.timer(.start))
+        await send(.timer(.tick))
       }
       
     case .takeRestButtonTapped:
-      state.restWaiting = RestWaitingCore.State(
+      let restWaitingState = RestWaitingCore.State(
         source: .focusPomodoro,
         focusedTimeBySeconds: state.focusedTime,
         overTimeBySeconds: state.overTimeBySeconds
       )
-      return .none
+      return .run { send in
+        await send(._moveToRestWaiting(restWaitingState))
+      }
       
     case .endFocusButtonTapped:
       return .run { [focusedTime = state.focusedTime] send in
@@ -253,11 +253,10 @@ public struct FocusPomodoroCore {
       
     case .timer(.tick):
       guard let goalDatetime = state.goalDatetime else { return .none }
-      
       let timeDifference = timeDifferenceInSeconds(from: Date.now, to: goalDatetime)
       
-      if state.focusTimeBySeconds == 0 {
-        if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
+      if state.focusTimeBySeconds <= 0 {
+        if state.overTimeBySeconds >= 3600 { // 60분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
             let restWaitingState = RestWaitingCore.State(
@@ -265,7 +264,7 @@ public struct FocusPomodoroCore {
               focusedTimeBySeconds: state.focusedTime,
               overTimeBySeconds: state.overTimeBySeconds
             )
-            await send(.set(\.restWaiting, restWaitingState))
+            await send(._moveToRestWaiting(restWaitingState))
           }
         } else {
           state.overTimeBySeconds = -(timeDifference)
@@ -278,17 +277,8 @@ public struct FocusPomodoroCore {
     case .timer:
       return .none
       
-    case .restWaiting(.presented(.restPomodoro(.presented(.goToFocus)))):
-      state.restWaiting = nil
-      return .none
-      
-    case .restWaiting:
+    case ._moveToRestWaiting:
       return .none
     }
-  }
-  
-  func timeDifferenceInSeconds(from startDate: Date, to endDate: Date) -> Int {
-    let difference = Int(endDate.timeIntervalSince(startDate))
-    return difference
   }
 }
