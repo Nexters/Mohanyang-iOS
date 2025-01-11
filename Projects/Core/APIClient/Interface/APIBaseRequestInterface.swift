@@ -19,7 +19,7 @@ public protocol APIBaseRequest {
 }
 
 public enum API {
-  public static var apiBaseURL: String {
+  public static var apiBaseHost: String {
     guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else {
       fatalError("url missing")
     }

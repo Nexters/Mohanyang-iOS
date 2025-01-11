@@ -32,12 +32,16 @@ extension View {
       )
   }
   
-  public func tooltipDestination<T: Tooltip>(tooltip: Binding<T?>) -> some View {
+  public func tooltipDestination<T: Tooltip>(
+    tooltip: Binding<T?>,
+    allowsHitTesting: Bool = true
+  ) -> some View {
     return self
       .overlayWithOnPreferenceChange(TooltipFramePreferenceKey.self) { value in
         if let content = tooltip.wrappedValue, let position = value[ObjectIdentifier(type(of: content))] {
           TooltipView(content: content, position: position)
             .transition(.opacity.animation(.easeInOut))
+            .allowsHitTesting(allowsHitTesting)
             .onTapGesture {
               tooltip.wrappedValue = nil
             }

@@ -7,17 +7,22 @@
 //
 
 import Foundation
+import SwiftUI
+import DesignSystem
 
-import CatServiceInterface
-import PomodoroServiceInterface
-import UserServiceInterface
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
-import DesignSystem
-import PushService
 import UserNotificationClientInterface
+import LiveActivityClientInterface
+import AudioClientInterface
+import CatServiceInterface
+import PomodoroServiceInterface
+import UserServiceInterface
+import PushService
 import AppService
+
+import DesignSystem
 
 import ComposableArchitecture
 import RiveRuntime
@@ -27,19 +32,13 @@ public struct FocusPomodoroCore {
   @ObservableState
   public struct State: Equatable {
     var selectedCategory: PomodoroCategory?
+    var goalDatetime: Date?
     var focusTimeBySeconds: Int = 0
     var overTimeBySeconds: Int = 0
-    
     var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
-
-    // 저장된 고양이 불러오고나서 이 state에 저장하면 될듯합니다
     var selectedCat: SomeCat?
-
     var catRiv: RiveViewModel = Rive.catFocusRiv(stateMachineName: "State Machine_Focus")
-    
     var pushTriggered: Bool = false
-
-    @Presents var restWaiting: RestWaitingCore.State?
     
     public init() {}
     
@@ -56,6 +55,7 @@ public struct FocusPomodoroCore {
   
   public enum Action: BindableAction {
     case onAppear
+    case didChangeScenePhase(ScenePhase)
     case binding(BindingAction<State>)
     case task
     
@@ -64,13 +64,14 @@ public struct FocusPomodoroCore {
     case catTapped
     case setupFocusTime
     case catSetInput
-    case _pushNotificationTrigger
+    case setupLiveActivity
+    case setupPushNotification
     
     case goToHome
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
-    case restWaiting(PresentationAction<RestWaitingCore.Action>)
+    case _moveToRestWaiting(RestWaitingCore.State)
   }
   
   @Dependency(PomodoroService.self) var pomodoroService
@@ -79,6 +80,8 @@ public struct FocusPomodoroCore {
   @Dependency(APIClient.self) var apiClient
   @Dependency(UserService.self) var userService
   @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(LiveActivityClient.self) var liveActivityClient
+  @Dependency(AudioClient.self) var audioClient
   
   public init() {}
   
@@ -87,10 +90,8 @@ public struct FocusPomodoroCore {
     Scope(state: \.timer, action: \.timer) {
       TimerCore()
     }
+    
     Reduce(self.core)
-      .ifLet(\.$restWaiting, action: \.restWaiting) {
-        RestWaitingCore()
-      }
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -102,7 +103,41 @@ public struct FocusPomodoroCore {
         }
         await send(.catSetInput)
       }
-
+      
+    case .didChangeScenePhase(.background):
+      let isDisturbAlarmEnabled = getDisturbAlarm(userDefaultsClient: self.userDefaultsClient)
+      return .run { send in
+        if isDisturbAlarmEnabled,
+           let myCatInfo = try await self.userService.getUserInfo(databaseClient: self.databaseClient)?.cat {
+          let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: TimeInterval(10),
+            repeats: false
+          )
+          try await scheduleNotification(
+            userNotificationClient: self.userNotificationClient,
+            contentType: .disturb(SomeCat(baseInfo: myCatInfo)),
+            trigger: trigger
+          )
+        }
+      }
+      
+    case .didChangeScenePhase(.active):
+      return .merge(
+        .run { send in
+          let settings = await self.userNotificationClient.getNotificationSettings()
+          if settings.authorizationStatus != .authorized {
+            await setTimerAlarm(userDefaultsClient: self.userDefaultsClient, isEnabled: false)
+            await setDisturbAlarm(userDefaultsClient: self.userDefaultsClient, isEnabled: false)
+          }
+        },
+        .run { _ in
+          await removePendingNotification(userNotificationClient: self.userNotificationClient, identifier: ["disturb"])
+        }
+      )
+      
+    case .didChangeScenePhase:
+      return .none
+      
     case .binding:
       return .none
       
@@ -114,16 +149,21 @@ public struct FocusPomodoroCore {
         )
         await send(.set(\.selectedCategory, selectedCategory))
         await send(.setupFocusTime)
+        await send(.setupLiveActivity)
+        await send(.setupPushNotification)
         await send(.timer(.start))
+        await send(.timer(.tick))
       }
       
     case .takeRestButtonTapped:
-      state.restWaiting = RestWaitingCore.State(
+      let restWaitingState = RestWaitingCore.State(
         source: .focusPomodoro,
         focusedTimeBySeconds: state.focusedTime,
         overTimeBySeconds: state.overTimeBySeconds
       )
-      return .none
+      return .run { send in
+        await send(._moveToRestWaiting(restWaitingState))
+      }
       
     case .endFocusButtonTapped:
       return .run { [focusedTime = state.focusedTime] send in
@@ -138,6 +178,7 @@ public struct FocusPomodoroCore {
       
     case .setupFocusTime:
       guard let selectedCategory = state.selectedCategory else { return .none }
+      state.goalDatetime = Date().addingTimeInterval(Double(selectedCategory.focusTimeSeconds))
       state.focusTimeBySeconds = selectedCategory.focusTimeSeconds
       return .none
       
@@ -147,14 +188,45 @@ public struct FocusPomodoroCore {
       state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
       
-    case ._pushNotificationTrigger:
+    case .setupLiveActivity:
+      let isLiveActivityAllowed = getLiveActivityState(userDefaultsClient: self.userDefaultsClient)
+      guard isLiveActivityAllowed,
+            let category = state.selectedCategory,
+            let goalDatetime = state.goalDatetime
+      else { return .none }
+      
+      let activity = try? liveActivityClient.protocolAdapter.startActivity(
+        attributes: PomodoroActivityAttributes(),
+        content: .init(
+          state: .init(category: category, goalDatetime: goalDatetime, isRest: false),
+          staleDate: nil
+        ),
+        pushType: nil
+      )
+      return .run { _ in
+        do {
+          try await Task.never()
+        } catch {
+          if let currentActivityID = activity?.id {
+            await liveActivityClient.protocolAdapter.endActivity(
+              PomodoroActivityAttributes.self,
+              id: currentActivityID,
+              content: nil,
+              dismissalPolicy: .immediate
+            )
+          }
+        }
+      }
+      
+    case .setupPushNotification:
       let isTimerAlarmOn = getTimerAlarm(userDefaultsClient: self.userDefaultsClient)
       guard isTimerAlarmOn,
-            let selectedCat = state.selectedCat
+            let selectedCat = state.selectedCat,
+            let timeInterval = state.goalDatetime?.timeIntervalSinceNow
       else { return .none }
       return .run { _ in
         let trigger = UNTimeIntervalNotificationTrigger(
-          timeInterval: 0.1,
+          timeInterval: timeInterval,
           repeats: false
         )
         try await scheduleNotification(
@@ -162,6 +234,15 @@ public struct FocusPomodoroCore {
           contentType: .focusEnd(selectedCat),
           trigger: trigger
         )
+        
+        do {
+          try await Task.never()
+        } catch {
+          await removePendingNotification(
+            userNotificationClient: self.userNotificationClient,
+            identifier: ["focusEnd"]
+          )
+        }
       }
       
     case .goToHome:
@@ -171,14 +252,11 @@ public struct FocusPomodoroCore {
       return .none
       
     case .timer(.tick):
-      if state.focusTimeBySeconds == 0 {
-        if !state.pushTriggered {
-          state.pushTriggered = true
-          return .run { send in
-            await send(._pushNotificationTrigger)
-          }
-        }
-        if state.overTimeBySeconds == 3600 { // 60분 초과시 휴식 대기화면으로 이동
+      guard let goalDatetime = state.goalDatetime else { return .none }
+      let timeDifference = timeDifferenceInSeconds(from: Date.now, to: goalDatetime)
+      
+      if state.focusTimeBySeconds <= 0 {
+        if state.overTimeBySeconds >= 3600 { // 60분 초과시 휴식 대기화면으로 이동
           return .run { [state] send in
             await send(.timer(.stop)) // task가 cancel을 해주지만 일단 action 중복을 방지하기 위해 명시적으로 stop
             let restWaitingState = RestWaitingCore.State(
@@ -186,24 +264,20 @@ public struct FocusPomodoroCore {
               focusedTimeBySeconds: state.focusedTime,
               overTimeBySeconds: state.overTimeBySeconds
             )
-            await send(.set(\.restWaiting, restWaitingState))
+            await send(._moveToRestWaiting(restWaitingState))
           }
         } else {
-          state.overTimeBySeconds += 1
+          state.overTimeBySeconds = -(timeDifference)
         }
       } else {
-        state.focusTimeBySeconds -= 1
+        state.focusTimeBySeconds = timeDifference
       }
       return .none
       
     case .timer:
       return .none
       
-    case .restWaiting(.presented(.restPomodoro(.presented(.goToFocus)))):
-      state.restWaiting = nil
-      return .none
-      
-    case .restWaiting:
+    case ._moveToRestWaiting:
       return .none
     }
   }

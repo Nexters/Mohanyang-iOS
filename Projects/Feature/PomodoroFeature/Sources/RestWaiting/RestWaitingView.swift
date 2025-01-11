@@ -12,6 +12,7 @@ import DesignSystem
 
 import ComposableArchitecture
 import Lottie
+import DatadogRUM
 
 public struct RestWaitingView: View {
   @Bindable var store: StoreOf<RestWaitingCore>
@@ -107,16 +108,9 @@ public struct RestWaitingView: View {
     }
     .background(Alias.Color.Background.primary)
     .toastDestination(toast: $store.toast)
-    .navigationDestination(
-      item: $store.scope(
-        state: \.restPomodoro,
-        action: \.restPomodoro
-      )
-    ) { store in
-      RestPomodoroView(store: store)
-    }
     .task {
       await store.send(.task).finish()
     }
+    .trackRUMView(name: "휴식대기화면")
   }
 }

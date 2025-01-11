@@ -12,6 +12,27 @@ import ProjectDescriptionHelpers
 @_spi(Shared)
 import DependencyPlugin
 
+// MARK: - ApplicationExtension
+
+let widgetExtensionTargetName = "WidgetExtension"
+let widgetExtensionTarget: Target = .target(
+  name: widgetExtensionTargetName,
+  destinations: AppEnv.platform,
+  product: .appExtension,
+  bundleId: AppEnv.bundleId + ".widgetextension",
+  deploymentTargets: AppEnv.deploymentTarget,
+  infoPlist: InfoPlist.Mohanyang.widgetExtension,
+  sources: [
+    "ApplicationExtension/WidgetExtension/**"
+  ],
+  entitlements: Entitlements.Mohanyang.widgetExtension,
+  dependencies: [
+    .dependency(module: Feature.LAPomodoroFeature)
+  ],
+  settings: .targetSettings(product: .appExtension)
+)
+
+
 // MARK: - Target
 
 let scripts: [TargetScript] = if currentConfig == .dev {
@@ -41,7 +62,8 @@ let appTarget: Target = .target(
   entitlements: Entitlements.Mohanyang.app,
   scripts: scripts,
   dependencies: [
-    .dependency(rootModule: Feature.self)
+    .dependency(rootModule: Feature.self),
+    .target(widgetExtensionTarget)
   ],
   settings: .targetSettings(product: .app)
 )
@@ -53,6 +75,12 @@ let appScheme = Scheme.makeAppScheme(
   config: currentConfig
 )
 
+let widgetExtensionScheme = Scheme.makeExtensionScheme(
+  extensionTarget: TargetReference(stringLiteral: widgetExtensionTargetName),
+  appTarget: TargetReference(stringLiteral: appTargetName),
+  config: currentConfig
+)
+
 
 // MARK: - Project
 
@@ -61,6 +89,6 @@ let project: Project = .init(
   organizationName: AppEnv.organizationName,
   options: .options(automaticSchemesOptions: .disabled, disableSynthesizedResourceAccessors: true),
   settings: .projectSettings(xcconfig: .mohanyangAppXCConfig),
-  targets: [appTarget],
-  schemes: [appScheme]
+  targets: [appTarget, widgetExtensionTarget],
+  schemes: [appScheme, widgetExtensionScheme]
 )

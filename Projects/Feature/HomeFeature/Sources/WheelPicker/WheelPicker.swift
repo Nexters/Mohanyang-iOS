@@ -23,6 +23,15 @@ struct WheelPicker<D: WheelPickerData>: View {
   var menuHeightMultiplier: CGFloat {
     return floor(backgroundRect.height / itemHeight)
   }
+  var itemsCountAbove: Double {
+    return Double(Int((menuHeightMultiplier - 1) / 2))
+  }
+  var pickerHeight: CGFloat {
+    return itemHeight * (itemsCountAbove * 2 + 1)
+  }
+  var paddingAdjustment: CGFloat {
+    return (Int(menuHeightMultiplier) % 2 == 0) ? itemHeight * 0.5 : 0
+  }
   
   init(
     image: Image,
@@ -35,10 +44,6 @@ struct WheelPicker<D: WheelPickerData>: View {
   }
   
   var body: some View {
-    let itemsCountAbove = Double(Int((menuHeightMultiplier - 1) / 2))
-    let pickerHeight = itemHeight * (itemsCountAbove * 2 + 1)
-    let paddingAdjustment = (Int(menuHeightMultiplier) % 2 == 0) ? itemHeight * 0.5 : 0
-    
     ZStack(alignment: .center) {
       RoundedRectangle(cornerRadius: 16)
         .fill(Alias.Color.Background.secondary)
@@ -50,6 +55,9 @@ struct WheelPicker<D: WheelPickerData>: View {
       ScrollViewReader { scrollViewProxy in
         ScrollView(.vertical) {
           LazyVStack(spacing: .zero) {
+            Rectangle() // 상단 spacer
+              .fill(Color.clear)
+              .frame(height: itemHeight * itemsCountAbove)
             ForEach(sources) { item in
               GeometryReader { geometryProxy in
                 let itemCenterY = geometryProxy.frame(in: .global).midY
@@ -66,21 +74,23 @@ struct WheelPicker<D: WheelPickerData>: View {
                   .frame(height: itemHeight)
                   .scaleEffect(x: scale, y: scale, anchor: .leading)
                   .frame(maxWidth: .infinity)
-                  .id(item.id)
               }
               .frame(height: itemHeight)
+              .id(item.id)
             }
+            Rectangle() // 하단 spacer
+              .fill(Color.clear)
+              .frame(height: itemHeight * itemsCountAbove)
           }
-          .scrollTargetLayout()
-          .padding(.vertical, itemHeight * itemsCountAbove)
+          .scrollTargetLayout(isEnabled: true)
         }
+        .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
         .scrollPosition(id: $selectionID, anchor: .center)
+        .scrollIndicators(.never)
         .frame(height: pickerHeight)
         .scrollClipDisabled()
         .padding(.vertical, paddingAdjustment)
         .clipShape(Rectangle())
-        .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
-        .scrollIndicators(.hidden)
         .onChange(of: selection) { _, value in
           guard let id = value?.id,
                 selectionID != id

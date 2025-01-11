@@ -74,3 +74,6 @@ Tuist/Dependencies/graph.json
 ## XCFramework ##
 XCFramework/Cartfile.resolved
 XCFramework/Carthage
+
+## Env ##
+XCConfig/Env.xcconfig

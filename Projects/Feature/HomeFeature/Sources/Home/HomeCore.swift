@@ -33,19 +33,19 @@ public struct HomeCore {
     
     var selectedCategory: PomodoroCategory?
     var selectedCat: SomeCat?
-
-    var isNetworkConnected: Bool = false
-
+    
+    var isNetworkConnected: Bool = true
+    
     var toast: DefaultToast?
     var dialog: DefaultDialog?
-
+    
     var catRiv: RiveViewModel = Rive.catHomeRiv(stateMachineName: "State Machine_Home")
-
+    
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
-    @Presents var focusPomodoro: FocusPomodoroCore.State?
     @Presents var myPage: MyPageCore.State?
-
+    @Presents var pomodoro: PomodoroCore.State?
+    
     public init() {}
   }
   
@@ -54,7 +54,7 @@ public struct HomeCore {
     case task
     case onLoad
     case onAppear
-    case setHomeCatTooltip(HomeCatDialogueTooltip?)
+    case changeHomeCatTooltipMessage
     case setHomeCategoryGuideTooltip(HomeCategoryGuideTooltip?)
     case setHomeTimeGuideTooltip(HomeTimeGuideTooltip?)
     case categoryButtonTapped
@@ -68,8 +68,8 @@ public struct HomeCore {
     case syncCategory
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
-    case focusPomodoro(PresentationAction<FocusPomodoroCore.Action>)
     case myPage(PresentationAction<MyPageCore.Action>)
+    case pomodoro(PresentationAction<PomodoroCore.Action>)
   }
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -91,11 +91,11 @@ public struct HomeCore {
       .ifLet(\.$timeSelect, action: \.timeSelect) {
         TimeSelectCore()
       }
-      .ifLet(\.$focusPomodoro, action: \.focusPomodoro) {
-        FocusPomodoroCore()
-      }
       .ifLet(\.$myPage, action: \.myPage) {
         MyPageCore()
+      }
+      .ifLet(\.$pomodoro, action: \.pomodoro) {
+        PomodoroCore()
       }
   }
   
@@ -103,14 +103,14 @@ public struct HomeCore {
     switch action {
     case .binding:
       return .none
-
+      
     case .task:
       return .run { send in
         for await isConnected in networkTracking.updateNetworkConnected() {
           await send(._fetchNetworkConnection(isConnected))
         }
       }
-
+      
     case .onLoad:
       return .run { send in
         if self.userDefaultsClient.boolForKey(isHomeGuideCompletedKey) == false {
@@ -126,15 +126,12 @@ public struct HomeCore {
           await send(.set(\.selectedCat, SomeCat(baseInfo: myCat)))
         }
         await send(.catSetInput)
-        await send(.setHomeCatTooltip(nil))
+        await send(.changeHomeCatTooltipMessage)
       }
       
-    case .setHomeCatTooltip:
-      guard let selectedCat = state.selectedCat else {
-        state.homeCatTooltip = nil
-        return .none
-      }
-      state.homeCatTooltip = .init(title: selectedCat.tooltipMessage)
+    case .changeHomeCatTooltipMessage:
+      let title = state.selectedCat?.generateTooltipMessage() ?? ""
+      state.homeCatTooltip = .init(title: title)
       return .none
       
     case let .setHomeCategoryGuideTooltip(tooltip):
@@ -165,24 +162,26 @@ public struct HomeCore {
       return .none
       
     case .playButtonTapped:
-      state.focusPomodoro = .init()
+      state.pomodoro = .init()
       return .none
       
     case .catTapped:
       guard let selectedCat = state.selectedCat else { return .none }
       state.catRiv.triggerInput(selectedCat.rivTriggerName)
-      return .none
+      return .run { send in
+        await send(.changeHomeCatTooltipMessage)
+      }
       
     case .catSetInput:
       guard let selectedCat = state.selectedCat else { return .none }
       state.catRiv.reset()
       state.catRiv.setInput(selectedCat.rivInputName, value: true)
       return .none
-
+      
     case let ._fetchNetworkConnection(isConnected):
       state.isNetworkConnected = isConnected
       return .none
-
+      
     case .syncCategory:
       return .run { send in
         try await self.pomodoroService.syncCategoryList(
@@ -222,7 +221,9 @@ public struct HomeCore {
       return .none
       
     case .timeSelect(.presented(.bottomCheckButtonTapped)):
-      guard let mode = state.timeSelect?.mode else { return .none }
+      guard let mode = state.timeSelect?.mode,
+            state.timeSelect?.isTimeChanged == true
+      else { return .none }
       var message: String
       switch mode {
       case .focus:
@@ -247,9 +248,9 @@ public struct HomeCore {
     case .myPage:
       return .none
       
-    case let .focusPomodoro(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))), // FocusPomodoro
-      let .focusPomodoro(.presented(.restWaiting(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))))), // RestWaiting
-      let .focusPomodoro(.presented(.restWaiting(.presented(.restPomodoro(.presented(.saveHistory(focusTimeBySeconds, restTimeBySeconds))))))): // RestPomodoro
+    case let .pomodoro(.presented(.focusPomodoro(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))), // FocusPomodoro
+      let .pomodoro(.presented(.restWaiting(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))), // RestWaiting
+      let .pomodoro(.presented(.restPomodoro(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))): // RestPomodoro
       guard let selectedCategoryID = state.selectedCategory?.id else { return .none }
       if focusTimeBySeconds >= 60 {
         return .run { _ in
@@ -267,22 +268,11 @@ public struct HomeCore {
         return .none
       }
       
-    case .focusPomodoro(.presented(.restWaiting(.presented(.goToHomeByOver60Minute)))):
-      state.focusPomodoro = nil
-      state.dialog = DefaultDialog(
-        title: "집중을 끝내고 돌아왔어요",
-        subTitle: "너무 오랜 시간동안 대기화면에 머물러서 홈화면으로 이동되었어요.",
-        firstButton: DialogButtonModel(title: "확인")
-      )
+    case .pomodoro(.presented(.restWaiting(.goToHomeByOver60Minute))):
+      state.dialog = focusEndDialog()
       return .none
       
-    case .focusPomodoro(.presented(.goToHome)),
-        .focusPomodoro(.presented(.restWaiting(.presented(.goToHome)))),
-        .focusPomodoro(.presented(.restWaiting(.presented(.restPomodoro(.presented(.goToHome)))))):
-      state.focusPomodoro = nil
-      return .none
-      
-    case .focusPomodoro:
+    case .pomodoro:
       return .none
     }
   }
@@ -304,6 +294,17 @@ public struct HomeCore {
       apiClient: self.apiClient,
       databaseClient: self.databaseClient,
       request: [request]
+    )
+  }
+}
+
+extension HomeCore {
+  private func focusEndDialog() -> DefaultDialog {
+    return DefaultDialog(
+      title: "집중을 끝내고 돌아왔어요",
+      subTitle: "너무 오랜 시간동안 대기화면에 머물러서 홈화면으로 이동되었어요.",
+      firstButton: DialogButtonModel(title: "확인"),
+      showCloseButton: false
     )
   }
 }

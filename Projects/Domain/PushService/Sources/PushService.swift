@@ -20,7 +20,7 @@ public func scheduleNotification(
   content.title = contentType.title
   content.subtitle = contentType.title
   content.body = contentType.body
-  content.sound = UNNotificationSound.default
+  content.sound = contentType.sound
   let request = UNNotificationRequest(
     identifier: contentType.identifier,
     content: content,

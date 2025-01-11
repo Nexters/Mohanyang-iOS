@@ -45,4 +45,20 @@ extension Scheme {
       analyzeAction: .analyzeAction(configuration: config.configurationName)
     )
   }
+  
+  public static func makeExtensionScheme(
+    extensionTarget: TargetReference,
+    appTarget: TargetReference,
+    config: BuildConfiguration
+  ) -> Scheme {
+    return .scheme(
+      name: extensionTarget.targetName,
+      shared: true,
+      buildAction: .buildAction(targets: [extensionTarget, appTarget]), // 순서는 반드시 Extension 타겟이 첫번째가 되도록 할 것
+      runAction: .runAction(configuration: config.configurationName),
+      archiveAction: .archiveAction(configuration: config.configurationName),
+      profileAction: .profileAction(configuration: config.configurationName),
+      analyzeAction: .analyzeAction(configuration: config.configurationName)
+    )
+  }
 }

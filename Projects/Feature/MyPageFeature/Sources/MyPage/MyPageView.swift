@@ -11,8 +11,10 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct MyPageView: View {
+  @Environment(\.scenePhase) private var scenePhase
   @Bindable var store: StoreOf<MyPageCore>
 
   public init(store: StoreOf<MyPageCore>) {
@@ -42,11 +44,6 @@ public struct MyPageView: View {
           }
 
           StatisticSectionView(isNetworkConnected: $store.isNetworkConnected)
-            .padding(.all, Alias.Spacing.xLarge)
-            .background(
-              RoundedRectangle(cornerRadius: Alias.BorderRadius.medium)
-                .foregroundStyle(Alias.Color.Background.secondary)
-            )
 
           VStack(spacing: Alias.Spacing.large) {
             AlarmSectionView(
@@ -58,6 +55,11 @@ public struct MyPageView: View {
               title: "딴 짓 방해하기",
               subTitle: "다른 앱을 사용하면 고양이가 방해해요",
               isOn: $store.isDisturbAlarmOn.sending(\.disturbAlarmToggleButtonTapped)
+            )
+            AlarmSectionView(
+              title: "잠금화면 표시하기",
+              subTitle: "잠금화면에 집중•휴식시간을 표시해요",
+              isOn: $store.isLiveActivityOn.sending(\.liveActivityToggleButtonTapped)
             )
           }
           .padding(.all, Alias.Spacing.xLarge)
@@ -98,9 +100,15 @@ public struct MyPageView: View {
     .task {
       await store.send(.task).finish()
     }
+    .onChange(of: scenePhase) {
+      if scenePhase == .active {
+        store.send(.scenePhaseActive)
+      }
+    }
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "마이페이지")
   }
 }
 
@@ -130,29 +138,44 @@ struct StatisticSectionView: View {
   @Binding var isNetworkConnected: Bool
 
   var body: some View {
-    ZStack {
-      VStack(spacing: Alias.Spacing.medium) {
-        Spacer()
-        if isNetworkConnected {
-          DesignSystemAsset.Image.imgUpdateStatistics.swiftUIImage
-        } else {
-          DesignSystemAsset.Image.imgOfflineStatistics.swiftUIImage
-        }
-        VStack(spacing: Alias.Spacing.xSmall) {
-          Text("통계 기능을 준비하고 있어요")
-            .font(Typography.header4)
-            .foregroundStyle(Alias.Color.Text.primary)
-          Text("집중시간을 모아보는 통계가\n곧업데이트될 예정이에요")
-            .font(Typography.subBodyR)
-            .foregroundStyle(Alias.Color.Text.secondary)
-            .multilineTextAlignment(.center)
-        }
-        Spacer()
+    VStack(spacing: Alias.Spacing.large) {
+      if isNetworkConnected {
+        content(
+          image: DesignSystemAsset.Image.imgUpdateStatistics.swiftUIImage,
+          title: "통계 기능을 준비하고 있어요",
+          subTitle: "집중시간을 모아보는 통계가\n곧업데이트될 예정이에요"
+        )
+      } else {
+        content(
+          image: DesignSystemAsset.Image.imgOfflineStatistics.swiftUIImage,
+          title: "지금은 통계를 확인할 수 없어요",
+          subTitle: "인터넷에 연결하면 통계를 볼 수 있어요"
+        )
       }
     }
     .frame(maxWidth: .infinity)
-    .frame(minHeight: 375)
+    .padding(.all, Alias.Spacing.xxLarge)
+    .background(
+      RoundedRectangle(cornerRadius: Alias.BorderRadius.medium)
+        .foregroundStyle(Alias.Color.Background.secondary)
+    )
   }
+
+  @ViewBuilder private func content(image: Image, title: String, subTitle: String) -> some View {
+    image.resizable()
+      .frame(width: 96, height: 96)
+
+    VStack(spacing: Alias.Spacing.xSmall) {
+      Text(title)
+        .font(Typography.bodySB)
+        .foregroundStyle(Alias.Color.Text.secondary)
+      Text(subTitle)
+        .font(Typography.subBodyR)
+        .foregroundStyle(Alias.Color.Text.secondary)
+        .multilineTextAlignment(.center)
+    }
+  }
+
 }
 
 struct AlarmSectionView: View {

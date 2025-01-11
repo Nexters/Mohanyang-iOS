@@ -15,23 +15,27 @@ import Dependencies
 
 extension APIClient: DependencyKey {
   public static let liveValue: APIClient = .live()
-
+  
   public static func live() -> Self {
-
+    
     actor Session {
       nonisolated let tokenInterceptor: TokenInterceptor
-
+      
       let session: URLSession = {
         let config = URLSessionConfiguration.default
-        return URLSession(configuration: config)
+        return URLSession(
+          configuration: config,
+          delegate: APIClientURLSessionDelegate(),
+          delegateQueue: nil
+        )
       }()
-
+      
       let decoder: JSONDecoder = JSONDecoder()
-
+      
       init(tokenInterceptor: TokenInterceptor) {
         self.tokenInterceptor = tokenInterceptor
       }
-
+      
       func sendRequest(
         _ request: APIBaseRequest,
         isWithInterceptor: Bool,
@@ -40,21 +44,21 @@ extension APIClient: DependencyKey {
         guard retryCnt < 3 else {
           throw throwNetworkErr(.timeOutError, statusCode: -1)
         }
-
+        
         var urlRequest = try await request.asURLRequest()
         if isWithInterceptor {
           urlRequest = try await tokenInterceptor.adapt(urlRequest)
         }
         Logger.shared.log(category: .network, urlRequest.asRequestLog())
-
+        
         let (data, response) = try await session.data(for: urlRequest)
-
+        
         guard let httpResponse = response as? HTTPURLResponse else {
           let error = NetworkError.noResponseError
           Logger.shared.log(level: .error, category: .network, "API Error:\n\(dump(error))")
           throw error
         }
-
+        
         switch httpResponse.statusCode {
         case 200..<300:
           Logger.shared.log(category: .network, urlRequest.asResponseLog(data, httpResponse))
@@ -76,10 +80,10 @@ extension APIClient: DependencyKey {
         return error
       }
     }
-
+    
     let tokenInterceptor = TokenInterceptor()
     let session = Session(tokenInterceptor: tokenInterceptor)
-
+    
     return .init(
       apiRequest: { request, isWithInterceptor in
         return try await session.sendRequest(request, isWithInterceptor: isWithInterceptor)

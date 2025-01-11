@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct CategorySelectView: View {
   @Bindable var store: StoreOf<CategorySelectCore>
@@ -59,5 +60,6 @@ public struct CategorySelectView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "카테고리 변경")
   }
 }

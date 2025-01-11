@@ -8,6 +8,7 @@
 @_spi(Internal)
 import PomodoroServiceInterface
 import APIClientInterface
+import Foundation
 
 import Dependencies
 
@@ -18,7 +19,8 @@ extension PomodoroService: DependencyKey {
   
   private static func live() -> PomodoroService {
     return .init(
-      syncCategoryList: { apiClient, databaseClient in
+      syncCategoryList: {
+        apiClient, databaseClient in
         let api = CategoryAPI.getCategoryList
         let categoryList = try await apiClient.apiRequest(request: api, as: [PomodoroCategory].self)
         for category in categoryList {
@@ -50,6 +52,23 @@ extension PomodoroService: DependencyKey {
       getFocusTimeSummaries: { apiClient in
         let api = FocusTimeAPI.getSummaries
         return try await apiClient.apiRequest(request: api, as: FocusTimeSummary.self)
+      },
+      registerBGTaskToUpdateTimer: { bgTaskClient, liveActivityClient in
+        bgTaskClient.registerTask(
+          identifier: "com.pomonyang.mohanyang.update_LiveActivity",
+          queue: nil
+        ) { task in
+          task.expirationHandler = {
+            task.setTaskCompleted(success: false)
+          }
+          let pomodoroActivities = liveActivityClient.protocolAdapter.getActivities(type: PomodoroActivityAttributes.self)
+          Task {
+            if let firstActivity = pomodoroActivities.first {
+              await firstActivity.update(firstActivity.content)
+            }
+            task.setTaskCompleted(success: true)
+          }
+        }
       }
     )
   }

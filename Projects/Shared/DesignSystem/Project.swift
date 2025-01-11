@@ -28,6 +28,7 @@ let project: Project = .makeTMABasedProject(
     ]
   ],
   resourceSynthesizers: [
+    .files(extensions: ["mp3"]), // for .mp3
     .fonts(), // for font
     .assets(), // for .xcassets,
     .custom(name: "Lottie", parser: .json, extensions: ["lottie"]), // for .lottie

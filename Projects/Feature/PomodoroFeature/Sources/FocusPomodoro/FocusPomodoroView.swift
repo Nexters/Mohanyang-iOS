@@ -12,9 +12,11 @@ import DesignSystem
 
 import ComposableArchitecture
 import RiveRuntime
+import DatadogRUM
 
 public struct FocusPomodoroView: View {
   @Bindable var store: StoreOf<FocusPomodoroCore>
+  @Environment(\.scenePhase) var scenePhase
   
   public init(store: StoreOf<FocusPomodoroCore>) {
     self.store = store
@@ -40,11 +42,11 @@ public struct FocusPomodoroView: View {
         VStack(spacing: Alias.Spacing.xLarge) {
           store.catRiv.view()
             .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
+            .frame(width: 240, height: 240)
             .onTapGesture {
               store.send(.catTapped)
             }
-            .frame(width: 240, height: 240)
-
+          
           VStack(spacing: .zero) {
             HStack(spacing: Alias.Spacing.xSmall) {
               DesignSystemAsset.Image._20Focus.swiftUIImage
@@ -55,10 +57,12 @@ public struct FocusPomodoroView: View {
             Text(formatTime(from: store.focusTimeBySeconds))
               .foregroundStyle(Alias.Color.Text.primary)
               .font(Typography.header1)
+              .monospacedDigit()
             if store.overTimeBySeconds > 0 {
               Text("\(formatTime(from: store.overTimeBySeconds)) 초과")
                 .foregroundStyle(Alias.Color.Accent.red)
                 .font(Typography.header4)
+                .monospacedDigit()
             } else {
               Spacer()
                 .frame(height: 25)
@@ -85,19 +89,15 @@ public struct FocusPomodoroView: View {
     }
     .background(Alias.Color.Background.primary)
     .tooltipDestination(tooltip: .constant(store.dialogueTooltip))
-    .navigationDestination(
-      item: $store.scope(
-        state: \.restWaiting,
-        action: \.restWaiting
-      )
-    ) { store in
-      RestWaitingView(store: store)
-    }
     .task {
       await store.send(.task).finish()
     }
     .onAppear {
       store.send(.onAppear)
     }
+    .onChange(of: scenePhase) { _, newValue in
+      store.send(.didChangeScenePhase(newValue))
+    }
+    .trackRUMView(name: "집중화면")
   }
 }

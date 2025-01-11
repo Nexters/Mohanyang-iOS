@@ -31,16 +31,20 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
                 .foregroundStyle(Alias.Color.Text.primary)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
-              Button(icon: DesignSystemAsset.Image._24ClosePrimary.swiftUIImage) {
-                self.dialog = nil
+              
+              if dialog.showCloseButton {
+                Button(icon: DesignSystemAsset.Image._24ClosePrimary.swiftUIImage) {
+                  self.dialog = nil
+                }
+                .buttonStyle(.icon(isFilled: false, level: .primary))
               }
-              .buttonStyle(.icon(isFilled: false, level: .primary))
             }
+            .frame(minHeight: 40)
             if let subTitle = dialog.subTitle {
               Text(subTitle)
                 .font(Typography.subBodyR)
                 .foregroundStyle(Alias.Color.Text.secondary)
-                .lineLimit(2)
+                .lineLimit(4)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
           }

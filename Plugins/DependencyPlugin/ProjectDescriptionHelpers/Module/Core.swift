@@ -16,4 +16,8 @@ public enum Core: String, Modulable {
   case UserDefaultsClient
   case FeedbackGeneratorClient
   case NetworkTracking
+  case StreamListener
+  case LiveActivityClient
+  case AudioClient
+  case BackgroundTaskClient
 }

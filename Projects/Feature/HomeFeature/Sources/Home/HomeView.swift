@@ -14,6 +14,7 @@ import DesignSystem
 import Utils
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct HomeView: View {
   @Bindable var store: StoreOf<HomeCore>
@@ -40,11 +41,10 @@ public struct HomeView: View {
         VStack(spacing: Alias.Spacing.xLarge) {
           store.catRiv.view()
             .setTooltipTarget(tooltip: HomeCatDialogueTooltip.self)
+            .frame(width: 240, height: 240)
             .onTapGesture {
               store.send(.catTapped)
             }
-            .frame(width: 240, height: 240)
-          
           Text(store.selectedCat?.baseInfo.name ?? "")
             .font(Typography.header4)
             .foregroundStyle(Alias.Color.Text.secondary)
@@ -108,7 +108,7 @@ public struct HomeView: View {
       if !store.isNetworkConnected {
         VStack {
           HStack(spacing: Alias.Spacing.small) {
-            DesignSystemAsset.Image._16NullPrimary.swiftUIImage
+            DesignSystemAsset.Image._16Offline.swiftUIImage
             Text("오프라인 모드")
               .font(Typography.bodySB)
               .foregroundStyle(Alias.Color.Text.secondary)
@@ -125,7 +125,7 @@ public struct HomeView: View {
         }
       }
     }
-    .tooltipDestination(tooltip: $store.homeCatTooltip.sending(\.setHomeCatTooltip))
+    .tooltipDestination(tooltip: .constant(store.homeCatTooltip))
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
     .toastDestination(toast: $store.toast)
@@ -148,11 +148,11 @@ public struct HomeView: View {
     }
     .navigationDestination(
       item: $store.scope(
-        state: \.focusPomodoro,
-        action: \.focusPomodoro
+        state: \.pomodoro,
+        action: \.pomodoro
       )
     ) { store in
-      FocusPomodoroView(store: store)
+      PomodoroView(store: store)
     }
     .navigationDestination(
       item: $store.scope(
@@ -171,5 +171,6 @@ public struct HomeView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "홈")
   }
 }

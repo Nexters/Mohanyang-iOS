@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 import ComposableArchitecture
+import DatadogRUM
 
 public struct RestPomodoroView: View {
   @Bindable var store: StoreOf<RestPomodoroCore>
@@ -39,10 +40,10 @@ public struct RestPomodoroView: View {
         VStack(spacing: Alias.Spacing.xLarge) {
           store.catRiv.view()
             .setTooltipTarget(tooltip: PomodoroDialogueTooltip.self)
+            .frame(width: 240, height: 240)
             .onTapGesture {
               store.send(.catTapped)
             }
-            .frame(width: 240, height: 240)
 
           VStack(spacing: .zero) {
             HStack(spacing: Alias.Spacing.xSmall) {
@@ -54,10 +55,12 @@ public struct RestPomodoroView: View {
             Text(formatTime(from: store.restTimeBySeconds))
               .foregroundStyle(Alias.Color.Text.primary)
               .font(Typography.header1)
+              .monospacedDigit()
             if store.overTimeBySeconds > 0 {
               Text("\(formatTime(from: store.overTimeBySeconds)) 초과")
                 .foregroundStyle(Alias.Color.Accent.red)
                 .font(Typography.header4)
+                .monospacedDigit()
             } else {
               Spacer()
                 .frame(height: 25)
@@ -123,5 +126,6 @@ public struct RestPomodoroView: View {
     .onAppear {
       store.send(.onAppear)
     }
+    .trackRUMView(name: "휴식화면")
   }
 }

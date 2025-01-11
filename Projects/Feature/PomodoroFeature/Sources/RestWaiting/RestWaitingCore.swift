@@ -20,16 +20,15 @@ import ComposableArchitecture
 public struct RestWaitingCore {
   @ObservableState
   public struct State: Equatable {
+    let restWaitingEndDate = Date().addingTimeInterval(3600)
     let source: Source
     let focusedTimeBySeconds: Int
     let overTimeBySeconds: Int
     var selectedCategory: PomodoroCategory?
     var changeFocusTimeByMinute: Int = 0
     
-    var timer: TimerCore.State = .init(interval: .seconds(3600), mode: .continuous)
+    var timer: TimerCore.State = .init(interval: .seconds(1), mode: .continuous)
     var toast: DefaultToast?
-    
-    @Presents var restPomodoro: RestPomodoroCore.State?
     
     public init(
       source: Source,
@@ -64,7 +63,7 @@ public struct RestWaitingCore {
     case saveHistory(focusTimeBySeconds: Int, restTimeBySeconds: Int)
     
     case timer(TimerCore.Action)
-    case restPomodoro(PresentationAction<RestPomodoroCore.Action>)
+    case _moveToRestPomodoro(RestPomodoroCore.State)
   }
   
   public enum Source {
@@ -85,9 +84,6 @@ public struct RestWaitingCore {
       TimerCore()
     }
     Reduce(self.core)
-      .ifLet(\.$restPomodoro, action: \.restPomodoro) {
-        RestPomodoroCore()
-      }
   }
   
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -130,9 +126,10 @@ public struct RestWaitingCore {
       return .none
       
     case .takeRestButtonTapped:
+      let restPomodoroState = RestPomodoroCore.State(focusedTimeBySeconds: state.focusedTimeBySeconds)
       return .run { [state] send in
         try await applyChangeFocusTime(state: state)
-        await send(.set(\.restPomodoro, RestPomodoroCore.State(focusedTimeBySeconds: state.focusedTimeBySeconds)))
+        await send(._moveToRestPomodoro(restPomodoroState))
       }
       
     case .endFocusButtonTapped:
@@ -152,15 +149,17 @@ public struct RestWaitingCore {
       return .none
       
     case .timer(.tick):
-      return .run { [state] send in
-        await send(.saveHistory(focusTimeBySeconds: state.focusedTimeBySeconds, restTimeBySeconds: 0))
+      guard state.restWaitingEndDate <= Date() else { return .none }
+      let focusedTimeBySeconds = state.focusedTimeBySeconds
+      return .run { send in
+        await send(.saveHistory(focusTimeBySeconds: focusedTimeBySeconds, restTimeBySeconds: 0))
         await send(.goToHomeByOver60Minute)
       }
       
     case .timer:
       return .none
       
-    case .restPomodoro:
+    case ._moveToRestPomodoro:
       return .none
     }
   }
