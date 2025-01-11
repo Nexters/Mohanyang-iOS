@@ -111,10 +111,10 @@ public struct SelectCatCore {
     case ._setNextAction:
       if state.route == .onboarding {
         return .run { send in
+          await setLiveActivityState(userDefaultsClient: self.userDefaultClient, isEnabled: true)
           let isGranted = try await userNotificationClient.requestAuthorization([.alert, .badge, .sound])
           await setTimerAlarm(userDefaultsClient: self.userDefaultClient, isEnabled: isGranted)
           await setDisturbAlarm(userDefaultsClient: self.userDefaultClient, isEnabled: isGranted)
-
           await send(._moveToNamingCat)
         }
       } else {
