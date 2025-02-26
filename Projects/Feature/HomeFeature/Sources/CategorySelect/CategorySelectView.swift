@@ -23,14 +23,20 @@ public struct CategorySelectView: View {
   public var body: some View {
     VStack(spacing: Alias.Spacing.large) {
       HStack(spacing: .zero) {
-        Text("카테고리 변경")
+        Text("카테고리")
           .font(Typography.header3)
           .foregroundStyle(Alias.Color.Text.primary)
         Spacer()
-        Button(icon: DesignSystemAsset.Image._24ClosePrimary.swiftUIImage) {
+        Button(icon: DesignSystemAsset.Image._24PlusPrimary.swiftUIImage) {
+          store.send(.addCategoryTapped)
+        }
+        .buttonStyle(.icon(isFilled: false, level: .primary))
+
+        Button(icon: DesignSystemAsset.Image._24EllipsisPrimary.swiftUIImage) {
           store.send(.dismissButtonTapped)
         }
         .buttonStyle(.icon(isFilled: false, level: .primary))
+        .padding(.leading, 8)
       }
       .padding(.leading, Alias.Spacing.xLarge)
       .padding(.trailing, Alias.Spacing.small)

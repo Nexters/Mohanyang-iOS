@@ -45,7 +45,8 @@ public struct HomeCore {
     @Presents var timeSelect: TimeSelectCore.State?
     @Presents var myPage: MyPageCore.State?
     @Presents var pomodoro: PomodoroCore.State?
-    
+    @Presents var categoryForm: CategoryFormCore.State?
+
     public init() {}
   }
   
@@ -70,6 +71,7 @@ public struct HomeCore {
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
     case myPage(PresentationAction<MyPageCore.Action>)
     case pomodoro(PresentationAction<PomodoroCore.Action>)
+    case categoryForm(PresentationAction<CategoryFormCore.Action>)
   }
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -96,6 +98,9 @@ public struct HomeCore {
       }
       .ifLet(\.$pomodoro, action: \.pomodoro) {
         PomodoroCore()
+      }
+      .ifLet(\.$categoryForm, action: \.categoryForm) {
+        CategoryFormCore()
       }
   }
   
@@ -160,7 +165,7 @@ public struct HomeCore {
     case .mypageButtonTappd:
       state.myPage = MyPageCore.State()
       return .none
-      
+
     case .playButtonTapped:
       state.pomodoro = .init()
       return .none
@@ -216,7 +221,11 @@ public struct HomeCore {
       return .run { send in
         await send(.syncCategory)
       }
-      
+
+    case .categorySelect(.presented(.addCategoryTapped)):
+      state.categoryForm = CategoryFormCore.State(type: .add)
+      return .none
+
     case .categorySelect:
       return .none
       
@@ -274,6 +283,10 @@ public struct HomeCore {
       
     case .pomodoro:
       return .none
+
+    case .categoryForm:
+      return .none
+
     }
   }
   

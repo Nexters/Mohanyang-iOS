@@ -18,7 +18,7 @@ public struct CategorySelectCore {
   public struct State: Equatable {
     var selectedCategory: PomodoroCategory?
     var categoryList: [PomodoroCategory] = []
-    
+
     public init() {}
   }
   
@@ -31,6 +31,8 @@ public struct CategorySelectCore {
     
     case setSelectedCategory(PomodoroCategory?)
     case selectCategory(PomodoroCategory)
+
+    case addCategoryTapped
   }
   
   @Dependency(PomodoroService.self) var pomodoroService
@@ -94,6 +96,11 @@ public struct CategorySelectCore {
     case let .selectCategory(category):
       state.selectedCategory = category
       return .none
+
+    case .addCategoryTapped:
+      return .run { _ in
+        await self.dismiss()
+      }
     }
   }
 }

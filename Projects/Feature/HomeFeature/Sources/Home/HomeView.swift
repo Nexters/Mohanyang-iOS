@@ -162,6 +162,14 @@ public struct HomeView: View {
     ) { store in
       MyPageView(store: store)
     }
+    .navigationDestination(
+      item: $store.scope(
+        state: \.categoryForm,
+        action: \.categoryForm
+      )
+    ) { store in
+      CategoryFormView(store: store)
+    }
     .task {
       await store.send(.task).finish()
     }
