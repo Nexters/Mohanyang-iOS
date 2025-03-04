@@ -26,7 +26,7 @@ public struct PomodoroCategory:
     return no
   }
   public let no: Int
-  public let baseCategoryCode: PomodoroCategoryCode
+  public let baseCategoryType: PomodoroCategoryType
   public let title: String
   public let position: Int
   public var focusTime: String
@@ -34,14 +34,14 @@ public struct PomodoroCategory:
   
   public init(
     no: Int,
-    baseCategoryCode: PomodoroCategoryCode,
+    baseCategoryType: PomodoroCategoryType,
     title: String,
     position: Int,
     focusTime: String,
     restTime: String
   ) {
     self.no = no
-    self.baseCategoryCode = baseCategoryCode
+    self.baseCategoryType = baseCategoryType
     self.title = title
     self.position = position
     self.focusTime = focusTime
@@ -51,7 +51,7 @@ public struct PomodoroCategory:
   @_spi(Internal)
   public init(managedObject: PomodoroCategoryObject) {
     self.no = managedObject.no
-    self.baseCategoryCode = managedObject.baseCategoryCode
+    self.baseCategoryType = managedObject.baseCategoryType
     self.title = managedObject.title
     self.position = managedObject.position
     self.focusTime = managedObject.focusTime
@@ -62,26 +62,12 @@ public struct PomodoroCategory:
   public func managedObject() -> PomodoroCategoryObject {
     let object = PomodoroCategoryObject()
     object.no = no
-    object.baseCategoryCode = baseCategoryCode
+    object.baseCategoryType = baseCategoryType
     object.title = title
     object.position = position
     object.focusTime = focusTime
     object.restTime = restTime
     return object
-  }
-  
-  /// 추후 서버에서 내려받는걸로 개선
-  public var image: Image {
-    switch baseCategoryCode {
-    case .basic:
-      return DesignSystemAsset.Image._24Cat.swiftUIImage
-    case .books:
-      return DesignSystemAsset.Image._24Book.swiftUIImage
-    case .study:
-      return DesignSystemAsset.Image._24Memo.swiftUIImage
-    case .work:
-      return DesignSystemAsset.Image._24Monitor.swiftUIImage
-    }
   }
 }
 
@@ -107,17 +93,32 @@ extension PomodoroCategory {
   }
 }
 
-public enum PomodoroCategoryCode: String, PersistableEnum, Codable {
+public enum PomodoroCategoryType: String, PersistableEnum, Codable, CaseIterable {
   case basic = "BASIC"
   case books = "BOOKS"
   case study = "STUDY"
   case work = "WORK"
 }
 
+extension PomodoroCategoryType {
+  public var image: Image {
+    switch self {
+    case .basic:
+      return DesignSystemAsset.Image._24Cat.swiftUIImage
+    case .books:
+      return DesignSystemAsset.Image._24Book.swiftUIImage
+    case .study:
+      return DesignSystemAsset.Image._24Memo.swiftUIImage
+    case .work:
+      return DesignSystemAsset.Image._24Monitor.swiftUIImage
+    }
+  }
+}
+
 @_spi(Internal)
 public final class PomodoroCategoryObject: Object {
   @Persisted(primaryKey: true) var no: Int
-  @Persisted var baseCategoryCode: PomodoroCategoryCode
+  @Persisted var baseCategoryType: PomodoroCategoryType
   @Persisted var title: String
   @Persisted var position: Int
   @Persisted var focusTime: String

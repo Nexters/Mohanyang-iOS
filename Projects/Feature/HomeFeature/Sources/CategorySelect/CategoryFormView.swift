@@ -26,7 +26,7 @@ public struct CategoryFormView: View {
     ) {
       VStack {
         Button {
-          store.send(.selectIcon("0"))
+          store.send(.editIconTapped)
         } label: {
           Image(systemName: "star.fill")
             .padding(20)
@@ -67,6 +67,14 @@ public struct CategoryFormView: View {
     }
     .padding(.horizontal, Alias.Spacing.xLarge)
     .background(Global.Color.gray50)
+    .bottomSheet(
+      item: $store.scope(
+        state: \.iconSelect,
+        action: \.iconSelect
+      )
+    ) { store in
+      CategoryIconSelectView(store: store)
+    }
   }
 }
 

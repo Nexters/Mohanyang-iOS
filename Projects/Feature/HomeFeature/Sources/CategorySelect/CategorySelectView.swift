@@ -47,7 +47,7 @@ public struct CategorySelectView: View {
           Button(
             title: .init(category.title),
             subtitle: "집중 \(category.focusTimeMinutes)분 | 휴식 \(category.restTimeMinutes)분",
-            leftIcon: category.image
+            leftIcon: category.baseCategoryType.image
           ) {
             store.send(.selectCategory(category))
           }

@@ -27,7 +27,7 @@ struct TimerLockScreenView: View {
               .foregroundStyle(Alias.Color.Text.tertiary)
               .font(Typography.bodySB)
           } else {
-            context.state.category.image
+            context.state.category.baseCategoryType.image
               .resizable()
               .frame(width: 20, height: 20)
             Text(context.state.category.title)

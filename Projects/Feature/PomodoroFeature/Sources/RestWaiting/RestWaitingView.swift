@@ -34,7 +34,7 @@ public struct RestWaitingView: View {
             if let selectedCategory = store.selectedCategory {
               Button(
                 title: .init(selectedCategory.title),
-                leftIcon: selectedCategory.image
+                leftIcon: selectedCategory.baseCategoryType.image
               ) {}
               .buttonStyle(.box(level: .tertiary, size: .small))
             }

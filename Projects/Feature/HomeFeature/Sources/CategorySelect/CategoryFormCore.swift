@@ -9,6 +9,7 @@
 import PomodoroServiceInterface
 
 import ComposableArchitecture
+import Foundation
 
 @Reducer
 public struct CategoryFormCore {
@@ -16,10 +17,11 @@ public struct CategoryFormCore {
   public struct State: Equatable {
     var formType: FormType
     var isButtonDisabled: Bool = false
-    var selectedCategory: PomodoroCategory?
+    var selectedIcon: PomodoroCategoryType?
     var text: String = ""
     var inputFieldError: CategoryNameError?
-    var selectedIcon: String?
+
+    @Presents var iconSelect: CategoryIconSelectCore.State?
 
     public init(type: FormType) {
       self.formType = type
@@ -27,15 +29,17 @@ public struct CategoryFormCore {
   }
 
   public enum Action: BindableAction {
+    case binding(BindingAction<State>)
+
     case onAppear
     case bottomCheckButtonTapped
 
     case _addNewCategoryResponse(Result<Void, Error>)
     case _editCategoryResponse(Result<Void, Error>)
 
-    case selectIcon(String)
+    case editIconTapped
 
-    case binding(BindingAction<State>)
+    case iconSelect(PresentationAction<CategoryIconSelectCore.Action>)
   }
 
   public enum FormType {
@@ -49,6 +53,9 @@ public struct CategoryFormCore {
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce(self.core)
+      .ifLet(\.$iconSelect, action: \.iconSelect) {
+        CategoryIconSelectCore()
+      }
   }
 
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
@@ -65,7 +72,15 @@ public struct CategoryFormCore {
     case ._editCategoryResponse(_):
       return .none
 
-    case .selectIcon(_):
+    case .editIconTapped:
+      state.iconSelect = CategoryIconSelectCore.State()
+      return .none
+
+    case .iconSelect(.presented(.selectIcon(let type))):
+      state.selectedIcon = type
+      return .none
+
+    case .iconSelect:
       return .none
 
     case .binding:
