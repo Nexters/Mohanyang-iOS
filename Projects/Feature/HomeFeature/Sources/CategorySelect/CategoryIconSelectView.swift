@@ -44,7 +44,7 @@ private struct CategoryIconItem: View {
   var body: some View {
     categoryType.image
       .padding(12)
-      .frame(height: 56)
+      .frame(width: 56, height: 56)
       .background(
         RoundedRectangle(cornerRadius: 12)
           .stroke(isSelected ? Alias.Color.Background.accent1 : .clear)

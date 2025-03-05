@@ -28,7 +28,7 @@ public struct CategoryFormView: View {
         Button {
           store.send(.editIconTapped)
         } label: {
-          Image(systemName: "star.fill")
+          store.selectedIcon.image
             .padding(20)
             .background {
               RoundedRectangle(cornerRadius: 20)

@@ -17,7 +17,7 @@ public struct CategoryFormCore {
   public struct State: Equatable {
     var formType: FormType
     var isButtonDisabled: Bool = false
-    var selectedIcon: PomodoroCategoryType?
+    var selectedIcon: PomodoroCategoryType = .basic
     var text: String = ""
     var inputFieldError: CategoryNameError?
 
@@ -73,11 +73,12 @@ public struct CategoryFormCore {
       return .none
 
     case .editIconTapped:
-      state.iconSelect = CategoryIconSelectCore.State()
+      state.iconSelect = CategoryIconSelectCore.State(selectedIcon: state.selectedIcon)
       return .none
 
     case .iconSelect(.presented(.selectIcon(let type))):
       state.selectedIcon = type
+      state.iconSelect = nil
       return .none
 
     case .iconSelect:

@@ -12,9 +12,11 @@ import ComposableArchitecture
 public struct CategoryIconSelectCore {
   @ObservableState
   public struct State: Equatable {
-    var selectedIcon: PomodoroCategoryType?
+    var selectedIcon: PomodoroCategoryType
 
-    public init() { }
+    public init(selectedIcon: PomodoroCategoryType) {
+      self.selectedIcon = selectedIcon
+    }
   }
 
   public enum Action {
@@ -27,7 +29,8 @@ public struct CategoryIconSelectCore {
 
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
-    case .selectIcon:
+    case .selectIcon(let icon):
+      state.selectedIcon = icon
       return .none
     }
   }

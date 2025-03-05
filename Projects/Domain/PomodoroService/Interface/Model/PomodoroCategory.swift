@@ -104,13 +104,13 @@ extension PomodoroCategoryType {
   public var image: Image {
     switch self {
     case .basic:
-      return DesignSystemAsset.Image._24Cat.swiftUIImage
+      return DesignSystemAsset.Image._40Cat.swiftUIImage
     case .books:
-      return DesignSystemAsset.Image._24Book.swiftUIImage
+      return DesignSystemAsset.Image._40OpenBook.swiftUIImage
     case .study:
-      return DesignSystemAsset.Image._24Memo.swiftUIImage
+      return DesignSystemAsset.Image._40BoxPen.swiftUIImage
     case .work:
-      return DesignSystemAsset.Image._24Monitor.swiftUIImage
+      return DesignSystemAsset.Image._40Monitor.swiftUIImage
     }
   }
 }
