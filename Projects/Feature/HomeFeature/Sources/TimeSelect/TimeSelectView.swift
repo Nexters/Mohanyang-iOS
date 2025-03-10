@@ -28,7 +28,7 @@ public struct TimeSelectView: View {
         if let selectedCategory = store.selectedCategory {
           Button(
             title: .init(selectedCategory.title),
-            leftIcon: selectedCategory.baseCategoryType.image
+            leftIcon: selectedCategory.baseCategoryCode.image
           ) {
             // no behavior
           }

@@ -17,7 +17,7 @@ public struct CategoryFormCore {
   public struct State: Equatable {
     var formType: FormType
     var isButtonDisabled: Bool = false
-    var selectedIcon: PomodoroCategoryType = .basic
+    var selectedIcon: PomodoroCategoryCode = .basic
     var text: String = ""
     var inputFieldError: CategoryNameError?
 

@@ -23,20 +23,39 @@ public struct CategorySelectView: View {
   public var body: some View {
     VStack(spacing: Alias.Spacing.large) {
       HStack(spacing: .zero) {
-        Text("카테고리")
+        Text(store.selectType.title)
           .font(Typography.header3)
           .foregroundStyle(Alias.Color.Text.primary)
         Spacer()
-        Button(icon: DesignSystemAsset.Image._24PlusPrimary.swiftUIImage) {
-          store.send(.addCategoryTapped)
-        }
-        .buttonStyle(.icon(isFilled: false, level: .primary))
+        // TODO: 맘에 안들ㅇ...
+        if store.selectType == .select {
 
-        Button(icon: DesignSystemAsset.Image._24EllipsisPrimary.swiftUIImage) {
-          store.send(.dismissButtonTapped)
+          if store.isCategoryAddAvailable {
+            Button(icon: DesignSystemAsset.Image._24PlusPrimary.swiftUIImage) {
+              store.send(.addCategoryTapped)
+            }
+            .buttonStyle(.icon(isFilled: false, level: .primary))
+          }
+
+          Button(icon: DesignSystemAsset.Image._24EllipsisPrimary.swiftUIImage) {
+            store.send(.moreButtonTapped)
+          }
+          .buttonStyle(.icon(isFilled: false, level: .primary))
+          .padding(.leading, 8)
+
+        } else {
+
+          Button {
+            store.send(.cancelButtonTapped)
+          } label: {
+            Text("취소")
+              .foregroundStyle(Alias.Color.Text.secondary)
+              .font(Typography.bodySB)
+              .padding(.vertical, 9)
+              .padding(.horizontal, 16)
+          }
+
         }
-        .buttonStyle(.icon(isFilled: false, level: .primary))
-        .padding(.leading, 8)
       }
       .padding(.leading, Alias.Spacing.xLarge)
       .padding(.trailing, Alias.Spacing.small)
@@ -47,19 +66,13 @@ public struct CategorySelectView: View {
           Button(
             title: .init(category.title),
             subtitle: "집중 \(category.focusTimeMinutes)분 | 휴식 \(category.restTimeMinutes)분",
-            leftIcon: category.baseCategoryType.image
+            leftIcon: category.baseCategoryCode.image
           ) {
             store.send(.selectCategory(category))
           }
           .buttonStyle(.selectList(isSelected: store.selectedCategory == category))
         }
       }
-      .padding(.horizontal, Alias.Spacing.large)
-      
-      Button(title: "확인") {
-        store.send(.bottomCheckButtonTapped)
-      }
-      .buttonStyle(.box(level: .secondary, size: .large, width: .low))
       .padding(.horizontal, Alias.Spacing.large)
       .padding(.bottom, Alias.Spacing.medium)
     }

@@ -28,7 +28,7 @@ public struct FocusPomodoroView: View {
         if let selectedCategory = store.selectedCategory {
           Button(
             title: .init(selectedCategory.title),
-            leftIcon: selectedCategory.baseCategoryType.image
+            leftIcon: selectedCategory.baseCategoryCode.image
           ) {
           }
           .buttonStyle(.box(level: .tertiary, size: .small))

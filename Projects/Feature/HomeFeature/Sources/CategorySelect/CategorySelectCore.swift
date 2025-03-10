@@ -16,17 +16,22 @@ import ComposableArchitecture
 public struct CategorySelectCore {
   @ObservableState
   public struct State: Equatable {
+    var selectType: CategorySelectType = .select
     var selectedCategory: PomodoroCategory?
-    var categoryList: [PomodoroCategory] = []
-
+    var categoryList: [PomodoroCategory] = [] {
+      didSet {
+        isCategoryAddAvailable = categoryList.count < 10
+      }
+    }
+    var isCategoryAddAvailable: Bool = true
     public init() {}
   }
   
   public enum Action {
     case onAppear
-    case dismissButtonTapped
-    case bottomCheckButtonTapped
-    
+    case moreButtonTapped
+    case cancelButtonTapped
+
     case getCategoryListResponse(Result<[PomodoroCategory], Error>)
     
     case setSelectedCategory(PomodoroCategory?)
@@ -34,7 +39,19 @@ public struct CategorySelectCore {
 
     case addCategoryTapped
   }
-  
+
+  public enum CategorySelectType {
+    case select, edit, delete
+
+    var title: String {
+      switch self {
+      case .select: return "카테고리"
+      case .edit: return "카테고리 수정"
+      case .delete: return "카테고리 삭제"
+      }
+    }
+  }
+
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -66,22 +83,14 @@ public struct CategorySelectCore {
         await send(.setSelectedCategory(selectedCategory))
       }
       
-    case .dismissButtonTapped:
-      return .run { _ in
-        await self.dismiss()
-      }
-      
-    case .bottomCheckButtonTapped:
-      return .run { [selectedCategory = state.selectedCategory] send in
-        if let selectedCategory {
-          await self.pomodoroService.changeSelectedCategory(
-            userDefaultsClient: self.userDefaultsClient,
-            categoryID: selectedCategory.id
-          )
-        }
-        await self.dismiss()
-      }
-      
+    case .moreButtonTapped:
+      // TODO: 액션메뉴
+      return .none
+
+    case .cancelButtonTapped:
+      state.selectType = .select
+      return .none
+
     case let .getCategoryListResponse(.success(response)):
       state.categoryList = response
       return .none
@@ -95,7 +104,15 @@ public struct CategorySelectCore {
       
     case let .selectCategory(category):
       state.selectedCategory = category
-      return .none
+      return .run { [selectedCategory = state.selectedCategory] send in
+        if let selectedCategory {
+          await self.pomodoroService.changeSelectedCategory(
+            userDefaultsClient: self.userDefaultsClient,
+            categoryID: selectedCategory.id
+          )
+        }
+        await self.dismiss()
+      }
 
     case .addCategoryTapped:
       return .run { _ in

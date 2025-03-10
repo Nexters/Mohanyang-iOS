@@ -200,7 +200,7 @@ public struct HomeCore {
           await send(.set(\.selectedCategory, selectedCategory))
         } else {
           let categoryList = try await self.pomodoroService.getCategoryList(databaseClient: self.databaseClient)
-          if let basicCategory = categoryList.first(where: { $0.baseCategoryType == .basic }) {
+          if let basicCategory = categoryList.first(where: { $0.baseCategoryCode == .basic }) {
             await self.pomodoroService.changeSelectedCategory(
               userDefaultsClient: self.userDefaultsClient,
               categoryID: basicCategory.id
@@ -210,7 +210,7 @@ public struct HomeCore {
         }
       }
       
-    case .categorySelect(.presented(.bottomCheckButtonTapped)):
+    case .categorySelect(.presented(.selectCategory)):
       state.toast = DefaultToast(
         message: "카테고리를 변경했어요",
         image: DesignSystemAsset.Image._24CheckSecondary.swiftUIImage

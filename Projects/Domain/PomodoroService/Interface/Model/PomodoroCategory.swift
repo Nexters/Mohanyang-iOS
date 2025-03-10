@@ -26,7 +26,7 @@ public struct PomodoroCategory:
     return no
   }
   public let no: Int
-  public let baseCategoryType: PomodoroCategoryType
+  public let baseCategoryCode: PomodoroCategoryCode
   public let title: String
   public let position: Int
   public var focusTime: String
@@ -34,14 +34,14 @@ public struct PomodoroCategory:
   
   public init(
     no: Int,
-    baseCategoryType: PomodoroCategoryType,
+    baseCategoryCode: PomodoroCategoryCode,
     title: String,
     position: Int,
     focusTime: String,
     restTime: String
   ) {
     self.no = no
-    self.baseCategoryType = baseCategoryType
+    self.baseCategoryCode = baseCategoryCode
     self.title = title
     self.position = position
     self.focusTime = focusTime
@@ -51,7 +51,7 @@ public struct PomodoroCategory:
   @_spi(Internal)
   public init(managedObject: PomodoroCategoryObject) {
     self.no = managedObject.no
-    self.baseCategoryType = managedObject.baseCategoryType
+    self.baseCategoryCode = managedObject.baseCategoryCode
     self.title = managedObject.title
     self.position = managedObject.position
     self.focusTime = managedObject.focusTime
@@ -62,7 +62,7 @@ public struct PomodoroCategory:
   public func managedObject() -> PomodoroCategoryObject {
     let object = PomodoroCategoryObject()
     object.no = no
-    object.baseCategoryType = baseCategoryType
+    object.baseCategoryCode = baseCategoryCode
     object.title = title
     object.position = position
     object.focusTime = focusTime
@@ -93,14 +93,14 @@ extension PomodoroCategory {
   }
 }
 
-public enum PomodoroCategoryType: String, PersistableEnum, Codable, CaseIterable {
+public enum PomodoroCategoryCode: String, PersistableEnum, Codable, CaseIterable {
   case basic = "BASIC"
   case books = "BOOKS"
   case study = "STUDY"
   case work = "WORK"
 }
 
-extension PomodoroCategoryType {
+extension PomodoroCategoryCode {
   public var image: Image {
     switch self {
     case .basic:
@@ -118,7 +118,7 @@ extension PomodoroCategoryType {
 @_spi(Internal)
 public final class PomodoroCategoryObject: Object {
   @Persisted(primaryKey: true) var no: Int
-  @Persisted var baseCategoryType: PomodoroCategoryType
+  @Persisted var baseCategoryCode: PomodoroCategoryCode
   @Persisted var title: String
   @Persisted var position: Int
   @Persisted var focusTime: String
