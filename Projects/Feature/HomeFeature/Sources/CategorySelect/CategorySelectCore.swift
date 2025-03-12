@@ -6,6 +6,7 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import Foundation
 import PomodoroServiceInterface
 import DatabaseClientInterface
 import UserDefaultsClientInterface
@@ -16,6 +17,7 @@ import ComposableArchitecture
 public struct CategorySelectCore {
   @ObservableState
   public struct State: Equatable {
+    var moreButtonFrame: CGRect = .zero
     var selectType: CategorySelectType = .select
     var selectedCategory: PomodoroCategory?
     var categoryList: [PomodoroCategory] = [] {
@@ -23,14 +25,18 @@ public struct CategorySelectCore {
         isCategoryAddAvailable = categoryList.count < 10
       }
     }
+    var isMenuViewShow: Bool = false
     var isCategoryAddAvailable: Bool = true
     public init() {}
   }
   
   public enum Action {
     case onAppear
+    case setMoreButtonFrame(CGRect)
     case moreButtonTapped
     case cancelButtonTapped
+    case editButtonTapped
+    case deleteButtonTapped
 
     case getCategoryListResponse(Result<[PomodoroCategory], Error>)
     
@@ -82,13 +88,27 @@ public struct CategorySelectCore {
         )
         await send(.setSelectedCategory(selectedCategory))
       }
-      
+
+    case .setMoreButtonFrame(let frame):
+      state.moreButtonFrame = frame
+      return .none
+
     case .moreButtonTapped:
-      // TODO: 액션메뉴
+      state.isMenuViewShow = true
       return .none
 
     case .cancelButtonTapped:
       state.selectType = .select
+      return .none
+
+    case .editButtonTapped:
+      state.isMenuViewShow = false
+      state.selectType = .edit
+      return .none
+
+    case .deleteButtonTapped:
+      state.isMenuViewShow = false
+      state.selectType = .delete
       return .none
 
     case let .getCategoryListResponse(.success(response)):

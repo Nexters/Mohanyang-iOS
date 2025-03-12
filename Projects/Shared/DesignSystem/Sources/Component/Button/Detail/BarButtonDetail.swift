@@ -120,8 +120,10 @@ struct DefaultBarButtonDetailStyle: BarButtonDetailStyle {
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: Alias.Spacing.small) {
       configuration.leftIcon
+        .frame(width: 24, height: 24)
       configuration.title
       configuration.rightIcon
+        .frame(width: 24, height: 24)
     }
   }
 }
