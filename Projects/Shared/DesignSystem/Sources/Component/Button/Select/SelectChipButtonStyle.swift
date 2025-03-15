@@ -11,13 +11,16 @@ import SwiftUI
 public struct SelectChipButtonStyle: ButtonStyle {
   let isSelected: Bool
   let isDisabled: Bool
-  
+  let iconSize: CGSize
+
   public init(
     isSelected: Bool,
-    isDisabled: Bool
+    isDisabled: Bool,
+    iconSize: CGSize
   ) {
     self.isSelected = isSelected
     self.isDisabled = isDisabled
+    self.iconSize = iconSize
   }
   
   public func makeBody(configuration: Configuration) -> some View {
@@ -25,7 +28,8 @@ public struct SelectChipButtonStyle: ButtonStyle {
       .selectButtonDetailStyle(
         SelectChipButtonStyleImpl(
           isSelected: isSelected,
-          isDisabled: isDisabled
+          isDisabled: isDisabled,
+          iconSize: iconSize
         )
       )
   }
@@ -34,23 +38,27 @@ public struct SelectChipButtonStyle: ButtonStyle {
 extension ButtonStyle where Self == SelectChipButtonStyle {
   public static func selectChip(
     isSelected: Bool,
-    isDisabled: Bool
+    isDisabled: Bool,
+    iconSize: CGSize = .init(width: 16, height: 16)
   ) -> Self {
-    return SelectChipButtonStyle(isSelected: isSelected, isDisabled: isDisabled)
+    return SelectChipButtonStyle(isSelected: isSelected, isDisabled: isDisabled, iconSize: iconSize)
   }
 }
 
 struct SelectChipButtonStyleImpl: SelectButtonDetailStyle {
   let isSelected: Bool
   let isDisabled: Bool
-  
+  let iconSize: CGSize
+
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: Alias.Spacing.xSmall) {
       configuration.leftIcon
+        .frame(width: iconSize.width, height: iconSize.height)
       configuration.subtitle
         .font(Typography.bodySB)
         .foregroundStyle(getSubtitleForegourndColor())
       configuration.rightIcon
+        .frame(width: iconSize.width, height: iconSize.height)
     }
     .padding(.horizontal, Alias.Spacing.medium)
     .padding(.vertical, Alias.Spacing.small)

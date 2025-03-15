@@ -10,32 +10,42 @@ import SwiftUI
 
 public struct SelectListButtonStyle: ButtonStyle {
   let isSelected: Bool
-  
-  public init(isSelected: Bool) {
+  let iconSize: CGSize
+
+  public init(isSelected: Bool, iconSize: CGSize) {
     self.isSelected = isSelected
+    self.iconSize = iconSize
   }
   
   public func makeBody(configuration: Configuration) -> some View {
     configuration.label
-      .selectButtonDetailStyle(SelectListButtonDetailStyleImpl(isSelected: isSelected))
+      .selectButtonDetailStyle(
+        SelectListButtonDetailStyleImpl(
+          isSelected: isSelected,
+          iconSize: iconSize
+        )
+      )
   }
 }
 
 extension ButtonStyle where Self == SelectListButtonStyle {
   public static func selectList(
-    isSelected: Bool
+    isSelected: Bool,
+    iconSize: CGSize = .init(width: 24, height: 24)
   ) -> Self {
-    return SelectListButtonStyle(isSelected: isSelected)
+    return SelectListButtonStyle(isSelected: isSelected, iconSize: iconSize)
   }
 }
 
 struct SelectListButtonDetailStyleImpl: SelectButtonDetailStyle {
   let isSelected: Bool
-  
+  let iconSize: CGSize
+
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: Alias.Spacing.medium) {
       HStack(spacing: Alias.Spacing.small) {
         configuration.leftIcon
+          .frame(width: iconSize.width, height: iconSize.height)
         configuration.title
           .font(Typography.bodySB)
           .foregroundStyle(Alias.Color.Text.primary)

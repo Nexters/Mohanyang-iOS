@@ -17,11 +17,19 @@ public struct CategorySelectView: View {
   @Namespace var moreButtonFrameID
   var moreButtonFrame: CGRect = .zero
   @Bindable var store: StoreOf<CategorySelectCore>
-  
+
+  private var columns: [GridItem] {
+    let columnCount = store.categoryList.count > 1 ? 2 : 1
+    return Array(
+      repeating: GridItem(.flexible(), spacing: Alias.Spacing.small),
+      count: columnCount
+    )
+  }
+
   public init(store: StoreOf<CategorySelectCore>) {
     self.store = store
   }
-  
+
   public var body: some View {
     ZStack {
       VStack(spacing: Alias.Spacing.large) {
@@ -60,11 +68,11 @@ public struct CategorySelectView: View {
         .padding(.trailing, Alias.Spacing.small)
         .frame(height: 40)
 
-        VStack(spacing: Alias.Spacing.small) {
+        LazyVGrid(columns: columns, spacing: Alias.Spacing.small) {
           ForEach(store.categoryList) { category in
             Button(
               title: .init(category.title),
-              subtitle: "집중 \(category.focusTimeMinutes)분 | 휴식 \(category.restTimeMinutes)분",
+              subtitle: nil,
               leftIcon: category.baseCategoryCode.image
             ) {
               store.send(.selectCategory(category))

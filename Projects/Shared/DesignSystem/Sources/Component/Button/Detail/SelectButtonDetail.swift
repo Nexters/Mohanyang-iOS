@@ -22,9 +22,9 @@ extension Button where Label == SelectButtonDetail<Text?, Text?, Image?, Image?>
       } subtitle: {
         subtitle == nil ? nil : Text(subtitle ?? "")
       } leftIcon: {
-        leftIcon
+        leftIcon?.resizable()
       } rightIcon: {
-        rightIcon
+        rightIcon?.resizable()
       }
     }
   }
