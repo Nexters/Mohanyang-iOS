@@ -74,9 +74,19 @@ public struct CategorySelectView: View {
       .padding(.leading, Alias.Spacing.xLarge)
       .padding(.trailing, Alias.Spacing.small)
 
-      LazyVGrid(columns: columns, spacing: Alias.Spacing.small) {
-        ForEach(store.categoryList) { category in
-          selectButton(category: category)
+      Group {
+        LazyVGrid(columns: columns, spacing: Alias.Spacing.small) {
+          ForEach(store.categoryList) { category in
+            selectButton(category: category)
+          }
+        }
+
+        if store.selectType == .delete {
+          Button(title: "\(store.selectedDeleteCategory.count)개 삭제하기") {
+            store.send(.deleteCategoriesTapped)
+          }
+          .buttonStyle(.box(level: .secondary, size: .large, width: .low))
+          .disabled(store.selectedDeleteCategory.isEmpty)
         }
       }
       .padding(.horizontal, Alias.Spacing.large)

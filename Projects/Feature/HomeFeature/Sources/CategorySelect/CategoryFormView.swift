@@ -21,7 +21,7 @@ public struct CategoryFormView: View {
 
   public var body: some View {
     NavigationContainer(
-      title: Text("카테고리 생성"),
+      title: Text(store.formType.title),
       style: .navigation
     ) {
       VStack {
@@ -48,7 +48,7 @@ public struct CategoryFormView: View {
         .padding(.top, 32)
 
         InputField(
-          placeholder: store.formType == .add ? "카테고리 이름" : "저장되어있는 기존 카테고리명",
+          placeholder: store.formType == .add ? "카테고리 이름" : "",
           text: $store.text,
           fieldError: $store.inputFieldError,
           submitLabel: .done

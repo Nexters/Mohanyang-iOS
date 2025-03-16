@@ -25,6 +25,14 @@ public struct CategoryFormCore {
 
     public init(type: FormType) {
       self.formType = type
+      switch type {
+      case .add:
+        self.text = ""
+        self.selectedIcon = .basic
+      case .edit(let category):
+        self.text = category.title
+        self.selectedIcon = category.baseCategoryCode
+      }
     }
   }
 
@@ -44,6 +52,15 @@ public struct CategoryFormCore {
 
   public enum FormType: Equatable {
     case add, edit(PomodoroCategory)
+
+    var title: String {
+      switch self {
+      case .add:
+        return "카테고리 생성"
+      case .edit:
+        return "카테고리 수정"
+      }
+    }
   }
 
   @Dependency(PomodoroService.self) var pomodoroService
