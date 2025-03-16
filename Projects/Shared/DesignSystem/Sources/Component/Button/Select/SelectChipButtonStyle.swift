@@ -56,7 +56,7 @@ struct SelectChipButtonStyleImpl: SelectButtonDetailStyle {
         .frame(width: iconSize.width, height: iconSize.height)
       configuration.subtitle
         .font(Typography.bodySB)
-        .foregroundStyle(getSubtitleForegourndColor())
+        .foregroundStyle(getSubtitleForegroundColor())
       configuration.rightIcon
         .frame(width: iconSize.width, height: iconSize.height)
     }
@@ -69,7 +69,7 @@ struct SelectChipButtonStyleImpl: SelectButtonDetailStyle {
     )
   }
   
-  func getSubtitleForegourndColor() -> Color {
+  func getSubtitleForegroundColor() -> Color {
     if isDisabled {
       return Alias.Color.Text.disabled
     } else {

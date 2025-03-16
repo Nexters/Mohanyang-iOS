@@ -42,8 +42,8 @@ public struct CategoryFormCore {
     case iconSelect(PresentationAction<CategoryIconSelectCore.Action>)
   }
 
-  public enum FormType {
-    case add, edit
+  public enum FormType: Equatable {
+    case add, edit(PomodoroCategory)
   }
 
   @Dependency(PomodoroService.self) var pomodoroService

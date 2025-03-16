@@ -20,6 +20,8 @@ public struct CategorySelectCore {
     var moreButtonFrame: CGRect = .zero
     var selectType: CategorySelectType = .select
     var selectedCategory: PomodoroCategory?
+    var selectedEditCategory: PomodoroCategory?
+    var selectedDeleteCategory: [PomodoroCategory] = []
     var categoryList: [PomodoroCategory] = [] {
       didSet {
         isCategoryAddAvailable = categoryList.count < 10
@@ -42,8 +44,11 @@ public struct CategorySelectCore {
     
     case setSelectedCategory(PomodoroCategory?)
     case selectCategory(PomodoroCategory)
+    case selectEditCategory(PomodoroCategory)
+    case selectDeleteCategory(PomodoroCategory)
 
     case addCategoryTapped
+    case deleteCategoriesTapped
   }
 
   public enum CategorySelectType {
@@ -141,10 +146,23 @@ public struct CategorySelectCore {
         await self.dismiss()
       }
 
+    case let .selectEditCategory(category):
+      state.selectedEditCategory = category
+      return .run { _ in
+        await self.dismiss()
+      }
+
+    case let .selectDeleteCategory(category):
+      state.selectedDeleteCategory.append(category)
+      return .none
+
     case .addCategoryTapped:
       return .run { _ in
         await self.dismiss()
       }
+
+    case .deleteCategoriesTapped:
+      return .none
     }
   }
 }

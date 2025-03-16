@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+import PomodoroServiceInterface
 import DesignSystem
 
 import ComposableArchitecture
@@ -75,14 +76,7 @@ public struct CategorySelectView: View {
 
       LazyVGrid(columns: columns, spacing: Alias.Spacing.small) {
         ForEach(store.categoryList) { category in
-          Button(
-            title: .init(category.title),
-            subtitle: nil,
-            leftIcon: category.baseCategoryCode.image
-          ) {
-            store.send(.selectCategory(category))
-          }
-          .buttonStyle(.selectList(isSelected: store.selectedCategory == category))
+          selectButton(category: category)
         }
       }
       .padding(.horizontal, Alias.Spacing.large)
@@ -109,5 +103,52 @@ public struct CategorySelectView: View {
       store.send(.onAppear)
     }
     .trackRUMView(name: "카테고리 변경")
+  }
+}
+
+extension CategorySelectView {
+  @ViewBuilder
+  private func selectButton(category: PomodoroCategory) -> some View {
+    switch store.selectType {
+    case .select:
+      Button(
+        title: .init(category.title),
+        subtitle: nil,
+        leftIcon: category.baseCategoryCode.image
+      ) {
+        store.send(.selectCategory(category))
+      }
+      .buttonStyle(.selectList(isSelected: store.selectedCategory == category))
+    case .edit:
+      Button(
+        title: .init(category.title),
+        subtitle: nil,
+        leftIcon: category.baseCategoryCode.image
+      ) {
+        store.send(.selectEditCategory(category))
+      }
+      .buttonStyle(
+        .selectList(
+          isSelected: store.selectedEditCategory == category,
+          isDisabled: category.title == "기본" // default 카테고리 여부 정보 필요할듯
+        )
+      )
+    case .delete:
+      let selectedCategory = store.selectedDeleteCategory.contains(category)
+      Button(
+        title: .init(category.title),
+        subtitle: nil,
+        leftIcon: selectedCategory ?
+        DesignSystemAsset.Image._40CheckCircle.swiftUIImage : DesignSystemAsset.Image.circle.swiftUIImage
+      ) {
+        store.send(.selectDeleteCategory(category))
+      }
+      .buttonStyle(
+        .selectList(
+          isSelected: selectedCategory,
+          isDisabled: category.title == "기본"
+        )
+      )
+    }
   }
 }

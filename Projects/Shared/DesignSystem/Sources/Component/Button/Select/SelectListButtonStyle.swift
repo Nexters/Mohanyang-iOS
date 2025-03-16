@@ -10,10 +10,16 @@ import SwiftUI
 
 public struct SelectListButtonStyle: ButtonStyle {
   let isSelected: Bool
+  let isDisabled: Bool
   let iconSize: CGSize
 
-  public init(isSelected: Bool, iconSize: CGSize) {
+  public init(
+    isSelected: Bool,
+    isDisabled: Bool,
+    iconSize: CGSize
+  ) {
     self.isSelected = isSelected
+    self.isDisabled = isDisabled
     self.iconSize = iconSize
   }
   
@@ -22,6 +28,7 @@ public struct SelectListButtonStyle: ButtonStyle {
       .selectButtonDetailStyle(
         SelectListButtonDetailStyleImpl(
           isSelected: isSelected,
+          isDisabled: isDisabled,
           iconSize: iconSize
         )
       )
@@ -31,28 +38,38 @@ public struct SelectListButtonStyle: ButtonStyle {
 extension ButtonStyle where Self == SelectListButtonStyle {
   public static func selectList(
     isSelected: Bool,
+    isDisabled: Bool = false,
     iconSize: CGSize = .init(width: 24, height: 24)
   ) -> Self {
-    return SelectListButtonStyle(isSelected: isSelected, iconSize: iconSize)
+    return SelectListButtonStyle(isSelected: isSelected, isDisabled: isDisabled, iconSize: iconSize)
   }
 }
 
 struct SelectListButtonDetailStyleImpl: SelectButtonDetailStyle {
   let isSelected: Bool
+  let isDisabled: Bool
   let iconSize: CGSize
 
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: Alias.Spacing.medium) {
       HStack(spacing: Alias.Spacing.small) {
-        configuration.leftIcon
-          .frame(width: iconSize.width, height: iconSize.height)
+        Group {
+          if isDisabled {
+            DesignSystemAsset.Image.lock.swiftUIImage
+              .resizable()
+              .renderingMode(.template)
+              .foregroundStyle(Alias.Color.Icon.disabled)
+          } else {
+            configuration.leftIcon
+          }
+        }
+        .frame(width: iconSize.width, height: iconSize.height)
+
         configuration.title
+          .lineLimit(1)
           .font(Typography.bodySB)
-          .foregroundStyle(Alias.Color.Text.primary)
+          .foregroundStyle(getTitleForegroundColor())
       }
-      configuration.subtitle
-        .font(Typography.subBodyR)
-        .foregroundStyle(Alias.Color.Text.tertiary)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(Alias.Spacing.xLarge)
@@ -62,7 +79,15 @@ struct SelectListButtonDetailStyleImpl: SelectButtonDetailStyle {
         .strokeBorder(isSelected ? Alias.Color.Background.accent1 : .clear, lineWidth: 1)
     )
   }
-  
+
+  func getTitleForegroundColor() -> Color {
+    if isDisabled {
+      return Alias.Color.Text.disabled
+    } else {
+      return Alias.Color.Text.primary
+    }
+  }
+
   func getBackgroundColor() -> Color {
     if isSelected {
       return Alias.Color.Background.accent2

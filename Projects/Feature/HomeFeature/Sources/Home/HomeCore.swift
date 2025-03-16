@@ -226,6 +226,10 @@ public struct HomeCore {
       state.categoryForm = CategoryFormCore.State(type: .add)
       return .none
 
+    case let .categorySelect(.presented(.selectEditCategory(category))):
+      state.categoryForm = CategoryFormCore.State(type: .edit(category))
+      return .none
+
     case .categorySelect:
       return .none
       
