@@ -50,7 +50,6 @@ public struct CategorySelectMenuView: View {
     .frame(width: 104, height: 104)
     .cornerRadius(Alias.BorderRadius.small)
     .shadow(color: .black.opacity(0.12), radius: 4, x: 0, y: 2)
-    .position(x: position.maxX - 104 / 2, y: position.maxY + 104 / 2)
+    .offset(x: -Alias.Spacing.small, y: position.maxY)
   }
 }
-

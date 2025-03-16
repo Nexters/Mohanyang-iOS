@@ -33,7 +33,7 @@ public struct CategorySelectCore {
   public enum Action {
     case onAppear
     case setMoreButtonFrame(CGRect)
-    case moreButtonTapped
+    case showMenu(Bool)
     case cancelButtonTapped
     case editButtonTapped
     case deleteButtonTapped
@@ -54,6 +54,13 @@ public struct CategorySelectCore {
       case .select: return "카테고리"
       case .edit: return "카테고리 수정"
       case .delete: return "카테고리 삭제"
+      }
+    }
+
+    var desc: String? {
+      switch self {
+      case .edit: return "수정할 카테고리를 선택해주세요."
+      default: return nil
       }
     }
   }
@@ -93,8 +100,8 @@ public struct CategorySelectCore {
       state.moreButtonFrame = frame
       return .none
 
-    case .moreButtonTapped:
-      state.isMenuViewShow = true
+    case .showMenu(let isShow):
+      state.isMenuViewShow = isShow
       return .none
 
     case .cancelButtonTapped:

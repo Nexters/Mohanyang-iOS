@@ -31,68 +31,80 @@ public struct CategorySelectView: View {
   }
 
   public var body: some View {
-    ZStack {
-      VStack(spacing: Alias.Spacing.large) {
-        HStack(spacing: .zero) {
+    VStack(spacing: Alias.Spacing.large) {
+      HStack(alignment: .top, spacing: .zero) {
+        VStack(alignment: .leading, spacing: 10) {
           Text(store.selectType.title)
             .font(Typography.header3)
             .foregroundStyle(Alias.Color.Text.primary)
-          Spacer()
-          if store.selectType == .select {
-            if store.isCategoryAddAvailable {
-              Button(icon: DesignSystemAsset.Image._24PlusPrimary.swiftUIImage) {
-                store.send(.addCategoryTapped)
-              }
-              .buttonStyle(.icon(isFilled: false, level: .primary))
-            }
-
-            Button(icon: DesignSystemAsset.Image._24EllipsisPrimary.swiftUIImage) {
-              store.send(.moreButtonTapped)
+          if let desc = store.selectType.desc {
+            Text(desc)
+              .font(Typography.bodyR)
+              .foregroundStyle(Alias.Color.Text.secondary)
+          }
+        }
+        Spacer()
+        if store.selectType == .select {
+          if store.isCategoryAddAvailable {
+            Button(icon: DesignSystemAsset.Image._24PlusPrimary.swiftUIImage) {
+              store.send(.addCategoryTapped)
             }
             .buttonStyle(.icon(isFilled: false, level: .primary))
-            .padding(.leading, 8)
-            .setFrameMeasure(space: .named("CategorySelectBottomSheet"), identifier: moreButtonFrameID)
-            .getFrameMeasure { value in
-              guard let frame = value[moreButtonFrameID] else { return }
-              store.send(.setMoreButtonFrame(frame))
-            }
-
-          } else {
-            Button(title: .init("취소")) {
-              store.send(.cancelButtonTapped)
-            }
-            .buttonStyle(.text(level: .primary, size: .medium))
           }
-        }
-        .padding(.leading, Alias.Spacing.xLarge)
-        .padding(.trailing, Alias.Spacing.small)
-        .frame(height: 40)
 
-        LazyVGrid(columns: columns, spacing: Alias.Spacing.small) {
-          ForEach(store.categoryList) { category in
-            Button(
-              title: .init(category.title),
-              subtitle: nil,
-              leftIcon: category.baseCategoryCode.image
-            ) {
-              store.send(.selectCategory(category))
-            }
-            .buttonStyle(.selectList(isSelected: store.selectedCategory == category))
+          Button(icon: DesignSystemAsset.Image._24EllipsisPrimary.swiftUIImage) {
+            store.send(.showMenu(true))
           }
-        }
-        .padding(.horizontal, Alias.Spacing.large)
-        .padding(.bottom, Alias.Spacing.medium)
-      }
+          .buttonStyle(.icon(isFilled: false, level: .primary))
+          .padding(.leading, 8)
+          .setFrameMeasure(space: .named("CategorySelectBottomSheet"), identifier: moreButtonFrameID)
+          .getFrameMeasure { value in
+            guard let frame = value[moreButtonFrameID] else { return }
+            store.send(.setMoreButtonFrame(frame))
+          }
 
-      if store.isMenuViewShow {
-        CategorySelectMenuView(
-          position: store.moreButtonFrame,
-          onEditTapped: { store.send(.editButtonTapped) },
-          onDeleteTapped: { store.send(.deleteButtonTapped) }
-        )
+        } else {
+          Button(title: .init("취소")) {
+            store.send(.cancelButtonTapped)
+          }
+          .buttonStyle(.text(level: .primary, size: .medium))
+        }
       }
+      .padding(.leading, Alias.Spacing.xLarge)
+      .padding(.trailing, Alias.Spacing.small)
+
+      LazyVGrid(columns: columns, spacing: Alias.Spacing.small) {
+        ForEach(store.categoryList) { category in
+          Button(
+            title: .init(category.title),
+            subtitle: nil,
+            leftIcon: category.baseCategoryCode.image
+          ) {
+            store.send(.selectCategory(category))
+          }
+          .buttonStyle(.selectList(isSelected: store.selectedCategory == category))
+        }
+      }
+      .padding(.horizontal, Alias.Spacing.large)
+      .padding(.bottom, Alias.Spacing.medium)
     }
     .coordinateSpace(name: "CategorySelectBottomSheet")
+    .overlay {
+      if store.isMenuViewShow {
+        Color.clear
+          .contentShape(Rectangle())
+          .onTapGesture {
+            store.send(.showMenu(false))
+          }
+          .overlay(alignment: .topTrailing) {
+            CategorySelectMenuView(
+              position: store.moreButtonFrame,
+              onEditTapped: { store.send(.editButtonTapped) },
+              onDeleteTapped: { store.send(.deleteButtonTapped) }
+            )
+          }
+      }
+    }
     .onAppear {
       store.send(.onAppear)
     }
