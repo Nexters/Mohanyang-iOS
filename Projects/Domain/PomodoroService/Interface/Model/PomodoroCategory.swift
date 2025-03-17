@@ -100,40 +100,30 @@ extension PomodoroCategory {
 }
 
 public enum PomodoroIconType: String, PersistableEnum, Codable, CaseIterable {
-  case bell = "BELL"
-  case fire = "FIRE"
-  case lightning = "LIGHTNING"
   case cat = "CAT"
-  case monitor = "MONITOR"
   case boxPen = "BOX_PEN"
   case openBook = "OPEN_BOOK"
-  case alarm = "ALARM"
-  case bubbleEllipses = "BUBBLE_ELLIPSES"
-  case asterisk = "ASTERISK"
-  case heart = "HEART"
-  case checkCircle = "CHECK_CIRCLE"
+  case briefcase = "BRIEFCASE"
   case laptop = "LAPTOP"
   case dumbbell = "DUMBBELL"
-  case briefcase = "BRIEFCASE"
-  case moon = "MOON"
+  case lightning = "LIGHTNING"
+  case fire = "FIRE"
+  case heart = "HEART"
+  case asterisk = "ASTERISK"
   case sun = "SUN"
+  case moon = "MOON"
 }
 
 extension PomodoroIconType {
   public var image: Image {
     switch self {
-    case .bell: return DesignSystemAsset.Image.bell.swiftUIImage
     case .fire: return DesignSystemAsset.Image.fire.swiftUIImage
     case .lightning: return DesignSystemAsset.Image.lightning.swiftUIImage
     case .cat: return DesignSystemAsset.Image.cat.swiftUIImage
-    case .monitor: return DesignSystemAsset.Image.monitor.swiftUIImage
     case .boxPen: return DesignSystemAsset.Image.boxPen.swiftUIImage
     case .openBook: return DesignSystemAsset.Image.openBook.swiftUIImage
-    case .alarm: return DesignSystemAsset.Image.alarm.swiftUIImage
-    case .bubbleEllipses: return DesignSystemAsset.Image.bubbleEllipses.swiftUIImage
     case .asterisk: return DesignSystemAsset.Image.asterisk.swiftUIImage
     case .heart: return DesignSystemAsset.Image.heart.swiftUIImage
-    case .checkCircle: return DesignSystemAsset.Image.checkCircle.swiftUIImage
     case .laptop: return DesignSystemAsset.Image.laptop.swiftUIImage
     case .dumbbell: return DesignSystemAsset.Image.dumbbell.swiftUIImage
     case .briefcase: return DesignSystemAsset.Image.briefcase.swiftUIImage

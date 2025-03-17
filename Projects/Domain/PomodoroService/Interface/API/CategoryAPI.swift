@@ -12,7 +12,9 @@ import APIClientInterface
 public enum CategoryAPI {
   case getCategory(id: Int)
   case selectCategory(id: Int)
+  case addCategory(request: AddCategoryRequest)
   case editCategory(id: Int, request: EditCategoryRequest)
+  case deleteCategory(id: Int)
   case getCategoryList
 }
 
@@ -29,9 +31,15 @@ extension CategoryAPI: APIBaseRequest {
     case let .selectCategory(id):
       return "/api/v1/categories/select/\(id)"
 
+    case .addCategory:
+      return "/api/v1/categories"
+
     case let .editCategory(id, _):
       return "/api/v1/categories/\(id)"
-      
+
+    case let .deleteCategory(id):
+      return "/api/v1/categories/\(id)"
+
     case .getCategoryList:
       return "/api/v1/categories"
     }
@@ -45,9 +53,15 @@ extension CategoryAPI: APIBaseRequest {
     case .selectCategory:
       return .patch
 
+    case .addCategory:
+      return .post
+
     case .editCategory:
       return .patch
-      
+
+    case .deleteCategory:
+      return .delete
+
     case .getCategoryList:
       return .get
     }
@@ -61,9 +75,15 @@ extension CategoryAPI: APIBaseRequest {
     case .selectCategory:
       return .requestPlain
 
+    case let .addCategory(request: request):
+      return .body(request)
+
     case let .editCategory(_, request):
       return .body(request)
-      
+
+    case .deleteCategory:
+      return .requestPlain
+
     case .getCategoryList:
       return .requestPlain
     }

@@ -9,13 +9,19 @@
 import Foundation
 
 public struct EditCategoryRequest: Encodable {
+  let title: String?
+  let iconType: String?
   let focusTime: String?
   let restTime: String?
   
   public init(
+    title: String?,
+    iconType: String?,
     focusTime: String?,
     restTime: String?
   ) {
+    self.title = title
+    self.iconType = iconType
     self.focusTime = focusTime
     self.restTime = restTime
   }
