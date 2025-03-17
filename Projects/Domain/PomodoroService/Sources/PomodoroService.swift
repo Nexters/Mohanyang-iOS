@@ -20,9 +20,14 @@ extension PomodoroService: DependencyKey {
   private static func live() -> PomodoroService {
     return .init(
       syncCategoryList: {
-        apiClient, databaseClient in
+        apiClient, userDefaultsClient, databaseClient in
         let api = CategoryAPI.getCategoryList
         let categoryList = try await apiClient.apiRequest(request: api, as: [PomodoroCategory].self)
+
+        if let selectedCategory = categoryList.first(where: { $0.isSelected }) {
+          await userDefaultsClient.setInteger(selectedCategory.id, key: selectedCategoryKey)
+        }
+
         for category in categoryList {
           try await databaseClient.create(object: category)
         }
@@ -30,9 +35,12 @@ extension PomodoroService: DependencyKey {
       getCategoryList: { databaseClient in
         try await databaseClient.read(PomodoroCategory.self)
       },
-      changeSelectedCategory: { userDefaultsClient, categoryID in
+      changeSelectedCategory: { apiClient, userDefaultsClient, categoryID in
+        let api = CategoryAPI.selectCategory(id: categoryID)
+        _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
         await userDefaultsClient.setInteger(categoryID, key: selectedCategoryKey)
       },
+      // TODO: 데이터베이스 저장 여부 민석과 논의 필요
       getSelectedCategory: { userDefaultsClient, databaseClient in
         let selectedCategoryID = userDefaultsClient.integerForKey(selectedCategoryKey)
         let results = try await databaseClient.read(PomodoroCategory.self, predicateFormat: "#no == %d", args: selectedCategoryID)

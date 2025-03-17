@@ -52,7 +52,7 @@ public struct HomeView: View {
         VStack(spacing: Alias.Spacing.medium) {
           Button(
             title: .init(store.selectedCategory?.title ?? ""),
-            leftIcon: store.selectedCategory?.baseCategoryCode.image
+            leftIcon: store.selectedCategory?.iconType.image
           ) {
             store.send(.categoryButtonTapped)
           }

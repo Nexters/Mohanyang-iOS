@@ -45,7 +45,7 @@ struct ContentView: View {
       attributes: PomodoroActivityAttributes(),
       content: .init(
         state: PomodoroActivityAttributes.ContentState(
-          category: .init(no: 0, baseCategoryCode: .basic, title: "테스트", position: 0, focusTime: "PT10M", restTime: "PT10M"),
+          category: .init(no: 0, iconType: .cat, title: "테스트", position: 0, focusTime: "PT10M", restTime: "PT10M"),
           goalDatetime: Date().addingTimeInterval(100),
           isRest: false
         ),
@@ -64,7 +64,7 @@ struct ContentView: View {
         id: testActivity.id,
         content: .init(
           state: PomodoroActivityAttributes.ContentState(
-            category: .init(no: 0, baseCategoryCode: .basic, title: "테스트2", position: 0, focusTime: "PT20M", restTime: "PT20M"),
+            category: .init(no: 0, iconType: .cat, title: "테스트2", position: 0, focusTime: "PT20M", restTime: "PT20M"),
             goalDatetime: Date().addingTimeInterval(100),
             isRest: false
           ),

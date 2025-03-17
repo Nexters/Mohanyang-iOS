@@ -286,6 +286,7 @@ public struct RestPomodoroCore {
     )
     try await self.pomodoroService.syncCategoryList(
       apiClient: self.apiClient,
+      userDefaultsClient: self.userDefaultsClient,
       databaseClient: self.databaseClient
     )
   }

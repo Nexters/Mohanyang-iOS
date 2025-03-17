@@ -191,6 +191,7 @@ public struct HomeCore {
       return .run { send in
         try await self.pomodoroService.syncCategoryList(
           apiClient: self.apiClient,
+          userDefaultsClient: self.userDefaultsClient,
           databaseClient: self.databaseClient
         )
         if let selectedCategory = try await self.pomodoroService.getSelectedCategory(
@@ -200,8 +201,9 @@ public struct HomeCore {
           await send(.set(\.selectedCategory, selectedCategory))
         } else {
           let categoryList = try await self.pomodoroService.getCategoryList(databaseClient: self.databaseClient)
-          if let basicCategory = categoryList.first(where: { $0.baseCategoryCode == .basic }) {
-            await self.pomodoroService.changeSelectedCategory(
+          if let basicCategory = categoryList.first(where: { $0.iconType == .cat }) { // TODO: 로직 확인 25.0317
+            try await self.pomodoroService.changeSelectedCategory(
+              apiClient: self.apiClient,
               userDefaultsClient: self.userDefaultsClient,
               categoryID: basicCategory.id
             )

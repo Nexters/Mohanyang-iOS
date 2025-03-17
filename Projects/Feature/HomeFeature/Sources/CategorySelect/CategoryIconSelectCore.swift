@@ -12,15 +12,15 @@ import ComposableArchitecture
 public struct CategoryIconSelectCore {
   @ObservableState
   public struct State: Equatable {
-    var selectedIcon: PomodoroCategoryCode
+    var selectedIcon: PomodoroIconType
 
-    public init(selectedIcon: PomodoroCategoryCode) {
+    public init(selectedIcon: PomodoroIconType) {
       self.selectedIcon = selectedIcon
     }
   }
 
   public enum Action {
-    case selectIcon(PomodoroCategoryCode)
+    case selectIcon(PomodoroIconType)
   }
 
   public var body: some ReducerOf<Self> {

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import APIClientInterface
 import PomodoroServiceInterface
 import DatabaseClientInterface
 import UserDefaultsClientInterface
@@ -70,6 +71,7 @@ public struct CategorySelectCore {
     }
   }
 
+  @Dependency(APIClient.self) var apiClient
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -138,7 +140,8 @@ public struct CategorySelectCore {
       state.selectedCategory = category
       return .run { [selectedCategory = state.selectedCategory] send in
         if let selectedCategory {
-          await self.pomodoroService.changeSelectedCategory(
+          try await self.pomodoroService.changeSelectedCategory(
+            apiClient: self.apiClient,
             userDefaultsClient: self.userDefaultsClient,
             categoryID: selectedCategory.id
           )

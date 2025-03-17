@@ -16,9 +16,9 @@ import DependenciesMacros
 
 @DependencyClient
 public struct PomodoroService {
-  public var syncCategoryList: @Sendable (_ apiClient: APIClient, _ databaseClient: DatabaseClient) async throws -> Void
+  public var syncCategoryList: @Sendable (_ apiClient: APIClient, _ userDefaultsClient: UserDefaultsClient, _ databaseClient: DatabaseClient) async throws -> Void
   public var getCategoryList: @Sendable (_ databaseClient: DatabaseClient) async throws -> [PomodoroCategory]
-  public var changeSelectedCategory: @Sendable (_ userDefaultsClient: UserDefaultsClient, _ categoryID: Int) async -> Void
+  public var changeSelectedCategory: @Sendable (_ apiClient: APIClient, _ userDefaultsClient: UserDefaultsClient, _ categoryID: Int) async throws -> Void
   public var getSelectedCategory: @Sendable (_ userDefaultsClient: UserDefaultsClient, _ databaseClient: DatabaseClient) async throws -> PomodoroCategory?
   public var changeCategoryTime: @Sendable (_ apiClient: APIClient, _ categoryID: Int, _ request: EditCategoryRequest) async throws -> Void
   public var saveFocusTimeHistory: @Sendable (_ apiClient: APIClient, _ databaseClient: DatabaseClient, _ request: [FocusTimeHistory]) async throws -> Void

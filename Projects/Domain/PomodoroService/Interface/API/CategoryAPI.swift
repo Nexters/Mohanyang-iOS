@@ -11,6 +11,7 @@ import APIClientInterface
 @_spi(Internal)
 public enum CategoryAPI {
   case getCategory(id: Int)
+  case selectCategory(id: Int)
   case editCategory(id: Int, request: EditCategoryRequest)
   case getCategoryList
 }
@@ -24,7 +25,10 @@ extension CategoryAPI: APIBaseRequest {
     switch self {
     case let .getCategory(id):
       return "/api/v1/categories/\(id)"
-      
+
+    case let .selectCategory(id):
+      return "/api/v1/categories/select/\(id)"
+
     case let .editCategory(id, _):
       return "/api/v1/categories/\(id)"
       
@@ -37,7 +41,10 @@ extension CategoryAPI: APIBaseRequest {
     switch self {
     case .getCategory:
       return .get
-      
+
+    case .selectCategory:
+      return .patch
+
     case .editCategory:
       return .patch
       
@@ -50,7 +57,10 @@ extension CategoryAPI: APIBaseRequest {
     switch self {
     case .getCategory:
       return .requestPlain
-      
+
+    case .selectCategory:
+      return .requestPlain
+
     case let .editCategory(_, request):
       return .body(request)
       

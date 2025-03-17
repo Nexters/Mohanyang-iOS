@@ -26,47 +26,53 @@ public struct PomodoroCategory:
     return no
   }
   public let no: Int
-  public let baseCategoryCode: PomodoroCategoryCode
+  /// deprecated: 25.03.17
+  public let iconType: PomodoroIconType
   public let title: String
   public let position: Int
   public var focusTime: String
   public var restTime: String
-  
+  public var isSelected: Bool
+
   public init(
     no: Int,
-    baseCategoryCode: PomodoroCategoryCode,
+    iconType: PomodoroIconType,
     title: String,
     position: Int,
     focusTime: String,
-    restTime: String
+    restTime: String,
+    isSelected: Bool
   ) {
     self.no = no
-    self.baseCategoryCode = baseCategoryCode
+    self.iconType = iconType
     self.title = title
     self.position = position
     self.focusTime = focusTime
     self.restTime = restTime
+    self.isSelected = isSelected
   }
   
   @_spi(Internal)
   public init(managedObject: PomodoroCategoryObject) {
     self.no = managedObject.no
-    self.baseCategoryCode = managedObject.baseCategoryCode
+    self.iconType = managedObject.iconType
     self.title = managedObject.title
     self.position = managedObject.position
     self.focusTime = managedObject.focusTime
     self.restTime = managedObject.restTime
+    self.isSelected = managedObject.isSelected
   }
   
   @_spi(Internal)
   public func managedObject() -> PomodoroCategoryObject {
     let object = PomodoroCategoryObject()
     object.no = no
-    object.baseCategoryCode = baseCategoryCode
+    object.iconType = iconType
     object.title = title
     object.position = position
     object.focusTime = focusTime
     object.restTime = restTime
+    object.isSelected = isSelected
     return object
   }
 }
@@ -93,24 +99,46 @@ extension PomodoroCategory {
   }
 }
 
-public enum PomodoroCategoryCode: String, PersistableEnum, Codable, CaseIterable {
-  case basic = "BASIC"
-  case books = "BOOKS"
-  case study = "STUDY"
-  case work = "WORK"
+public enum PomodoroIconType: String, PersistableEnum, Codable, CaseIterable {
+  case bell = "BELL"
+  case fire = "FIRE"
+  case lightning = "LIGHTNING"
+  case cat = "CAT"
+  case monitor = "MONITOR"
+  case boxPen = "BOX_PEN"
+  case openBook = "OPEN_BOOK"
+  case alarm = "ALARM"
+  case bubbleEllipses = "BUBBLE_ELLIPSES"
+  case asterisk = "ASTERISK"
+  case heart = "HEART"
+  case checkCircle = "CHECK_CIRCLE"
+  case laptop = "LAPTOP"
+  case dumbbell = "DUMBBELL"
+  case briefcase = "BRIEFCASE"
+  case moon = "MOON"
+  case sun = "SUN"
 }
 
-extension PomodoroCategoryCode {
+extension PomodoroIconType {
   public var image: Image {
     switch self {
-    case .basic:
-      return DesignSystemAsset.Image._40Cat.swiftUIImage
-    case .books:
-      return DesignSystemAsset.Image._40OpenBook.swiftUIImage
-    case .study:
-      return DesignSystemAsset.Image._40BoxPen.swiftUIImage
-    case .work:
-      return DesignSystemAsset.Image._40Monitor.swiftUIImage
+    case .bell: return DesignSystemAsset.Image.bell.swiftUIImage
+    case .fire: return DesignSystemAsset.Image.fire.swiftUIImage
+    case .lightning: return DesignSystemAsset.Image.lightning.swiftUIImage
+    case .cat: return DesignSystemAsset.Image.cat.swiftUIImage
+    case .monitor: return DesignSystemAsset.Image.monitor.swiftUIImage
+    case .boxPen: return DesignSystemAsset.Image.boxPen.swiftUIImage
+    case .openBook: return DesignSystemAsset.Image.openBook.swiftUIImage
+    case .alarm: return DesignSystemAsset.Image.alarm.swiftUIImage
+    case .bubbleEllipses: return DesignSystemAsset.Image.bubbleEllipses.swiftUIImage
+    case .asterisk: return DesignSystemAsset.Image.asterisk.swiftUIImage
+    case .heart: return DesignSystemAsset.Image.heart.swiftUIImage
+    case .checkCircle: return DesignSystemAsset.Image.checkCircle.swiftUIImage
+    case .laptop: return DesignSystemAsset.Image.laptop.swiftUIImage
+    case .dumbbell: return DesignSystemAsset.Image.dumbbell.swiftUIImage
+    case .briefcase: return DesignSystemAsset.Image.briefcase.swiftUIImage
+    case .moon: return DesignSystemAsset.Image.moon.swiftUIImage
+    case .sun: return DesignSystemAsset.Image.sun.swiftUIImage
     }
   }
 }
@@ -118,9 +146,10 @@ extension PomodoroCategoryCode {
 @_spi(Internal)
 public final class PomodoroCategoryObject: Object {
   @Persisted(primaryKey: true) var no: Int
-  @Persisted var baseCategoryCode: PomodoroCategoryCode
+  @Persisted var iconType: PomodoroIconType
   @Persisted var title: String
   @Persisted var position: Int
   @Persisted var focusTime: String
   @Persisted var restTime: String
+  @Persisted var isSelected: Bool
 }

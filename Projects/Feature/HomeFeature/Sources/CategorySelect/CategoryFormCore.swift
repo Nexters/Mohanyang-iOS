@@ -17,7 +17,7 @@ public struct CategoryFormCore {
   public struct State: Equatable {
     var formType: FormType
     var isButtonDisabled: Bool = false
-    var selectedIcon: PomodoroCategoryCode = .basic
+    var selectedIcon: PomodoroIconType = .cat
     var text: String = ""
     var inputFieldError: CategoryNameError?
 
@@ -28,10 +28,10 @@ public struct CategoryFormCore {
       switch type {
       case .add:
         self.text = ""
-        self.selectedIcon = .basic
+        self.selectedIcon = .cat
       case .edit(let category):
         self.text = category.title
-        self.selectedIcon = category.baseCategoryCode
+        self.selectedIcon = category.iconType
       }
     }
   }

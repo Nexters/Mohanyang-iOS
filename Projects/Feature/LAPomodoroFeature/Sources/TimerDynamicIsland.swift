@@ -39,7 +39,7 @@ struct TimerDynamicIsland {
               .foregroundStyle(Alias.Color.Text.disabled)
               .font(Typography.bodySB)
           } else {
-            context.state.category.baseCategoryCode.image
+            context.state.category.iconType.image
               .resizable()
               .frame(width: 20, height: 20)
             Text(context.state.category.title)
@@ -90,7 +90,7 @@ struct TimerDynamicIsland {
   
   @ViewBuilder
   var compactLeadingView: some View {
-    context.state.category.baseCategoryCode.image
+    context.state.category.iconType.image
       .resizable()
       .frame(width: 20, height: 20)
   }
