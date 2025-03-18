@@ -129,7 +129,6 @@ public struct HomeView: View {
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
     .toastDestination(toast: $store.toast)
-    .dialog(dialog: $store.dialog)
     .bottomSheet(
       item: $store.scope(
         state: \.categorySelect,
@@ -138,6 +137,7 @@ public struct HomeView: View {
     ) { store in
       CategorySelectView(store: store)
     }
+    .dialog(dialog: $store.dialog)
     .fullScreenCover(
       item: $store.scope(
         state: \.timeSelect,

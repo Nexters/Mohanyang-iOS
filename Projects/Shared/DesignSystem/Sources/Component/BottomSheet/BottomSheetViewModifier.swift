@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Utils
 
 struct BottomSheetViewModifier<
   Item: Identifiable & Equatable,
@@ -15,10 +16,15 @@ struct BottomSheetViewModifier<
   @Binding var item: Item?
   let bottomSheetContent: (Item) -> BottomSheetContent
   @State var yOffset: CGFloat = 0
-  
+  @State var opacity: Double = 0
+
   func body(content: Content) -> some View {
-    content
-      .fullScreenCover(item: $item) { item in
+    ZStack {
+      content
+      Global.Color.black.opacity(opacity)
+        .ignoresSafeArea()
+
+      if let item = item {
         VStack(spacing: .zero) {
           Color.black.opacity(0.001)
             .onTapGesture {
@@ -43,7 +49,12 @@ struct BottomSheetViewModifier<
         }
         .presentationBackground(.clear)
       }
-      .updateBottomSheetBackground($item)
+    }
+    .onChange(of: item == nil) { _, value in
+      withAnimation(.easeInOut) {
+        opacity = value ? 0 : Global.Opacity._50d
+      }
+    }
   }
 }
 
@@ -60,26 +71,26 @@ extension View {
 }
 
 
-extension View {
-  func updateBottomSheetBackground<Item: Identifiable>(_ item: Binding<Item?>) -> some View {
-    self.modifier(BottomSheetBackgroundModifier(item: item))
-  }
-}
+//extension View {
+//  func updateBottomSheetBackground<Item: Identifiable>(_ item: Binding<Item?>) -> some View {
+//    self.modifier(BottomSheetBackgroundModifier(item: item))
+//  }
+//}
 
-struct BottomSheetBackgroundModifier<Item: Identifiable>: ViewModifier {
-  @Binding var item: Item?
-  @State var opacity: Double = 0
-  
-  func body(content: Content) -> some View {
-    ZStack {
-      content
-      Global.Color.black.opacity(opacity)
-        .ignoresSafeArea()
-    }
-    .onChange(of: item == nil) { _, value in
-      withAnimation(.easeInOut) {
-        opacity = value ? 0 : Global.Opacity._50d
-      }
-    }
-  }
-}
+//struct BottomSheetBackgroundModifier<Item: Identifiable>: ViewModifier {
+//  @Binding var item: Item?
+//  @State var opacity: Double = 0
+//  
+//  func body(content: Content) -> some View {
+//    ZStack {
+//      content
+//      Global.Color.black.opacity(opacity)
+//        .ignoresSafeArea()
+//    }
+//    .onChange(of: item == nil) { _, value in
+//      withAnimation(.easeInOut) {
+//        opacity = value ? 0 : Global.Opacity._50d
+//      }
+//    }
+//  }
+//}

@@ -15,10 +15,10 @@ public struct EditCategoryRequest: Encodable {
   let restTime: String?
   
   public init(
-    title: String?,
-    iconType: String?,
-    focusTime: String?,
-    restTime: String?
+    title: String? = nil,
+    iconType: String? = nil,
+    focusTime: String? = nil,
+    restTime: String? = nil
   ) {
     self.title = title
     self.iconType = iconType
