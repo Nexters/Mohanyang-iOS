@@ -82,7 +82,7 @@ public struct CategoryFormCore {
     case .onAppear:
       return .none
 
-    case .bottomCheckButtonTapped: // home에서 받아서 해당 뷰 dismiss하기 3.27
+    case .bottomCheckButtonTapped:
       return .run { [type = state.formType, title = state.text, iconType = state.selectedIcon.rawValue] send in
         switch type {
         case .add:
@@ -114,6 +114,11 @@ public struct CategoryFormCore {
       return .none
 
     case .iconSelect:
+      return .none
+
+    case .binding(\.text):
+      state.inputFieldError = state.text.count > 10 ? .exceedsMaxLength : nil
+      state.isButtonDisabled = state.text.isEmpty ? true : false
       return .none
 
     case .binding:
