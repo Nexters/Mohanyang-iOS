@@ -67,6 +67,7 @@ public struct HomeCore {
     case catSetInput
     case _fetchNetworkConnection(Bool)
     case syncCategory
+    case deleteCategories([Int])
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
     case myPage(PresentationAction<MyPageCore.Action>)
@@ -211,7 +212,11 @@ public struct HomeCore {
           }
         }
       }
-      
+
+    case .deleteCategories:
+      // delete 서버통신
+      return .none
+
     case .categorySelect(.presented(.selectCategory)):
       state.toast = DefaultToast(
         message: "카테고리를 변경했어요",
@@ -232,9 +237,13 @@ public struct HomeCore {
       state.categoryForm = CategoryFormCore.State(type: .edit(category))
       return .none
 
-    case .categorySelect(.presented(.deleteCategoriesTapped)):
-      state.dialog = deleteCategoriesDialog()
-      return .none
+    case let .categorySelect(.presented(.deleteCategoriesTapped(ids))):
+      return .run { send in
+        let deleteDialog = deleteCategoriesDialog {
+          await send(.deleteCategories(ids))
+        }
+        await send(.set(\.dialog, deleteDialog))
+      }
 
     case .categorySelect:
       return .none
@@ -331,12 +340,12 @@ extension HomeCore {
     )
   }
 
-  private func deleteCategoriesDialog() -> DefaultDialog {
+  private func deleteCategoriesDialog(action: @escaping () async -> Void) -> DefaultDialog {
     return DefaultDialog(
       title: "카테고리를 삭제할까요?",
       subTitle: "카테고리로 집중한 기록도 함께 사라져요",
       firstButton: DialogButtonModel(title: "취소"),
-      secondButton: DialogButtonModel(title: "삭제하기"),
+      secondButton: DialogButtonModel(title: "삭제하기", action: action),
       showCloseButton: false
     )
   }

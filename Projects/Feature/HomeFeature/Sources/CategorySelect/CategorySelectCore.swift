@@ -22,7 +22,7 @@ public struct CategorySelectCore {
     var selectType: CategorySelectType = .select
     var selectedCategory: PomodoroCategory?
     var selectedEditCategory: PomodoroCategory?
-    var selectedDeleteCategory: [PomodoroCategory] = []
+    var selectedDeleteCategory: [Int] = []
     var categoryList: [PomodoroCategory] = [] {
       didSet {
         isCategoryAddAvailable = categoryList.count < 10
@@ -49,7 +49,7 @@ public struct CategorySelectCore {
     case selectDeleteCategory(PomodoroCategory)
 
     case addCategoryTapped
-    case deleteCategoriesTapped
+    case deleteCategoriesTapped([Int])
   }
 
   public enum CategorySelectType {
@@ -156,7 +156,7 @@ public struct CategorySelectCore {
       }
 
     case let .selectDeleteCategory(category):
-      state.selectedDeleteCategory.append(category)
+      state.selectedDeleteCategory.append(category.id)
       return .none
 
     case .addCategoryTapped:

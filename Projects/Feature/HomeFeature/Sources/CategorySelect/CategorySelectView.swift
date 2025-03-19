@@ -83,7 +83,7 @@ public struct CategorySelectView: View {
 
         if store.selectType == .delete {
           Button(title: "\(store.selectedDeleteCategory.count)개 삭제하기") {
-            store.send(.deleteCategoriesTapped)
+            store.send(.deleteCategoriesTapped(store.selectedDeleteCategory))
           }
           .buttonStyle(.box(level: .secondary, size: .large, width: .low))
           .disabled(store.selectedDeleteCategory.isEmpty)
@@ -144,7 +144,7 @@ extension CategorySelectView {
         )
       )
     case .delete:
-      let selectedCategory = store.selectedDeleteCategory.contains(category)
+      let selectedCategory = store.selectedDeleteCategory.contains(category.id)
       Button(
         title: .init(category.title),
         subtitle: nil,
