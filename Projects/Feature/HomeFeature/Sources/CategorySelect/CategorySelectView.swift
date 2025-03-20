@@ -91,16 +91,6 @@ public struct CategorySelectView: View {
       }
       .padding(.horizontal, Alias.Spacing.large)
       .padding(.bottom, Alias.Spacing.medium)
-
-      if store.selectType == .delete {
-        Button(title: "\(store.selectedDeleteCategory.count)개 삭제하기") {
-          store.send(.deleteCategoriesTapped(store.selectedDeleteCategory))
-        }
-        .padding(.horizontal, Alias.Spacing.large)
-        .padding(.bottom, Alias.Spacing.medium)
-        .buttonStyle(.box(level: .secondary, size: .large, width: .low))
-        .disabled(store.selectedDeleteCategory.isEmpty)
-      }
     }
     .coordinateSpace(name: "CategorySelectBottomSheet")
     .overlay {
