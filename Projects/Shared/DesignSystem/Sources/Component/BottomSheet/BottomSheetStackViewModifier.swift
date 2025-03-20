@@ -1,25 +1,27 @@
 //
-//  BottomSheet.swift
-//  DesignSystemExample
+//  BottomSheetStackViewModifier.swift
+//  DesignSystem
 //
-//  Created by devMinseok on 8/12/24.
-//  Copyright © 2024 PomoNyang. All rights reserved.
+//  Created by 김지현 on 3/20/25.
+//  Copyright © 2025 PomoNyang. All rights reserved.
 //
 
 import SwiftUI
 import Utils
 
-struct BottomSheetViewModifier<
+struct BottomSheetStackViewModifier<
   Item: Identifiable & Equatable,
   BottomSheetContent: View
 >: ViewModifier {
   @Binding var item: Item?
   let bottomSheetContent: (Item) -> BottomSheetContent
-  @State var yOffset: CGFloat = 0
 
   func body(content: Content) -> some View {
-    content
-      .fullScreenCover(item: $item) { item in
+    ZStack(alignment: .bottom) {
+      content
+        .updateBottomSheetBackground($item)
+        .zIndex(1)
+      if let item {
         VStack(spacing: .zero) {
           Color.black.opacity(0.001)
             .onTapGesture {
@@ -42,44 +44,23 @@ struct BottomSheetViewModifier<
               .frame(height: 30)
             }
         }
-        .presentationBackground(.clear)
-      }
-      .updateBottomSheetBackground($item)
-  }
-}
-
-extension View {
-  func updateBottomSheetBackground<Item: Identifiable>(_ item: Binding<Item?>) -> some View {
-    self.modifier(BottomSheetBackgroundModifier(item: item))
-  }
-}
-
-struct BottomSheetBackgroundModifier<Item: Identifiable>: ViewModifier {
-  @Binding var item: Item?
-  @State var opacity: Double = 0
-
-  func body(content: Content) -> some View {
-    ZStack {
-      content
-      Global.Color.black.opacity(opacity)
-        .ignoresSafeArea()
-    }
-    .onChange(of: item == nil) { _, value in
-      withAnimation(.easeInOut) {
-        opacity = value ? 0 : Global.Opacity._50d
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .zIndex(2)
       }
     }
+    .animation(.spring(duration: 0.3), value: item == nil)
   }
 }
 
+
 extension View {
-  public func bottomSheet<
+  public func bottomSheetStack<
     Item: Identifiable & Equatable,
     Content: View
   >(
     item: Binding<Item?>,
     @ViewBuilder content: @escaping (Item) -> Content
   ) -> some View {
-    return self.modifier(BottomSheetViewModifier(item: item, bottomSheetContent: content))
+    return self.modifier(BottomSheetStackViewModifier(item: item, bottomSheetContent: content))
   }
 }

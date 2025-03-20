@@ -18,7 +18,6 @@ import ComposableArchitecture
 public struct CategorySelectCore {
   @ObservableState
   public struct State: Equatable {
-    var moreButtonFrame: CGRect = .zero
     var selectType: CategorySelectType = .select
     var selectedCategory: PomodoroCategory?
     var selectedEditCategory: PomodoroCategory?
@@ -35,7 +34,6 @@ public struct CategorySelectCore {
   
   public enum Action {
     case onAppear
-    case setMoreButtonFrame(CGRect)
     case showMenu(Bool)
     case cancelButtonTapped
     case editButtonTapped
@@ -102,10 +100,6 @@ public struct CategorySelectCore {
         )
         await send(.setSelectedCategory(selectedCategory))
       }
-
-    case .setMoreButtonFrame(let frame):
-      state.moreButtonFrame = frame
-      return .none
 
     case .showMenu(let isShow):
       state.isMenuViewShow = isShow

@@ -16,7 +16,7 @@ import DatadogRUM
 
 public struct CategorySelectView: View {
   @Namespace var moreButtonFrameID
-  var moreButtonFrame: CGRect = .zero
+  @State var moreButtonFrame: CGRect = .zero
   @Bindable var store: StoreOf<CategorySelectCore>
 
   private var columns: [GridItem] {
@@ -61,7 +61,7 @@ public struct CategorySelectView: View {
           .setFrameMeasure(space: .named("CategorySelectBottomSheet"), identifier: moreButtonFrameID)
           .getFrameMeasure { value in
             guard let frame = value[moreButtonFrameID] else { return }
-            store.send(.setMoreButtonFrame(frame))
+            self.moreButtonFrame = frame
           }
 
         } else {
@@ -91,6 +91,16 @@ public struct CategorySelectView: View {
       }
       .padding(.horizontal, Alias.Spacing.large)
       .padding(.bottom, Alias.Spacing.medium)
+
+      if store.selectType == .delete {
+        Button(title: "\(store.selectedDeleteCategory.count)개 삭제하기") {
+          store.send(.deleteCategoriesTapped(store.selectedDeleteCategory))
+        }
+        .padding(.horizontal, Alias.Spacing.large)
+        .padding(.bottom, Alias.Spacing.medium)
+        .buttonStyle(.box(level: .secondary, size: .large, width: .low))
+        .disabled(store.selectedDeleteCategory.isEmpty)
+      }
     }
     .coordinateSpace(name: "CategorySelectBottomSheet")
     .overlay {
@@ -102,7 +112,7 @@ public struct CategorySelectView: View {
           }
           .overlay(alignment: .topTrailing) {
             CategorySelectMenuView(
-              position: store.moreButtonFrame,
+              position: moreButtonFrame,
               onEditTapped: { store.send(.editButtonTapped) },
               onDeleteTapped: { store.send(.deleteButtonTapped) }
             )
