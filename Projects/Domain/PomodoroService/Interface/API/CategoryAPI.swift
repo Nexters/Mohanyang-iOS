@@ -14,7 +14,7 @@ public enum CategoryAPI {
   case selectCategory(id: Int)
   case addCategory(request: AddCategoryRequest)
   case editCategory(id: Int, request: EditCategoryRequest)
-  case deleteCategory(id: Int)
+  case deleteCategory(request: DeleteCategoryRequest)
   case getCategoryList
 }
 
@@ -37,8 +37,8 @@ extension CategoryAPI: APIBaseRequest {
     case let .editCategory(id, _):
       return "/api/v1/categories/\(id)"
 
-    case let .deleteCategory(id):
-      return "/api/v1/categories/\(id)"
+    case let .deleteCategory:
+      return "/api/v1/categories"
 
     case .getCategoryList:
       return "/api/v1/categories"
@@ -81,8 +81,8 @@ extension CategoryAPI: APIBaseRequest {
     case let .editCategory(_, request):
       return .body(request)
 
-    case .deleteCategory:
-      return .requestPlain
+    case let .deleteCategory(request):
+      return .body(request)
 
     case .getCategoryList:
       return .requestPlain

@@ -61,6 +61,10 @@ extension PomodoroService: DependencyKey {
         let api = FocusTimeAPI.getSummaries
         return try await apiClient.apiRequest(request: api, as: FocusTimeSummary.self)
       },
+      deleteCategories: { apiClient, request in
+        let api = CategoryAPI.deleteCategory(request: request)
+        _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
+      },
       registerBGTaskToUpdateTimer: { bgTaskClient, liveActivityClient in
         bgTaskClient.registerTask(
           identifier: "com.pomonyang.mohanyang.update_LiveActivity",

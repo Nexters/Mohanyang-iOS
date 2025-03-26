@@ -23,7 +23,8 @@ public struct PomodoroService {
   public var changeCategoryTime: @Sendable (_ apiClient: APIClient, _ categoryID: Int, _ request: EditCategoryRequest) async throws -> Void
   public var saveFocusTimeHistory: @Sendable (_ apiClient: APIClient, _ databaseClient: DatabaseClient, _ request: [FocusTimeHistory]) async throws -> Void
   public var getFocusTimeSummaries: @Sendable (_ apiClient: APIClient) async throws -> FocusTimeSummary
-  
+  public var deleteCategories: @Sendable (_ apiClient: APIClient, _ request: DeleteCategoryRequest) async throws -> Void
+
   public var registerBGTaskToUpdateTimer: @Sendable (_ bgTaskClient: BackgroundTaskClient, _ liveActivityClient: LiveActivityClient) -> Bool = { _, _ in false }
 }
 
