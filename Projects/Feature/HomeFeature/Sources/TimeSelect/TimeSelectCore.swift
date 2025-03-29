@@ -121,7 +121,7 @@ public struct TimeSelectCore {
           }
           
           // TODO: - 오프라인 대응 필요
-          try? await self.pomodoroService.changeCategoryTime(
+          try? await self.pomodoroService.editCategory(
             apiClient: self.apiClient,
             categoryID: selectedCategoryID,
             request: request

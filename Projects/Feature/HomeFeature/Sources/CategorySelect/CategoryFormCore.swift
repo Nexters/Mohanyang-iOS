@@ -6,10 +6,11 @@
 //  Copyright © 2025 PomoNyang. All rights reserved.
 //
 
+import Foundation
+import APIClientInterface
 import PomodoroServiceInterface
 
 import ComposableArchitecture
-import Foundation
 
 @Reducer
 public struct CategoryFormCore {
@@ -63,6 +64,7 @@ public struct CategoryFormCore {
     }
   }
 
+  @Dependency(APIClient.self) var apiClient
   @Dependency(PomodoroService.self) var pomodoroService
 
   public init() {}
@@ -80,8 +82,21 @@ public struct CategoryFormCore {
     case .onAppear:
       return .none
 
-    case .bottomCheckButtonTapped:
-      return .none
+    case .bottomCheckButtonTapped: // home에서 받아서 해당 뷰 dismiss하기 3.27
+      return .run { [type = state.formType, title = state.text, iconType = state.selectedIcon.rawValue] send in
+        switch type {
+        case .add:
+          try await self.pomodoroService.addCategory(
+            apiClient: apiClient,
+            request: .init(title: title, iconType: iconType)
+          )
+        case .edit(let category):
+          try await self.pomodoroService.editCategory(
+            apiClient: apiClient, categoryID: category.id,
+            request: .init(title: title, iconType: iconType)
+          )
+        }
+      }
 
     case ._addNewCategoryResponse(_):
       return .none

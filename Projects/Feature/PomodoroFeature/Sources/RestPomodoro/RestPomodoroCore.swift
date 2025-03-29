@@ -279,7 +279,7 @@ public struct RestPomodoroCore {
     let iso8601Duration = DateComponents(minute: changedTimeMinute).to8601DurationString()
     let request = EditCategoryRequest(focusTime: nil, restTime: iso8601Duration)
     
-    try await self.pomodoroService.changeCategoryTime(
+    try await self.pomodoroService.editCategory(
       apiClient: self.apiClient,
       categoryID: selectedCategory.id,
       request: request

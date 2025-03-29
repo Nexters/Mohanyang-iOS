@@ -305,6 +305,10 @@ public struct HomeCore {
     case .pomodoro:
       return .none
 
+    case .categoryForm(.presented(.bottomCheckButtonTapped)):
+      state.categoryForm = nil
+      return .none
+
     case .categoryForm:
       return .none
 

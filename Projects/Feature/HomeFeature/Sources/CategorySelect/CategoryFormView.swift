@@ -58,7 +58,7 @@ public struct CategoryFormView: View {
         Spacer(minLength: 0)
 
         Button("확인") {
-          // add or edit
+          store.send(.bottomCheckButtonTapped)
         }
         .buttonStyle(.box(level: .primary, size: .large, width: .low))
         .disabled(store.isButtonDisabled)

@@ -46,7 +46,7 @@ extension PomodoroService: DependencyKey {
         let results = try await databaseClient.read(PomodoroCategory.self, predicateFormat: "#no == %d", args: selectedCategoryID)
         return results.first
       },
-      changeCategoryTime: { apiClient, categoryID, request in
+      editCategory: { apiClient, categoryID, request in
         let api = CategoryAPI.editCategory(id: categoryID, request: request)
         _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
       },
@@ -60,6 +60,10 @@ extension PomodoroService: DependencyKey {
       getFocusTimeSummaries: { apiClient in
         let api = FocusTimeAPI.getSummaries
         return try await apiClient.apiRequest(request: api, as: FocusTimeSummary.self)
+      },
+      addCategory: { apiClient, request in
+        let api = CategoryAPI.addCategory(request: request)
+        _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
       },
       deleteCategories: { apiClient, request in
         let api = CategoryAPI.deleteCategory(request: request)
