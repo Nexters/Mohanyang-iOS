@@ -11,16 +11,13 @@ import SwiftUI
 public struct SelectListButtonStyle: ButtonStyle {
   let isSelected: Bool
   let isDisabled: Bool
-  let iconSize: CGSize
 
   public init(
     isSelected: Bool,
-    isDisabled: Bool,
-    iconSize: CGSize
+    isDisabled: Bool
   ) {
     self.isSelected = isSelected
     self.isDisabled = isDisabled
-    self.iconSize = iconSize
   }
   
   public func makeBody(configuration: Configuration) -> some View {
@@ -28,8 +25,7 @@ public struct SelectListButtonStyle: ButtonStyle {
       .selectButtonDetailStyle(
         SelectListButtonDetailStyleImpl(
           isSelected: isSelected,
-          isDisabled: isDisabled,
-          iconSize: iconSize
+          isDisabled: isDisabled
         )
       )
   }
@@ -38,17 +34,15 @@ public struct SelectListButtonStyle: ButtonStyle {
 extension ButtonStyle where Self == SelectListButtonStyle {
   public static func selectList(
     isSelected: Bool,
-    isDisabled: Bool = false,
-    iconSize: CGSize = .init(width: 24, height: 24)
+    isDisabled: Bool = false
   ) -> Self {
-    return SelectListButtonStyle(isSelected: isSelected, isDisabled: isDisabled, iconSize: iconSize)
+    return SelectListButtonStyle(isSelected: isSelected, isDisabled: isDisabled)
   }
 }
 
 struct SelectListButtonDetailStyleImpl: SelectButtonDetailStyle {
   let isSelected: Bool
   let isDisabled: Bool
-  let iconSize: CGSize
 
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: Alias.Spacing.medium) {
@@ -63,7 +57,6 @@ struct SelectListButtonDetailStyleImpl: SelectButtonDetailStyle {
             configuration.leftIcon
           }
         }
-        .frame(width: iconSize.width, height: iconSize.height)
 
         configuration.title
           .lineLimit(1)

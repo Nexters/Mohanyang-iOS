@@ -65,7 +65,7 @@ public struct RestWaitingView: View {
             HStack(spacing: Alias.Spacing.small) {
               Button(
                 subtitle: "5분",
-                leftIcon: DesignSystemAsset.Image._16MinusTertiary.swiftUIImage
+                leftIcon: { DesignSystemAsset.Image._16MinusTertiary.swiftUIImage }
               ) {
                 store.send(.minus5MinuteButtonTapped)
               }
@@ -77,7 +77,7 @@ public struct RestWaitingView: View {
               )
               Button(
                 subtitle: "5분",
-                leftIcon: DesignSystemAsset.Image._16PlusTertiary.swiftUIImage
+                leftIcon: { DesignSystemAsset.Image._16PlusTertiary.swiftUIImage }
               ) {
                 store.send(.plus5MinuteButtonTapped)
               }
