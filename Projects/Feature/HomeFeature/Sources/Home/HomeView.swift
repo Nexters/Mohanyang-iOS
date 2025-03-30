@@ -129,7 +129,7 @@ public struct HomeView: View {
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
     .toastDestination(toast: $store.toast)
-    .bottomSheetStack(
+    .bottomSheet(
       item: $store.scope(
         state: \.categorySelect,
         action: \.categorySelect

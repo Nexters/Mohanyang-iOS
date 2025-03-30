@@ -216,7 +216,6 @@ public struct HomeCore {
     case .deleteCategories(let ids):
       return .run { send in
         try await self.pomodoroService.deleteCategories(apiClient: apiClient, request: .init(no: ids))
-        await send(.set(\.dialog, nil))
       }
 
     case .categorySelect(.presented(.selectCategory)):
@@ -238,14 +237,6 @@ public struct HomeCore {
     case let .categorySelect(.presented(.selectEditCategory(category))):
       state.categoryForm = CategoryFormCore.State(type: .edit(category))
       return .none
-
-    case let .categorySelect(.presented(.deleteCategoriesTapped(ids))):
-      return .run { send in
-        let deleteDialog = deleteCategoriesDialog {
-          await send(.deleteCategories(ids))
-        }
-        await send(.set(\.dialog, deleteDialog))
-      }
 
     case .categorySelect:
       return .none
@@ -342,16 +333,6 @@ extension HomeCore {
       title: "집중을 끝내고 돌아왔어요",
       subTitle: "너무 오랜 시간동안 대기화면에 머물러서 홈화면으로 이동되었어요.",
       firstButton: DialogButtonModel(title: "확인"),
-      showCloseButton: false
-    )
-  }
-
-  private func deleteCategoriesDialog(action: @escaping () async -> Void) -> DefaultDialog {
-    return DefaultDialog(
-      title: "카테고리를 삭제할까요?",
-      subTitle: "카테고리로 집중한 기록도 함께 사라져요",
-      firstButton: DialogButtonModel(title: "취소"),
-      secondButton: DialogButtonModel(title: "삭제하기", action: action),
       showCloseButton: false
     )
   }
