@@ -118,7 +118,7 @@ public struct CategoryFormCore {
 
     case .binding(\.text):
       state.inputFieldError = state.text.count > 10 ? .exceedsMaxLength : nil
-      state.isButtonDisabled = state.text.isEmpty ? true : false
+      state.isButtonDisabled = state.text.isEmpty || state.inputFieldError != nil ? true : false
       return .none
 
     case .binding:
