@@ -48,13 +48,13 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
           }
-          
+
           // MARK: Buttons
           HStack(spacing: Alias.Spacing.medium) {
             Button(
               title: LocalizedStringKey(dialog.firstButton.title),
-              leftIcon: dialog.firstButton.leftIcon,
-              rightIcon: dialog.firstButton.rightIcon,
+              leftIcon: { dialog.firstButton.leftIcon },
+              rightIcon: { dialog.firstButton.rightIcon },
               action: {
                 self.dialog = nil
                 Task {
@@ -72,8 +72,8 @@ struct DialogViewModifier<T: Dialog>: ViewModifier {
             if let secondButton = dialog.secondButton {
               Button(
                 title: LocalizedStringKey(secondButton.title),
-                leftIcon: secondButton.leftIcon,
-                rightIcon: secondButton.rightIcon,
+                leftIcon: { secondButton.leftIcon },
+                rightIcon: { secondButton.rightIcon },
                 action: {
                   self.dialog = nil
                   Task {

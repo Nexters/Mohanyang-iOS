@@ -26,7 +26,7 @@ public struct RestPomodoroView: View {
         if let selectedCategory = store.selectedCategory {
           Button(
             title: .init(selectedCategory.title),
-            leftIcon: selectedCategory.iconType.image
+            leftIcon: { selectedCategory.iconType.image.resize(24) }
           ) {
           }
           .buttonStyle(.box(level: .tertiary, size: .small))

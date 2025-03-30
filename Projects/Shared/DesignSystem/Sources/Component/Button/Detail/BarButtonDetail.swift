@@ -8,20 +8,67 @@
 
 import SwiftUI
 
-extension Button where Label == BarButtonDetail<Text, Image?, Image?> {
+extension Button {
   public init(
     title: LocalizedStringKey,
-    leftIcon: Image? = nil,
-    rightIcon: Image? = nil,
     action: @escaping () -> Void
-  ) {
+  ) where Label == BarButtonDetail<Text, EmptyView?, EmptyView?> {
     self.init(action: action) {
       BarButtonDetail {
         Text(title)
       } leftIcon: {
-        leftIcon
+        nil as EmptyView?
       } rightIcon: {
-        rightIcon
+        nil as EmptyView?
+      }
+    }
+  }
+
+  public init<LeftIcon: View, RightIcon: View>(
+    title: LocalizedStringKey,
+    @ViewBuilder leftIcon: () -> LeftIcon?,
+    @ViewBuilder rightIcon: () -> RightIcon?,
+    action: @escaping () -> Void
+  ) where Label == BarButtonDetail<Text, LeftIcon?, RightIcon?> {
+    self.init(action: action) {
+      BarButtonDetail {
+        Text(title)
+      } leftIcon: {
+        leftIcon()
+      } rightIcon: {
+        rightIcon()
+      }
+    }
+  }
+
+  public init<LeftIcon: View>(
+    title: LocalizedStringKey,
+    @ViewBuilder leftIcon: () -> LeftIcon?,
+    action: @escaping () -> Void
+  ) where Label == BarButtonDetail<Text, LeftIcon?, EmptyView?> {
+    self.init(action: action) {
+      BarButtonDetail {
+        Text(title)
+      } leftIcon: {
+        leftIcon()
+      } rightIcon: {
+        nil as EmptyView?
+      }
+    }
+  }
+
+  public init<RightIcon: View>(
+    title: LocalizedStringKey,
+    @ViewBuilder rightIcon: () -> RightIcon?,
+    action: @escaping () -> Void
+  ) where Label == BarButtonDetail<Text, EmptyView?, RightIcon?> {
+    self.init(action: action) {
+      BarButtonDetail {
+        Text(title)
+      } leftIcon: {
+        nil as EmptyView?
+      } rightIcon: {
+        rightIcon()
       }
     }
   }

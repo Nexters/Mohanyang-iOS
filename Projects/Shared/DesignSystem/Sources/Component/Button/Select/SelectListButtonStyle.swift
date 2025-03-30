@@ -50,8 +50,8 @@ struct SelectListButtonDetailStyleImpl: SelectButtonDetailStyle {
         Group {
           if isDisabled {
             DesignSystemAsset.Image.lock.swiftUIImage
-              .resizable()
               .renderingMode(.template)
+              .resize(24)
               .foregroundStyle(Alias.Color.Icon.disabled)
           } else {
             configuration.leftIcon

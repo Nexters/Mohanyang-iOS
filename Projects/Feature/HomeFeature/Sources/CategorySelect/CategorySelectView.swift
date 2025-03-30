@@ -124,7 +124,7 @@ extension CategorySelectView {
       Button(
         title: .init(category.title),
         subtitle: nil,
-        leftIcon: { category.iconType.image }
+        leftIcon: { category.iconType.image.resize(24) }
       ) {
         store.send(.selectCategory(category))
       }
@@ -133,7 +133,7 @@ extension CategorySelectView {
       Button(
         title: .init(category.title),
         subtitle: nil,
-        leftIcon: { category.iconType.image }
+        leftIcon: { category.iconType.image.resize(24) }
       ) {
         store.send(.selectEditCategory(category))
       }
@@ -149,8 +149,9 @@ extension CategorySelectView {
         title: .init(category.title),
         subtitle: nil,
         leftIcon: {
-          selectedCategory ?
+          let image: Image = selectedCategory ?
           DesignSystemAsset.Image.checkCircle.swiftUIImage : DesignSystemAsset.Image.circle.swiftUIImage
+          return image.resize(24)
         }
       ) {
         store.send(.selectDeleteCategory(category))
