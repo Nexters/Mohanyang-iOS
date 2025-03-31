@@ -83,7 +83,11 @@ public struct CategoryFormCore {
       return .none
 
     case .bottomCheckButtonTapped:
-      return .run { [type = state.formType, title = state.text, iconType = state.selectedIcon.rawValue] send in
+      let type = state.formType
+      let title = state.text
+      let iconType = state.selectedIcon.rawValue
+
+      return .run { send in
         switch type {
         case .add:
           try await self.pomodoroService.addCategory(
@@ -117,7 +121,8 @@ public struct CategoryFormCore {
       return .none
 
     case .binding(\.text):
-      state.inputFieldError = state.text.count > 10 ? .exceedsMaxLength : nil
+      let max: Int = 10
+      state.inputFieldError = state.text.count > max ? .exceedsMaxLength(max) : nil
       state.isButtonDisabled = state.text.isEmpty || state.inputFieldError != nil ? true : false
       return .none
 

@@ -26,7 +26,6 @@ public struct PomodoroCategory:
     return no
   }
   public let no: Int
-  /// deprecated: 25.03.17
   public let iconType: PomodoroIconType
   public let title: String
   public let position: Int
@@ -99,7 +98,7 @@ extension PomodoroCategory {
   }
 }
 
-public enum PomodoroIconType: String, PersistableEnum, Codable, CaseIterable {
+public enum PomodoroIconType: String, Identifiable, PersistableEnum, Codable, CaseIterable {
   case cat = "CAT"
   case boxPen = "BOX_PEN"
   case openBook = "OPEN_BOOK"
@@ -115,20 +114,22 @@ public enum PomodoroIconType: String, PersistableEnum, Codable, CaseIterable {
 }
 
 extension PomodoroIconType {
+  public var id: String { rawValue }
+
   public var image: Image {
     switch self {
-    case .fire: return DesignSystemAsset.Image.fire.swiftUIImage
-    case .lightning: return DesignSystemAsset.Image.lightning.swiftUIImage
-    case .cat: return DesignSystemAsset.Image.cat.swiftUIImage
-    case .boxPen: return DesignSystemAsset.Image.boxPen.swiftUIImage
-    case .openBook: return DesignSystemAsset.Image.openBook.swiftUIImage
-    case .asterisk: return DesignSystemAsset.Image.asterisk.swiftUIImage
-    case .heart: return DesignSystemAsset.Image.heart.swiftUIImage
-    case .laptop: return DesignSystemAsset.Image.laptop.swiftUIImage
-    case .dumbbell: return DesignSystemAsset.Image.dumbbell.swiftUIImage
-    case .briefcase: return DesignSystemAsset.Image.briefcase.swiftUIImage
-    case .moon: return DesignSystemAsset.Image.moon.swiftUIImage
-    case .sun: return DesignSystemAsset.Image.sun.swiftUIImage
+    case .fire: DesignSystemAsset.Image.fire.swiftUIImage
+    case .lightning: DesignSystemAsset.Image.lightning.swiftUIImage
+    case .cat: DesignSystemAsset.Image.cat.swiftUIImage
+    case .boxPen: DesignSystemAsset.Image.boxPen.swiftUIImage
+    case .openBook: DesignSystemAsset.Image.openBook.swiftUIImage
+    case .asterisk: DesignSystemAsset.Image.asterisk.swiftUIImage
+    case .heart: DesignSystemAsset.Image.heart.swiftUIImage
+    case .laptop: DesignSystemAsset.Image.laptop.swiftUIImage
+    case .dumbbell: DesignSystemAsset.Image.dumbbell.swiftUIImage
+    case .briefcase: DesignSystemAsset.Image.briefcase.swiftUIImage
+    case .moon: DesignSystemAsset.Image.moon.swiftUIImage
+    case .sun: DesignSystemAsset.Image.sun.swiftUIImage
     }
   }
 }

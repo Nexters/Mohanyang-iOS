@@ -9,9 +9,9 @@
 import Foundation
 import DesignSystem
 
-enum CategoryNameError {
+enum CategoryNameError: Equatable {
   case cantSetExistName
-  case exceedsMaxLength
+  case exceedsMaxLength(Int)
 }
 
 extension CategoryNameError: InputFieldErrorProtocol {
@@ -19,8 +19,8 @@ extension CategoryNameError: InputFieldErrorProtocol {
     switch self {
     case .cantSetExistName:
       "이미 존재하는 카테고리예요."
-    case .exceedsMaxLength:
-      "최대 10글자까지 입력할 수 있어요."
+    case .exceedsMaxLength(let max):
+      "최대 \(max)글자까지 입력할 수 있어요."
     }
   }
 }

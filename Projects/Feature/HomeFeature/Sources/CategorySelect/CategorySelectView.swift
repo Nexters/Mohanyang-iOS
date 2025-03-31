@@ -18,6 +18,7 @@ public struct CategorySelectView: View {
   @Namespace var moreButtonFrameID
   @State var moreButtonFrame: CGRect = .zero
   @Bindable var store: StoreOf<CategorySelectCore>
+  @Namespace var CategorySelectBottomSheetID
 
   private var columns: [GridItem] {
     let columnCount = store.categoryList.count > 1 ? 2 : 1
@@ -58,7 +59,7 @@ public struct CategorySelectView: View {
           }
           .buttonStyle(.icon(isFilled: false, level: .primary))
           .padding(.leading, 8)
-          .setFrameMeasure(space: .named("CategorySelectBottomSheet"), identifier: moreButtonFrameID)
+          .setFrameMeasure(space: .named(CategorySelectBottomSheetID), identifier: moreButtonFrameID)
           .getFrameMeasure { value in
             guard let frame = value[moreButtonFrameID] else { return }
             self.moreButtonFrame = frame
@@ -92,7 +93,7 @@ public struct CategorySelectView: View {
       .padding(.horizontal, Alias.Spacing.large)
       .padding(.bottom, Alias.Spacing.medium)
     }
-    .coordinateSpace(name: "CategorySelectBottomSheet")
+    .coordinateSpace(name: CategorySelectBottomSheetID)
     .overlay {
       if store.isMenuViewShow {
         Color.clear

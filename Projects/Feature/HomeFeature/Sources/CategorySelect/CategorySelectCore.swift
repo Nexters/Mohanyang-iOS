@@ -55,16 +55,16 @@ public struct CategorySelectCore {
 
     var title: String {
       switch self {
-      case .select: return "카테고리"
-      case .edit: return "카테고리 수정"
-      case .delete: return "카테고리 삭제"
+      case .select: "카테고리"
+      case .edit: "카테고리 수정"
+      case .delete: "카테고리 삭제"
       }
     }
 
     var desc: String? {
       switch self {
-      case .edit: return "수정할 카테고리를 선택해주세요."
-      default: return nil
+      case .edit: "수정할 카테고리를 선택해주세요."
+      default: nil
       }
     }
   }

@@ -9,15 +9,11 @@
 import SwiftUI
 
 public struct SelectListButtonStyle: ButtonStyle {
+  @Environment(\.isEnabled) var isEnabled
   let isSelected: Bool
-  let isDisabled: Bool
 
-  public init(
-    isSelected: Bool,
-    isDisabled: Bool
-  ) {
+  public init(isSelected: Bool) {
     self.isSelected = isSelected
-    self.isDisabled = isDisabled
   }
   
   public func makeBody(configuration: Configuration) -> some View {
@@ -25,7 +21,7 @@ public struct SelectListButtonStyle: ButtonStyle {
       .selectButtonDetailStyle(
         SelectListButtonDetailStyleImpl(
           isSelected: isSelected,
-          isDisabled: isDisabled
+          isDisabled: !isEnabled
         )
       )
   }
@@ -36,7 +32,7 @@ extension ButtonStyle where Self == SelectListButtonStyle {
     isSelected: Bool,
     isDisabled: Bool = false
   ) -> Self {
-    return SelectListButtonStyle(isSelected: isSelected, isDisabled: isDisabled)
+    return SelectListButtonStyle(isSelected: isSelected)
   }
 }
 

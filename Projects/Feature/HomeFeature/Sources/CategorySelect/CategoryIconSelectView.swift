@@ -23,7 +23,7 @@ public struct CategoryIconSelectView: View {
 
   public var body: some View {
     LazyVGrid(columns: columns, spacing: 8) {
-      ForEach(PomodoroIconType.allCases, id: \.self) { type in
+      ForEach(PomodoroIconType.allCases) { type in
         CategoryIconItem(
           categoryType: type,
           isSelected: store.selectedIcon == type
