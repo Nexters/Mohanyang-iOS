@@ -65,9 +65,10 @@ extension PomodoroService: DependencyKey {
         let api = CategoryAPI.addCategory(request: request)
         _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
       },
-      deleteCategories: { apiClient, request in
-        let api = CategoryAPI.deleteCategory(request: request)
+      deleteCategories: { apiClient, databaseClient, ids in
+        let api = CategoryAPI.deleteCategory(request: .init(no: ids))
         _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
+        try await databaseClient.delete(PomodoroCategory.self, predicateFormat: "#no in %d", args: ids)
       },
       registerBGTaskToUpdateTimer: { bgTaskClient, liveActivityClient in
         bgTaskClient.registerTask(

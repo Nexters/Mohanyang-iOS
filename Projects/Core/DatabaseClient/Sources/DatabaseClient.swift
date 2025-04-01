@@ -66,6 +66,13 @@ extension DatabaseClient: DependencyKey {
           throw(NSError(domain: "Realm is not initialized", code: 0))
         }
       },
+      deleteWithFilter: { type, predicateFormat, args in
+        if let realmActor {
+          try await realmActor.delete(type, predicateFormat: predicateFormat, args: args)
+        } else {
+          throw(NSError(domain: "Realm is not initialized", code: 0))
+        }
+      },
       deleteTable: { objectType in
         if let realmActor {
           try await realmActor.delete(objectType)
@@ -136,7 +143,14 @@ extension DatabaseClient.RealmActor {
       realm.delete(objects)
     }
   }
-  
+
+  public func delete<T: Object>(_ object: T.Type, predicateFormat: String, args: Any...) async throws {
+    let objects = realm.objects(object).filter(predicateFormat, args)
+    try await realm.asyncWrite {
+      realm.delete(objects)
+    }
+  }
+
   public func deleteAll() async throws {
     try await realm.asyncWrite {
       realm.deleteAll()
