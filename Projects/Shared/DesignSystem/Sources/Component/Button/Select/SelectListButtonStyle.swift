@@ -29,8 +29,7 @@ public struct SelectListButtonStyle: ButtonStyle {
 
 extension ButtonStyle where Self == SelectListButtonStyle {
   public static func selectList(
-    isSelected: Bool,
-    isDisabled: Bool = false
+    isSelected: Bool
   ) -> Self {
     return SelectListButtonStyle(isSelected: isSelected)
   }

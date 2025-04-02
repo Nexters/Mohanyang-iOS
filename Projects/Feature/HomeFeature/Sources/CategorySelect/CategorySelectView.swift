@@ -138,11 +138,9 @@ extension CategorySelectView {
       ) {
         store.send(.selectEditCategory(category))
       }
+      .disabled(category.title == "기본")
       .buttonStyle(
-        .selectList(
-          isSelected: store.selectedEditCategory == category,
-          isDisabled: category.title == "기본" // default 카테고리 여부 정보 필요할듯
-        )
+        .selectList(isSelected: store.selectedEditCategory == category)
       )
     case .delete:
       let selectedCategory = store.selectedDeleteCategory.contains(category.id)
@@ -157,11 +155,9 @@ extension CategorySelectView {
       ) {
         store.send(.selectDeleteCategory(category))
       }
+      .disabled(category.title == "기본")
       .buttonStyle(
-        .selectList(
-          isSelected: selectedCategory,
-          isDisabled: category.title == "기본"
-        )
+        .selectList(isSelected: selectedCategory)
       )
     }
   }
