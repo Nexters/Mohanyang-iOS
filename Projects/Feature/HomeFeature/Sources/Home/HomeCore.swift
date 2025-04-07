@@ -216,7 +216,7 @@ public struct HomeCore {
     case .deleteCategories(let ids):
       return .run { send in
         try await self.pomodoroService.deleteCategories(apiClient: apiClient, databaseClient: databaseClient, ids: ids)
-        try await self.pomodoroService.syncCategoryList(apiClient: apiClient, userDefaultsClient: userDefaultsClient, databaseClient: databaseClient)
+        await send(.categorySelect(.dismiss))
       }
 
     case .categorySelect(.presented(.selectCategory)):

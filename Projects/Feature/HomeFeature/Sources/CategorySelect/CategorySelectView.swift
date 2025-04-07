@@ -91,7 +91,7 @@ public struct CategorySelectView: View {
         }
       }
       .padding(.horizontal, Alias.Spacing.large)
-      .padding(.bottom, Alias.Spacing.medium)
+      .padding(.bottom, store.categoryList.count < 3 ? 36 : Alias.Spacing.medium)
     }
     .coordinateSpace(name: CategorySelectBottomSheetID)
     .overlay {
@@ -138,7 +138,7 @@ extension CategorySelectView {
       ) {
         store.send(.selectEditCategory(category))
       }
-      .disabled(category.title == "기본")
+      .disabled(category.position == 0)
       .buttonStyle(
         .selectList(isSelected: store.selectedEditCategory == category)
       )
@@ -155,7 +155,7 @@ extension CategorySelectView {
       ) {
         store.send(.selectDeleteCategory(category))
       }
-      .disabled(category.title == "기본")
+      .disabled(category.position == 0)
       .buttonStyle(
         .selectList(isSelected: selectedCategory)
       )
