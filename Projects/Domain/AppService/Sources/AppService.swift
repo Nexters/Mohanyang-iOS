@@ -12,7 +12,7 @@ import UserDefaultsClientInterface
 
 import RealmSwift
 
-let currentSchemaVersion: UInt64 = 1
+let currentSchemaVersion: UInt64 = 2
 
 public func initilizeDatabaseSystem(
   databaseClient: DatabaseClient
@@ -25,7 +25,28 @@ public func initilizeDatabaseSystem(
       category: .database,
       "[Realm DB Migration] oldVersion: \(oldSchemaVersion) -> newVersion: \(currentSchemaVersion)"
     )
-    
+
+    // MARK: 1.0.0 -> 1.0.1
+    if oldSchemaVersion < 2 {
+      migration.enumerateObjects(ofType: "PomodoroCategoryObject") { oldObject, newObject in
+        let baseCategoryCode = oldObject?["baseCategoryCode"] as? String
+        switch baseCategoryCode {
+        case "BASIC":
+          newObject?["iconType"] = "CAT"
+        case "BOOKS":
+          newObject?["iconType"] = "OPEN_BOOK"
+        case "STUDY":
+          newObject?["iconType"] = "BOX_PEN"
+        case "WORK":
+          newObject?["iconType"] = "LAPTOP"
+        default:
+          newObject?["iconType"] = "CAT"
+        }
+
+        newObject?["isSelected"] = false
+      }
+    }
+
     Logger.shared.log(category: .database, "[Realm DB Migration] Complete")
   }
   
