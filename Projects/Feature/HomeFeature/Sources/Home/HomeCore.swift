@@ -299,7 +299,9 @@ public struct HomeCore {
 
     case .categoryForm(.presented(.bottomCheckButtonTapped)):
       state.categoryForm = nil
-      return .none
+      return .run { send in
+        await send(.syncCategory)
+      }
 
     case .categoryForm:
       return .none

@@ -81,6 +81,7 @@ public struct CategorySelectView: View {
             selectButton(category: category)
           }
         }
+        .padding(.bottom, store.categoryList.count < 3 && store.selectType != .delete ? 24 : 0)
 
         if store.selectType == .delete {
           Button(title: "\(store.selectedDeleteCategory.count)개 삭제하기") {
@@ -91,7 +92,7 @@ public struct CategorySelectView: View {
         }
       }
       .padding(.horizontal, Alias.Spacing.large)
-      .padding(.bottom, store.categoryList.count < 3 ? 36 : Alias.Spacing.medium)
+      .padding(.bottom, Alias.Spacing.medium)
     }
     .coordinateSpace(name: CategorySelectBottomSheetID)
     .overlay {
