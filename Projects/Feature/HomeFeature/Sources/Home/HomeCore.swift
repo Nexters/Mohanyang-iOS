@@ -297,7 +297,7 @@ public struct HomeCore {
     case .pomodoro:
       return .none
 
-    case .categoryForm(.presented(.bottomCheckButtonTapped)):
+    case .categoryForm(.presented(.categorySaved)):
       state.categoryForm = nil
       return .run { send in
         await send(.syncCategory)
