@@ -13,6 +13,8 @@ import DesignSystem
 import ComposableArchitecture
 
 public struct CategoryFormView: View {
+  @FocusState private var isTextFieldFocused: Bool
+  @State private var shouldRestoreKeyboard: Bool = false
   @Bindable var store: StoreOf<CategoryFormCore>
 
   public init(store: StoreOf<CategoryFormCore>) {
@@ -26,6 +28,10 @@ public struct CategoryFormView: View {
     ) {
       VStack {
         Button {
+          if isTextFieldFocused {
+              shouldRestoreKeyboard = true
+            }
+          hideKeyboard()
           store.send(.editIconTapped)
         } label: {
           store.selectedIcon.image
@@ -53,6 +59,7 @@ public struct CategoryFormView: View {
           fieldError: $store.inputFieldError,
           submitLabel: .done
         )
+        .focused($isTextFieldFocused)
         .padding(.vertical, 24)
 
         Spacer(minLength: 0)
@@ -75,6 +82,13 @@ public struct CategoryFormView: View {
     ) { store in
       CategoryIconSelectView(store: store)
     }
+    .onChange(of: store.iconSelect) { _, newValue in
+      if newValue == nil, shouldRestoreKeyboard {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+          isTextFieldFocused = true
+          shouldRestoreKeyboard = false
+        }
+      }
+    }
   }
 }
-
