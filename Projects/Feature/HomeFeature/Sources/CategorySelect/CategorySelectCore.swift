@@ -150,7 +150,11 @@ public struct CategorySelectCore {
       }
 
     case let .selectDeleteCategory(category):
-      state.selectedDeleteCategory.append(category.id)
+      if let existIds = state.selectedDeleteCategory.firstIndex(of: category.id) {
+        state.selectedDeleteCategory.remove(at: existIds)
+      } else {
+        state.selectedDeleteCategory.append(category.id)
+      }
       return .none
 
     case .addCategoryTapped:

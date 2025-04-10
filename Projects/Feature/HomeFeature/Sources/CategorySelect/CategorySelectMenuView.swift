@@ -20,7 +20,7 @@ public struct CategorySelectMenuView: View {
         onEditTapped()
       } label: {
         HStack(spacing: Alias.Spacing.small) {
-          DesignSystemAsset.Image._24PenPrimary.swiftUIImage
+          DesignSystemAsset.Image.pen.swiftUIImage.resize(24)
           Text("수정")
             .font(Typography.bodySB)
             .foregroundStyle(Alias.Color.Text.secondary)
@@ -34,7 +34,7 @@ public struct CategorySelectMenuView: View {
         onDeleteTapped()
       } label: {
         HStack(spacing: Alias.Spacing.small) {
-          DesignSystemAsset.Image._24PenPrimary.swiftUIImage
+          DesignSystemAsset.Image.trashcan.swiftUIImage.resize(24)
           Text("삭제")
             .font(Typography.bodySB)
             .foregroundStyle(Alias.Color.Text.secondary)
