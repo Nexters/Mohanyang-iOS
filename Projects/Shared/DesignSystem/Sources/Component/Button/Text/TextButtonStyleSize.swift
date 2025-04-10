@@ -40,9 +40,9 @@ extension TextButtonStyleSize {
   var buttonHeight: CGFloat {
     switch self {
     case .large:
-      return Alias.Size.ButtonHeight.large
-    case .medium:
       return Alias.Size.ButtonHeight.medium
+    case .medium:
+      return Alias.Size.ButtonHeight.small
     case .small:
       return Alias.Size.ButtonHeight.small
     }

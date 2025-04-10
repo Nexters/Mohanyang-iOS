@@ -8,23 +8,61 @@
 
 import SwiftUI
 
-extension Button where Label == SelectButtonDetail<Text?, Text?, Image?, Image?> {
-  public init(
+extension Button {
+  public init<LeftIcon: View, RightIcon: View>(
     title: LocalizedStringKey? = nil,
     subtitle: LocalizedStringKey? = nil,
-    leftIcon: Image? = nil,
-    rightIcon: Image? = nil,
+    @ViewBuilder leftIcon: () -> LeftIcon?,
+    @ViewBuilder rightIcon: () -> RightIcon?,
     action: @escaping () -> Void
-  ) {
+  ) where Label == SelectButtonDetail<Text?, Text?, LeftIcon?, RightIcon?> {
     self.init(action: action) {
       SelectButtonDetail {
         title == nil ? nil : Text(title ?? "")
       } subtitle: {
         subtitle == nil ? nil : Text(subtitle ?? "")
       } leftIcon: {
-        leftIcon
+        leftIcon()
       } rightIcon: {
-        rightIcon
+        rightIcon()
+      }
+    }
+  }
+
+  public init<LeftIcon: View>(
+    title: LocalizedStringKey? = nil,
+    subtitle: LocalizedStringKey? = nil,
+    @ViewBuilder leftIcon: () -> LeftIcon?,
+    action: @escaping () -> Void
+  ) where Label == SelectButtonDetail<Text?, Text?, LeftIcon?, EmptyView?> {
+    self.init(action: action) {
+      SelectButtonDetail {
+        title == nil ? nil : Text(title ?? "")
+      } subtitle: {
+        subtitle == nil ? nil : Text(subtitle ?? "")
+      } leftIcon: {
+        leftIcon()
+      } rightIcon: {
+        nil as EmptyView?
+      }
+    }
+  }
+
+  public init<RightIcon: View>(
+    title: LocalizedStringKey? = nil,
+    subtitle: LocalizedStringKey? = nil,
+    @ViewBuilder rightIcon: () -> RightIcon?,
+    action: @escaping () -> Void
+  ) where Label == SelectButtonDetail<Text?, Text?, EmptyView?, RightIcon?> {
+    self.init(action: action) {
+      SelectButtonDetail {
+        title == nil ? nil : Text(title ?? "")
+      } subtitle: {
+        subtitle == nil ? nil : Text(subtitle ?? "")
+      } leftIcon: {
+        nil as EmptyView?
+      } rightIcon: {
+        rightIcon()
       }
     }
   }

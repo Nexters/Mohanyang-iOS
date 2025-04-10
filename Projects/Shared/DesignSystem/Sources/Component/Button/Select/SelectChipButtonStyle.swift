@@ -11,7 +11,7 @@ import SwiftUI
 public struct SelectChipButtonStyle: ButtonStyle {
   let isSelected: Bool
   let isDisabled: Bool
-  
+
   public init(
     isSelected: Bool,
     isDisabled: Bool
@@ -43,13 +43,13 @@ extension ButtonStyle where Self == SelectChipButtonStyle {
 struct SelectChipButtonStyleImpl: SelectButtonDetailStyle {
   let isSelected: Bool
   let isDisabled: Bool
-  
+
   func makeBody(configuration: Configuration) -> some View {
     HStack(spacing: Alias.Spacing.xSmall) {
       configuration.leftIcon
       configuration.subtitle
         .font(Typography.bodySB)
-        .foregroundStyle(getSubtitleForegourndColor())
+        .foregroundStyle(getSubtitleForegroundColor())
       configuration.rightIcon
     }
     .padding(.horizontal, Alias.Spacing.medium)
@@ -61,7 +61,7 @@ struct SelectChipButtonStyleImpl: SelectButtonDetailStyle {
     )
   }
   
-  func getSubtitleForegourndColor() -> Color {
+  func getSubtitleForegroundColor() -> Color {
     if isDisabled {
       return Alias.Color.Text.disabled
     } else {

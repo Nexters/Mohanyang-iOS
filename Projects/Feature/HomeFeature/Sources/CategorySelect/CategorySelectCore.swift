@@ -6,6 +6,8 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import Foundation
+import APIClientInterface
 import PomodoroServiceInterface
 import DatabaseClientInterface
 import UserDefaultsClientInterface
@@ -16,23 +18,58 @@ import ComposableArchitecture
 public struct CategorySelectCore {
   @ObservableState
   public struct State: Equatable {
+    var selectType: CategorySelectType = .select
     var selectedCategory: PomodoroCategory?
-    var categoryList: [PomodoroCategory] = []
-    
+    var selectedEditCategory: PomodoroCategory?
+    var selectedDeleteCategory: [Int] = []
+    var categoryList: [PomodoroCategory] = [] {
+      didSet {
+        isCategoryAddAvailable = categoryList.count < 10
+      }
+    }
+    var isMenuViewShow: Bool = false
+    var isCategoryAddAvailable: Bool = true
     public init() {}
   }
   
   public enum Action {
     case onAppear
-    case dismissButtonTapped
-    case bottomCheckButtonTapped
-    
+    case showMenu(Bool)
+    case cancelButtonTapped
+    case editButtonTapped
+    case deleteButtonTapped
+
     case getCategoryListResponse(Result<[PomodoroCategory], Error>)
     
     case setSelectedCategory(PomodoroCategory?)
     case selectCategory(PomodoroCategory)
+    case selectEditCategory(PomodoroCategory)
+    case selectDeleteCategory(PomodoroCategory)
+
+    case addCategoryTapped
+    case deleteCategoriesTapped([Int])
   }
-  
+
+  public enum CategorySelectType {
+    case select, edit, delete
+
+    var title: String {
+      switch self {
+      case .select: "카테고리"
+      case .edit: "카테고리 수정"
+      case .delete: "카테고리 삭제"
+      }
+    }
+
+    var desc: String? {
+      switch self {
+      case .edit: "수정할 카테고리를 선택해주세요."
+      default: nil
+      }
+    }
+  }
+
+  @Dependency(APIClient.self) var apiClient
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -63,23 +100,25 @@ public struct CategorySelectCore {
         )
         await send(.setSelectedCategory(selectedCategory))
       }
-      
-    case .dismissButtonTapped:
-      return .run { _ in
-        await self.dismiss()
-      }
-      
-    case .bottomCheckButtonTapped:
-      return .run { [selectedCategory = state.selectedCategory] send in
-        if let selectedCategory {
-          await self.pomodoroService.changeSelectedCategory(
-            userDefaultsClient: self.userDefaultsClient,
-            categoryID: selectedCategory.id
-          )
-        }
-        await self.dismiss()
-      }
-      
+
+    case .showMenu(let isShow):
+      state.isMenuViewShow = isShow
+      return .none
+
+    case .cancelButtonTapped:
+      state.selectType = .select
+      return .none
+
+    case .editButtonTapped:
+      state.isMenuViewShow = false
+      state.selectType = .edit
+      return .none
+
+    case .deleteButtonTapped:
+      state.isMenuViewShow = false
+      state.selectType = .delete
+      return .none
+
     case let .getCategoryListResponse(.success(response)):
       state.categoryList = response
       return .none
@@ -93,6 +132,33 @@ public struct CategorySelectCore {
       
     case let .selectCategory(category):
       state.selectedCategory = category
+      return .run { [selectedCategory = state.selectedCategory] send in
+        if let selectedCategory {
+          try await self.pomodoroService.changeSelectedCategory(
+            apiClient: self.apiClient,
+            userDefaultsClient: self.userDefaultsClient,
+            categoryID: selectedCategory.id
+          )
+        }
+        await self.dismiss()
+      }
+
+    case let .selectEditCategory(category):
+      state.selectedEditCategory = category
+      return .run { _ in
+        await self.dismiss()
+      }
+
+    case let .selectDeleteCategory(category):
+      state.selectedDeleteCategory.append(category.id)
+      return .none
+
+    case .addCategoryTapped:
+      return .run { _ in
+        await self.dismiss()
+      }
+
+    case .deleteCategoriesTapped:
       return .none
     }
   }

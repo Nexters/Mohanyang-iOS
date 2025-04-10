@@ -8,58 +8,158 @@
 
 import SwiftUI
 
+import PomodoroServiceInterface
 import DesignSystem
 
 import ComposableArchitecture
 import DatadogRUM
 
 public struct CategorySelectView: View {
+  @Namespace var moreButtonFrameID
+  @State var moreButtonFrame: CGRect = .zero
   @Bindable var store: StoreOf<CategorySelectCore>
-  
+  @Namespace var CategorySelectBottomSheetID
+
+  private var columns: [GridItem] {
+    let columnCount = store.categoryList.count > 1 ? 2 : 1
+    return Array(
+      repeating: GridItem(.flexible(), spacing: Alias.Spacing.small),
+      count: columnCount
+    )
+  }
+
   public init(store: StoreOf<CategorySelectCore>) {
     self.store = store
   }
-  
+
   public var body: some View {
     VStack(spacing: Alias.Spacing.large) {
-      HStack(spacing: .zero) {
-        Text("카테고리 변경")
-          .font(Typography.header3)
-          .foregroundStyle(Alias.Color.Text.primary)
-        Spacer()
-        Button(icon: DesignSystemAsset.Image._24ClosePrimary.swiftUIImage) {
-          store.send(.dismissButtonTapped)
+      HStack(alignment: .top, spacing: .zero) {
+        VStack(alignment: .leading, spacing: 10) {
+          Text(store.selectType.title)
+            .font(Typography.header3)
+            .foregroundStyle(Alias.Color.Text.primary)
+          if let desc = store.selectType.desc {
+            Text(desc)
+              .font(Typography.bodyR)
+              .foregroundStyle(Alias.Color.Text.secondary)
+          }
         }
-        .buttonStyle(.icon(isFilled: false, level: .primary))
+        Spacer()
+        if store.selectType == .select {
+          if store.isCategoryAddAvailable {
+            Button(icon: DesignSystemAsset.Image._24PlusPrimary.swiftUIImage) {
+              store.send(.addCategoryTapped)
+            }
+            .buttonStyle(.icon(isFilled: false, level: .primary))
+          }
+
+          Button(icon: DesignSystemAsset.Image._24EllipsisPrimary.swiftUIImage) {
+            store.send(.showMenu(true))
+          }
+          .buttonStyle(.icon(isFilled: false, level: .primary))
+          .padding(.leading, 8)
+          .setFrameMeasure(space: .named(CategorySelectBottomSheetID), identifier: moreButtonFrameID)
+          .getFrameMeasure { value in
+            guard let frame = value[moreButtonFrameID] else { return }
+            self.moreButtonFrame = frame
+          }
+
+        } else {
+          Button(title: .init("취소")) {
+            store.send(.cancelButtonTapped)
+          }
+          .buttonStyle(.text(level: .primary, size: .medium))
+        }
       }
       .padding(.leading, Alias.Spacing.xLarge)
       .padding(.trailing, Alias.Spacing.small)
-      .frame(height: 40)
-      
-      VStack(spacing: Alias.Spacing.small) {
-        ForEach(store.categoryList) { category in
-          Button(
-            title: .init(category.title),
-            subtitle: "집중 \(category.focusTimeMinutes)분 | 휴식 \(category.restTimeMinutes)분",
-            leftIcon: category.image
-          ) {
-            store.send(.selectCategory(category))
+
+      Group {
+        LazyVGrid(columns: columns, spacing: Alias.Spacing.small) {
+          ForEach(store.categoryList) { category in
+            selectButton(category: category)
           }
-          .buttonStyle(.selectList(isSelected: store.selectedCategory == category))
+        }
+        .padding(.bottom, store.categoryList.count < 3 && store.selectType != .delete ? 24 : 0)
+
+        if store.selectType == .delete {
+          Button(title: "\(store.selectedDeleteCategory.count)개 삭제하기") {
+            store.send(.deleteCategoriesTapped(store.selectedDeleteCategory))
+          }
+          .buttonStyle(.box(level: .secondary, size: .large, width: .low))
+          .disabled(store.selectedDeleteCategory.isEmpty)
         }
       }
       .padding(.horizontal, Alias.Spacing.large)
-      
-      Button(title: "확인") {
-        store.send(.bottomCheckButtonTapped)
-      }
-      .buttonStyle(.box(level: .secondary, size: .large, width: .low))
-      .padding(.horizontal, Alias.Spacing.large)
       .padding(.bottom, Alias.Spacing.medium)
+    }
+    .coordinateSpace(name: CategorySelectBottomSheetID)
+    .overlay {
+      if store.isMenuViewShow {
+        Color.clear
+          .contentShape(Rectangle())
+          .onTapGesture {
+            store.send(.showMenu(false))
+          }
+          .overlay(alignment: .topTrailing) {
+            CategorySelectMenuView(
+              position: moreButtonFrame,
+              onEditTapped: { store.send(.editButtonTapped) },
+              onDeleteTapped: { store.send(.deleteButtonTapped) }
+            )
+          }
+      }
     }
     .onAppear {
       store.send(.onAppear)
     }
     .trackRUMView(name: "카테고리 변경")
+  }
+}
+
+extension CategorySelectView {
+  @ViewBuilder
+  private func selectButton(category: PomodoroCategory) -> some View {
+    switch store.selectType {
+    case .select:
+      Button(
+        title: .init(category.title),
+        subtitle: nil,
+        leftIcon: { category.iconType.image.resize(24) }
+      ) {
+        store.send(.selectCategory(category))
+      }
+      .buttonStyle(.selectList(isSelected: store.selectedCategory == category))
+    case .edit:
+      Button(
+        title: .init(category.title),
+        subtitle: nil,
+        leftIcon: { category.iconType.image.resize(24) }
+      ) {
+        store.send(.selectEditCategory(category))
+      }
+      .disabled(category.position == 0)
+      .buttonStyle(
+        .selectList(isSelected: store.selectedEditCategory == category)
+      )
+    case .delete:
+      let selectedCategory = store.selectedDeleteCategory.contains(category.id)
+      Button(
+        title: .init(category.title),
+        subtitle: nil,
+        leftIcon: {
+          let image: Image = selectedCategory ?
+          DesignSystemAsset.Image.checkCircle.swiftUIImage : DesignSystemAsset.Image.circle.swiftUIImage
+          return image.resize(24)
+        }
+      ) {
+        store.send(.selectDeleteCategory(category))
+      }
+      .disabled(category.position == 0)
+      .buttonStyle(
+        .selectList(isSelected: selectedCategory)
+      )
+    }
   }
 }

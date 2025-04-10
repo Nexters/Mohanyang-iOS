@@ -11,7 +11,7 @@ import SwiftUI
 public struct SelectButtonStyle: ButtonStyle {
   @Environment(\.isEnabled) var isEnabled
   let isSelected: Bool
-  
+
   public init(isSelected: Bool) {
     self.isSelected = isSelected
   }
@@ -38,7 +38,7 @@ extension ButtonStyle where Self == SelectButtonStyle {
 struct SelectButtonDetailStyleImpl: SelectButtonDetailStyle {
   let isSelected: Bool
   let isDisabled: Bool
-  
+
   func makeBody(configuration: Configuration) -> some View {
     VStack(spacing: Alias.Spacing.xSmall) {
       HStack(spacing: Alias.Spacing.xSmall) {

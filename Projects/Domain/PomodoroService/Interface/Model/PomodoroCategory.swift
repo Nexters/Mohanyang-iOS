@@ -26,62 +26,53 @@ public struct PomodoroCategory:
     return no
   }
   public let no: Int
-  public let baseCategoryCode: PomodoroCategoryCode
+  public let iconType: PomodoroIconType
   public let title: String
   public let position: Int
   public var focusTime: String
   public var restTime: String
-  
+  public var isSelected: Bool
+
   public init(
     no: Int,
-    baseCategoryCode: PomodoroCategoryCode,
+    iconType: PomodoroIconType,
     title: String,
     position: Int,
     focusTime: String,
-    restTime: String
+    restTime: String,
+    isSelected: Bool
   ) {
     self.no = no
-    self.baseCategoryCode = baseCategoryCode
+    self.iconType = iconType
     self.title = title
     self.position = position
     self.focusTime = focusTime
     self.restTime = restTime
+    self.isSelected = isSelected
   }
   
   @_spi(Internal)
   public init(managedObject: PomodoroCategoryObject) {
     self.no = managedObject.no
-    self.baseCategoryCode = managedObject.baseCategoryCode
+    self.iconType = managedObject.iconType
     self.title = managedObject.title
     self.position = managedObject.position
     self.focusTime = managedObject.focusTime
     self.restTime = managedObject.restTime
+    self.isSelected = managedObject.isSelected
   }
   
   @_spi(Internal)
   public func managedObject() -> PomodoroCategoryObject {
     let object = PomodoroCategoryObject()
     object.no = no
-    object.baseCategoryCode = baseCategoryCode
+    object.iconType = iconType
     object.title = title
     object.position = position
     object.focusTime = focusTime
     object.restTime = restTime
+    object.isSelected = isSelected
     return object
-  }
-  
-  /// 추후 서버에서 내려받는걸로 개선
-  public var image: Image {
-    switch baseCategoryCode {
-    case .basic:
-      return DesignSystemAsset.Image._24Cat.swiftUIImage
-    case .books:
-      return DesignSystemAsset.Image._24Book.swiftUIImage
-    case .study:
-      return DesignSystemAsset.Image._24Memo.swiftUIImage
-    case .work:
-      return DesignSystemAsset.Image._24Monitor.swiftUIImage
-    }
   }
 }
 
@@ -107,19 +98,49 @@ extension PomodoroCategory {
   }
 }
 
-public enum PomodoroCategoryCode: String, PersistableEnum, Codable {
-  case basic = "BASIC"
-  case books = "BOOKS"
-  case study = "STUDY"
-  case work = "WORK"
+public enum PomodoroIconType: String, Identifiable, PersistableEnum, Codable, CaseIterable {
+  case cat = "CAT"
+  case boxPen = "BOX_PEN"
+  case openBook = "OPEN_BOOK"
+  case briefcase = "BRIEFCASE"
+  case laptop = "LAPTOP"
+  case dumbbell = "DUMBBELL"
+  case lightning = "LIGHTNING"
+  case fire = "FIRE"
+  case heart = "HEART"
+  case asterisk = "ASTERISK"
+  case sun = "SUN"
+  case moon = "MOON"
+}
+
+extension PomodoroIconType {
+  public var id: String { rawValue }
+
+  public var image: Image {
+    switch self {
+    case .fire: DesignSystemAsset.Image.fire.swiftUIImage
+    case .lightning: DesignSystemAsset.Image.lightning.swiftUIImage
+    case .cat: DesignSystemAsset.Image.cat.swiftUIImage
+    case .boxPen: DesignSystemAsset.Image.boxPen.swiftUIImage
+    case .openBook: DesignSystemAsset.Image.openBook.swiftUIImage
+    case .asterisk: DesignSystemAsset.Image.asterisk.swiftUIImage
+    case .heart: DesignSystemAsset.Image.heart.swiftUIImage
+    case .laptop: DesignSystemAsset.Image.laptop.swiftUIImage
+    case .dumbbell: DesignSystemAsset.Image.dumbbell.swiftUIImage
+    case .briefcase: DesignSystemAsset.Image.briefcase.swiftUIImage
+    case .moon: DesignSystemAsset.Image.moon.swiftUIImage
+    case .sun: DesignSystemAsset.Image.sun.swiftUIImage
+    }
+  }
 }
 
 @_spi(Internal)
 public final class PomodoroCategoryObject: Object {
   @Persisted(primaryKey: true) var no: Int
-  @Persisted var baseCategoryCode: PomodoroCategoryCode
+  @Persisted var iconType: PomodoroIconType
   @Persisted var title: String
   @Persisted var position: Int
   @Persisted var focusTime: String
   @Persisted var restTime: String
+  @Persisted var isSelected: Bool
 }

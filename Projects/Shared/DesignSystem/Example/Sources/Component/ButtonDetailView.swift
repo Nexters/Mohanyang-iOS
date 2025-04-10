@@ -263,8 +263,8 @@ struct ButtonDetailView: View {
           Button(
             title: "Title",
             subtitle: "subTitle",
-            leftIcon: Image(systemName: "left"),
-            rightIcon: Image(systemName: "right"),
+            leftIcon: { Image(systemName: "left") },
+            rightIcon: { Image(systemName: "right") },
             action: {
               /*action*/
             }
@@ -274,8 +274,8 @@ struct ButtonDetailView: View {
           Button(
             title: "Title",
             subtitle: "subTitle",
-            leftIcon: Image(systemName: "left"),
-            rightIcon: Image(systemName: "right"),
+            leftIcon: { Image(systemName: "left") },
+            rightIcon: { Image(systemName: "right") },
             action: { /*action*/ }
           )
           .buttonStyle(.select(isSelected: false))
@@ -283,8 +283,8 @@ struct ButtonDetailView: View {
           Button(
             title: "Title",
             subtitle: "subTitle",
-            leftIcon: Image(systemName: "left"),
-            rightIcon: Image(systemName: "right"),
+            leftIcon: { Image(systemName: "left") },
+            rightIcon: { Image(systemName: "right") },
             action: { /*action*/ }
           )
           .buttonStyle(.select(isSelected: false))
@@ -301,8 +301,8 @@ struct ButtonDetailView: View {
           Button(
             title: "Title",
             subtitle: "subTitle",
-            leftIcon: Image(systemName: "left"),
-            rightIcon: Image(systemName: "right"),
+            leftIcon: { Image(systemName: "left") },
+            rightIcon: { Image(systemName: "right") },
             action: {
               /*action*/
             }
@@ -311,8 +311,8 @@ struct ButtonDetailView: View {
           Button(
             title: "Title",
             subtitle: "subTitle",
-            leftIcon: Image(systemName: "left"),
-            rightIcon: Image(systemName: "right"),
+            leftIcon: { Image(systemName: "left") },
+            rightIcon: { Image(systemName: "right") },
             action: { /*action*/ }
           )
           .buttonStyle(.selectList(isSelected: false))

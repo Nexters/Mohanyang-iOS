@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Utils
 
 struct BottomSheetViewModifier<
   Item: Identifiable & Equatable,
@@ -15,7 +16,7 @@ struct BottomSheetViewModifier<
   @Binding var item: Item?
   let bottomSheetContent: (Item) -> BottomSheetContent
   @State var yOffset: CGFloat = 0
-  
+
   func body(content: Content) -> some View {
     content
       .fullScreenCover(item: $item) { item in
@@ -48,19 +49,6 @@ struct BottomSheetViewModifier<
 }
 
 extension View {
-  public func bottomSheet<
-    Item: Identifiable & Equatable,
-    Content: View
-  >(
-    item: Binding<Item?>,
-    @ViewBuilder content: @escaping (Item) -> Content
-  ) -> some View {
-    return self.modifier(BottomSheetViewModifier(item: item, bottomSheetContent: content))
-  }
-}
-
-
-extension View {
   func updateBottomSheetBackground<Item: Identifiable>(_ item: Binding<Item?>) -> some View {
     self.modifier(BottomSheetBackgroundModifier(item: item))
   }
@@ -69,7 +57,7 @@ extension View {
 struct BottomSheetBackgroundModifier<Item: Identifiable>: ViewModifier {
   @Binding var item: Item?
   @State var opacity: Double = 0
-  
+
   func body(content: Content) -> some View {
     ZStack {
       content
@@ -81,5 +69,17 @@ struct BottomSheetBackgroundModifier<Item: Identifiable>: ViewModifier {
         opacity = value ? 0 : Global.Opacity._50d
       }
     }
+  }
+}
+
+extension View {
+  public func bottomSheet<
+    Item: Identifiable & Equatable,
+    Content: View
+  >(
+    item: Binding<Item?>,
+    @ViewBuilder content: @escaping (Item) -> Content
+  ) -> some View {
+    return self.modifier(BottomSheetViewModifier(item: item, bottomSheetContent: content))
   }
 }

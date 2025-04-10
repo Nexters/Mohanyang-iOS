@@ -65,6 +65,7 @@ public struct AppView: View {
     ) { store in
       NetworkErrorView(store: store)
     }
+    .dialog(dialog: $store.dialog)
     .onLoad {
       store.send(.onLoad)
     }
