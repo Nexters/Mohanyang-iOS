@@ -14,7 +14,7 @@ import Dependencies
 
 let selectedCategoryKey = "userdefaults_key_selected_category"
 
-extension PomodoroService: DependencyKey {
+extension PomodoroService: @retroactive DependencyKey {
   public static let liveValue: PomodoroService = .live()
   
   private static func live() -> PomodoroService {

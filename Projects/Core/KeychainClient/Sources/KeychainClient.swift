@@ -13,7 +13,7 @@ import KeychainClientInterface
 
 import Dependencies
 
-extension KeychainClient: DependencyKey {
+extension KeychainClient: @retroactive DependencyKey {
   public static let liveValue: KeychainClient = .live()
   
   public static func live() -> KeychainClient {

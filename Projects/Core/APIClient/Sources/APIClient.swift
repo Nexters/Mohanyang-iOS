@@ -13,11 +13,10 @@ import APIClientInterface
 
 import Dependencies
 
-extension APIClient: DependencyKey {
+extension APIClient: @retroactive DependencyKey {
   public static let liveValue: APIClient = .live()
   
   public static func live() -> Self {
-    
     actor Session {
       nonisolated let tokenInterceptor: TokenInterceptor
       

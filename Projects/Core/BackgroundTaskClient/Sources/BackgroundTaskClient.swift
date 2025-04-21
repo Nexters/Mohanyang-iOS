@@ -12,7 +12,7 @@ import BackgroundTaskClientInterface
 
 import Dependencies
 
-extension BackgroundTaskClient: DependencyKey {
+extension BackgroundTaskClient: @retroactive DependencyKey {
   public static let liveValue: BackgroundTaskClient = .live()
   
   public static func live() -> BackgroundTaskClient {

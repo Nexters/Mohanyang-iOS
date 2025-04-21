@@ -13,7 +13,7 @@ import APIClientInterface
 
 import Dependencies
 
-extension CatService: DependencyKey {
+extension CatService: @retroactive DependencyKey {
   public static let liveValue: CatService = .live()
   private static func live() -> Self {
     return CatService(

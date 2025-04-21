@@ -11,7 +11,7 @@ import AudioClientInterface
 
 import Dependencies
 
-extension AudioClient: DependencyKey {
+extension AudioClient: @retroactive DependencyKey {
   public static let liveValue: AudioClient = .live()
   
   public static func live() -> AudioClient {

@@ -11,7 +11,7 @@ import LiveActivityClientInterface
 
 import Dependencies
 
-extension LiveActivityClient: DependencyKey {
+extension LiveActivityClient: @retroactive DependencyKey {
   public static let liveValue: LiveActivityClient = .live()
   
   public static func live() -> LiveActivityClient {
