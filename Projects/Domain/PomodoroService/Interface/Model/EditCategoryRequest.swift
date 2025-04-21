@@ -1,9 +1,9 @@
 //
 //  EditCategoryRequest.swift
-//  PomodoroService
+//  PomodoroServiceInterface
 //
-//  Created by devMinseok on 8/17/24.
-//  Copyright © 2024 PomoNyang. All rights reserved.
+//  Created by 김지현 on 4/10/25.
+//  Copyright © 2025 PomoNyang. All rights reserved.
 //
 
 import Foundation
@@ -13,7 +13,7 @@ public struct EditCategoryRequest: Encodable {
   let iconType: String?
   let focusTime: String?
   let restTime: String?
-  
+
   public init(
     title: String? = nil,
     iconType: String? = nil,

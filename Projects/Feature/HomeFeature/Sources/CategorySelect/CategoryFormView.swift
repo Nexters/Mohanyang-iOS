@@ -13,6 +13,7 @@ import DesignSystem
 import ComposableArchitecture
 
 public struct CategoryFormView: View {
+  @FocusState private var focusField: CategoryFormCore.Field?
   @Bindable var store: StoreOf<CategoryFormCore>
 
   public init(store: StoreOf<CategoryFormCore>) {
@@ -24,7 +25,7 @@ public struct CategoryFormView: View {
       title: Text(store.formType.title),
       style: .navigation
     ) {
-      VStack {
+      VStack(spacing: .zero) {
         Button {
           store.send(.editIconTapped)
         } label: {
@@ -53,6 +54,7 @@ public struct CategoryFormView: View {
           fieldError: $store.inputFieldError,
           submitLabel: .done
         )
+        .focused($focusField, equals: .nameTextField)
         .padding(.vertical, 24)
 
         Spacer(minLength: 0)
@@ -64,8 +66,8 @@ public struct CategoryFormView: View {
         .disabled(store.isButtonDisabled)
         .padding(.bottom, Alias.Spacing.small)
       }
+      .padding(.horizontal, Alias.Spacing.xLarge)
     }
-    .padding(.horizontal, Alias.Spacing.xLarge)
     .background(Global.Color.gray50)
     .bottomSheet(
       item: $store.scope(
@@ -75,6 +77,12 @@ public struct CategoryFormView: View {
     ) { store in
       CategoryIconSelectView(store: store)
     }
+    .onAppear {
+      store.send(.onAppear)
+    }
+    .synchronize(
+      $store.focusedField.sending(\.setFocusedField),
+      $focusField
+    )
   }
 }
-

@@ -12,7 +12,7 @@ import DatabaseClientInterface
 import RealmSwift
 import Dependencies
 
-extension DatabaseClient: DependencyKey {
+extension DatabaseClient: @retroactive DependencyKey {
   public static let liveValue: DatabaseClient = .live()
   
   public static func live() -> DatabaseClient {

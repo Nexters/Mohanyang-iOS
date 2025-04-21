@@ -12,7 +12,7 @@ import NetworkTrackingInterface
 
 import Dependencies
 
-extension NetworkTracking: DependencyKey {
+extension NetworkTracking: @retroactive DependencyKey {
   public static let liveValue: NetworkTracking = .live()
   
   public static func live() -> NetworkTracking {

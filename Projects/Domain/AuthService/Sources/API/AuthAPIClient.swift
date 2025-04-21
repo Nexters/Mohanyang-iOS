@@ -17,7 +17,7 @@ enum KeychainClientKeys: String {
   case refreshToken = "mohanyang_keychain_refresh_token"
 }
 
-extension AuthService: DependencyKey {
+extension AuthService: @retroactive DependencyKey {
   public static let liveValue: AuthService = .live()
   private static func live() -> Self {
     return AuthService(

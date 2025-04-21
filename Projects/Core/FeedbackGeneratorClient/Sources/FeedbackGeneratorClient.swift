@@ -11,7 +11,7 @@ import FeedbackGeneratorClientInterface
 
 import Dependencies
 
-extension FeedbackGeneratorClient: DependencyKey {
+extension FeedbackGeneratorClient: @retroactive DependencyKey {
   public static let liveValue: FeedbackGeneratorClient = .live()
   
   public static func live() -> FeedbackGeneratorClient {

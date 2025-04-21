@@ -11,7 +11,7 @@ import Dependencies
 
 import UserDefaultsClientInterface
 
-extension UserDefaultsClient: DependencyKey {
+extension UserDefaultsClient: @retroactive DependencyKey {
   public static let liveValue: UserDefaultsClient = .live()
   
   public static func live() -> UserDefaultsClient {

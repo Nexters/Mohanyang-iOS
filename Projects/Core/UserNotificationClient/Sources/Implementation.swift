@@ -13,7 +13,7 @@ import UserNotificationClientInterface
 
 import Dependencies
 
-extension UserNotificationClient: DependencyKey {
+extension UserNotificationClient: @retroactive DependencyKey {
   public static let liveValue = Self(
     add: {
       try await UNUserNotificationCenter.current().add($0)

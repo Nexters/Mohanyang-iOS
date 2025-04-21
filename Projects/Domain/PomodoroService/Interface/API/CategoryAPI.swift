@@ -37,7 +37,7 @@ extension CategoryAPI: APIBaseRequest {
     case let .editCategory(id, _):
       return "/api/v1/categories/\(id)"
 
-    case let .deleteCategory:
+    case .deleteCategory:
       return "/api/v1/categories"
 
     case .getCategoryList:

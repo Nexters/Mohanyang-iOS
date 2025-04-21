@@ -13,7 +13,7 @@ import UserServiceInterface
 
 import Dependencies
 
-extension UserService: DependencyKey {
+extension UserService: @retroactive DependencyKey {
   public static let liveValue: UserService = .live()
   private static func live() -> Self {
     return UserService(

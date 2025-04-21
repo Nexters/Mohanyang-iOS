@@ -17,10 +17,11 @@ public struct CategoryFormCore {
   @ObservableState
   public struct State: Equatable {
     var formType: FormType
-    var isButtonDisabled: Bool = false
+    var isButtonDisabled: Bool = true
     var selectedIcon: PomodoroIconType = .cat
     var text: String = ""
     var inputFieldError: CategoryNameError?
+    var focusedField: Field?
 
     @Presents var iconSelect: CategoryIconSelectCore.State?
 
@@ -39,15 +40,15 @@ public struct CategoryFormCore {
 
   public enum Action: BindableAction {
     case binding(BindingAction<State>)
-
     case onAppear
     case bottomCheckButtonTapped
+    case editIconTapped
+    case categorySaved
+    case setExistCategoryError(String)
+    case setFocusedField(Field?)
 
     case _addNewCategoryResponse(Result<Void, Error>)
     case _editCategoryResponse(Result<Void, Error>)
-
-    case editIconTapped
-
     case iconSelect(PresentationAction<CategoryIconSelectCore.Action>)
   }
 
@@ -64,8 +65,13 @@ public struct CategoryFormCore {
     }
   }
 
+  public enum Field {
+    case nameTextField
+  }
+
   @Dependency(APIClient.self) var apiClient
   @Dependency(PomodoroService.self) var pomodoroService
+  let maxNameLength: Int = 10
 
   public init() {}
 
@@ -80,6 +86,7 @@ public struct CategoryFormCore {
   private func core(state: inout State, action: Action) -> EffectOf<Self> {
     switch action {
     case .onAppear:
+      state.focusedField = .nameTextField
       return .none
 
     case .bottomCheckButtonTapped:
@@ -88,17 +95,13 @@ public struct CategoryFormCore {
       let iconType = state.selectedIcon.rawValue
 
       return .run { send in
-        switch type {
-        case .add:
-          try await self.pomodoroService.addCategory(
-            apiClient: apiClient,
-            request: .init(title: title, iconType: iconType)
-          )
-        case .edit(let category):
-          try await self.pomodoroService.editCategory(
-            apiClient: apiClient, categoryID: category.id,
-            request: .init(title: title, iconType: iconType)
-          )
+        do {
+          try await self.saveCategory(type: type, title: title, iconType: iconType, apiClient: apiClient)
+          await send(.categorySaved)
+        } catch let error as NetworkError {
+          if case .apiError(let description) = error {
+            await send(.setExistCategoryError(description))
+          }
         }
       }
 
@@ -112,6 +115,11 @@ public struct CategoryFormCore {
       state.iconSelect = CategoryIconSelectCore.State(selectedIcon: state.selectedIcon)
       return .none
 
+    case .setExistCategoryError(let msg):
+      state.inputFieldError = .cantSetExistName(msg)
+      state.isButtonDisabled = true
+      return .none
+
     case .iconSelect(.presented(.selectIcon(let type))):
       state.selectedIcon = type
       state.iconSelect = nil
@@ -120,14 +128,38 @@ public struct CategoryFormCore {
     case .iconSelect:
       return .none
 
+    case .categorySaved:
+      return .none
+
+    case let .setFocusedField(focusedField):
+      state.focusedField = focusedField
+      return .none
+
     case .binding(\.text):
-      let max: Int = 10
-      state.inputFieldError = state.text.count > max ? .exceedsMaxLength(max) : nil
+      state.inputFieldError = state.text.count > maxNameLength ? .exceedsMaxLength(maxNameLength) : nil
       state.isButtonDisabled = state.text.isEmpty || state.inputFieldError != nil ? true : false
       return .none
 
     case .binding:
       return .none
+    }
+  }
+}
+
+extension CategoryFormCore {
+  private func saveCategory(
+    type: FormType,
+    title: String,
+    iconType: String,
+    apiClient: APIClient
+  ) async throws {
+    switch type {
+    case .add:
+      let request = AddCategoryRequest(title: title, iconType: iconType)
+      try await pomodoroService.addCategory(apiClient: apiClient, request: request)
+    case .edit(let category):
+      let request = EditCategoryRequest(title: title, iconType: iconType)
+      try await pomodoroService.editCategory(apiClient: apiClient, categoryID: category.id, request: request)
     }
   }
 }
