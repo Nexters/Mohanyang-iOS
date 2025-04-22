@@ -9,6 +9,7 @@
 import Foundation
 import APIClientInterface
 import PomodoroServiceInterface
+import AnalyticsClientInterface
 
 import ComposableArchitecture
 
@@ -71,6 +72,7 @@ public struct CategoryFormCore {
 
   @Dependency(APIClient.self) var apiClient
   @Dependency(PomodoroService.self) var pomodoroService
+  @Dependency(AnalyticsClient.self) var analyticsClient
   let maxNameLength: Int = 10
 
   public init() {}
@@ -121,6 +123,14 @@ public struct CategoryFormCore {
       return .none
 
     case .iconSelect(.presented(.selectIcon(let type))):
+      analyticsClient.sendEvent(
+        EventData(
+          name: "category_icon_usage",
+          properties: [
+            "Icon_type": type.rawValue
+          ]
+        )
+      )
       state.selectedIcon = type
       state.iconSelect = nil
       return .none
@@ -129,6 +139,16 @@ public struct CategoryFormCore {
       return .none
 
     case .categorySaved:
+      switch state.formType {
+      case .add:
+        analyticsClient.sendEvent(
+          EventData(name: "category_create_complete")
+        )
+      case .edit:
+        analyticsClient.sendEvent(
+          EventData(name: "category_edit_complete")
+        )
+      }
       return .none
 
     case let .setFocusedField(focusedField):

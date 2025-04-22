@@ -11,6 +11,7 @@ import APIClientInterface
 import PomodoroServiceInterface
 import DatabaseClientInterface
 import UserDefaultsClientInterface
+import AnalyticsClientInterface
 
 import ComposableArchitecture
 
@@ -29,6 +30,8 @@ public struct CategorySelectCore {
     }
     var isMenuViewShow: Bool = false
     var isCategoryAddAvailable: Bool = true
+    var addedCategoryCount: Int = 0
+
     public init() {}
   }
   
@@ -73,6 +76,7 @@ public struct CategorySelectCore {
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
+  @Dependency(AnalyticsClient.self) var analyticsClient
   @Dependency(\.dismiss) var dismiss
   
   public init() {}
@@ -110,6 +114,9 @@ public struct CategorySelectCore {
       return .none
 
     case .editButtonTapped:
+      analyticsClient.sendEvent(
+        EventData(name: "category_edit_click")
+      )
       state.isMenuViewShow = false
       state.selectType = .edit
       return .none
@@ -158,11 +165,17 @@ public struct CategorySelectCore {
       return .none
 
     case .addCategoryTapped:
+      analyticsClient.sendEvent(
+        EventData(name: "user_category_add_click")
+      )
       return .run { _ in
         await self.dismiss()
       }
 
     case .deleteCategoriesTapped:
+      analyticsClient.sendEvent(
+        EventData(name: "category_delete_cta_click")
+      )
       return .none
     }
   }

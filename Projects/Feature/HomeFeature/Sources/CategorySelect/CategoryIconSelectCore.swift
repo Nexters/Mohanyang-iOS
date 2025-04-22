@@ -34,5 +34,4 @@ public struct CategoryIconSelectCore {
       return .none
     }
   }
-
 }
