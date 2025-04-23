@@ -52,7 +52,7 @@ public struct HomeView: View {
         VStack(spacing: Alias.Spacing.medium) {
           Button(
             title: .init(store.selectedCategory?.title ?? ""),
-            leftIcon: store.selectedCategory?.image
+            leftIcon: { store.selectedCategory?.iconType.image.resize(24) }
           ) {
             store.send(.categoryButtonTapped)
           }
@@ -129,7 +129,6 @@ public struct HomeView: View {
     .tooltipDestination(tooltip: $store.homeCategoryGuideTooltip.sending(\.setHomeCategoryGuideTooltip))
     .tooltipDestination(tooltip: $store.homeTimeGuideTooltip.sending(\.setHomeTimeGuideTooltip))
     .toastDestination(toast: $store.toast)
-    .dialog(dialog: $store.dialog)
     .bottomSheet(
       item: $store.scope(
         state: \.categorySelect,
@@ -138,6 +137,7 @@ public struct HomeView: View {
     ) { store in
       CategorySelectView(store: store)
     }
+    .dialog(dialog: $store.dialog)
     .fullScreenCover(
       item: $store.scope(
         state: \.timeSelect,
@@ -161,6 +161,14 @@ public struct HomeView: View {
       )
     ) { store in
       MyPageView(store: store)
+    }
+    .navigationDestination(
+      item: $store.scope(
+        state: \.categoryForm,
+        action: \.categoryForm
+      )
+    ) { store in
+      CategoryFormView(store: store)
     }
     .task {
       await store.send(.task).finish()

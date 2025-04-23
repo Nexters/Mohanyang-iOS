@@ -7,7 +7,7 @@
 
 import ProjectDescription
 
-public enum BuildConfiguration: String, CaseIterable {
+public enum BuildConfiguration: String, CaseIterable, Sendable {
   case dev
   case prod
 }

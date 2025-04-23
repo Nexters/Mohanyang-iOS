@@ -26,6 +26,8 @@ public struct DatabaseClient {
   public var updateWithValue: @Sendable (Object.Type, Any) async throws -> Void
   /// Use delete<T: Object>(_ object:).
   public var delete: @Sendable (Object) async throws -> Void
+  /// Use delete<T: Persistable>(_ type:, predicateFormat:, args:).
+  public var deleteWithFilter: @Sendable (Object.Type, String, Any) async throws -> Void
   /// Use delete<T: Object>(_ object:).
   public var deleteTable: @Sendable (Object.Type) async throws -> Void
   /// Use delete<T: Object>(_ type:).
@@ -58,7 +60,11 @@ public struct DatabaseClient {
   public func delete<T: Object>(_ object: T) async throws {
     try await self.delete(object)
   }
-  
+
+  public func delete<T: Persistable>(_ type: T.Type, predicateFormat: String, args: Any) async throws {
+    try await self.deleteWithFilter(type.ManagedObject, predicateFormat, args)
+  }
+
   public func delete<T: Object>(_ type: T.Type) async throws {
     try await self.deleteTable(type)
   }

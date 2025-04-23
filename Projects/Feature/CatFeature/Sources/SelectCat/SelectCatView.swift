@@ -57,7 +57,7 @@ public struct SelectCatView: View {
             Button(
               title: LocalizedStringKey(cat.defaultName),
               subtitle: LocalizedStringKey(cat.keyword),
-              rightIcon: cat.keywordImage,
+              rightIcon: { cat.keywordImage },
               action: { store.send(.selectCat(cat)) }
             )
             .buttonStyle(.select(isSelected: cat == store.selectedCat))

@@ -173,13 +173,14 @@ public struct RestWaitingCore {
     let iso8601Duration = DateComponents(minute: changedTimeMinute).to8601DurationString()
     let request = EditCategoryRequest(focusTime: iso8601Duration, restTime: nil)
     
-    try await self.pomodoroService.changeCategoryTime(
+    try await self.pomodoroService.editCategory(
       apiClient: self.apiClient,
       categoryID: selectedCategory.id,
       request: request
     )
     try await self.pomodoroService.syncCategoryList(
       apiClient: self.apiClient,
+      userDefaultsClient: self.userDefaultsClient,
       databaseClient: self.databaseClient
     )
   }

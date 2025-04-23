@@ -19,6 +19,7 @@ import DatabaseClientInterface
 import APIClientInterface
 import MyPageFeature
 import DesignSystem
+import AnalyticsClientInterface
 
 import ComposableArchitecture
 import RiveRuntime
@@ -45,7 +46,8 @@ public struct HomeCore {
     @Presents var timeSelect: TimeSelectCore.State?
     @Presents var myPage: MyPageCore.State?
     @Presents var pomodoro: PomodoroCore.State?
-    
+    @Presents var categoryForm: CategoryFormCore.State?
+
     public init() {}
   }
   
@@ -66,10 +68,12 @@ public struct HomeCore {
     case catSetInput
     case _fetchNetworkConnection(Bool)
     case syncCategory
+    case deleteCategories([Int])
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
     case myPage(PresentationAction<MyPageCore.Action>)
     case pomodoro(PresentationAction<PomodoroCore.Action>)
+    case categoryForm(PresentationAction<CategoryFormCore.Action>)
   }
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
@@ -78,6 +82,7 @@ public struct HomeCore {
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(NetworkTracking.self) var networkTracking
   @Dependency(UserService.self) var userService
+  @Dependency(AnalyticsClient.self) var analyticsClient
   let isHomeGuideCompletedKey = "mohanyang_userdefaults_isHomeGuideCompleted"
   
   public init() {}
@@ -96,6 +101,9 @@ public struct HomeCore {
       }
       .ifLet(\.$pomodoro, action: \.pomodoro) {
         PomodoroCore()
+      }
+      .ifLet(\.$categoryForm, action: \.categoryForm) {
+        CategoryFormCore()
       }
   }
   
@@ -146,6 +154,9 @@ public struct HomeCore {
       return .none
       
     case .categoryButtonTapped:
+      analyticsClient.sendEvent(
+        EventData(name: "user_home_category_click")
+      )
       state.categorySelect = CategorySelectCore.State()
       return .none
       
@@ -160,7 +171,7 @@ public struct HomeCore {
     case .mypageButtonTappd:
       state.myPage = MyPageCore.State()
       return .none
-      
+
     case .playButtonTapped:
       state.pomodoro = .init()
       return .none
@@ -186,6 +197,7 @@ public struct HomeCore {
       return .run { send in
         try await self.pomodoroService.syncCategoryList(
           apiClient: self.apiClient,
+          userDefaultsClient: self.userDefaultsClient,
           databaseClient: self.databaseClient
         )
         if let selectedCategory = try await self.pomodoroService.getSelectedCategory(
@@ -195,8 +207,9 @@ public struct HomeCore {
           await send(.set(\.selectedCategory, selectedCategory))
         } else {
           let categoryList = try await self.pomodoroService.getCategoryList(databaseClient: self.databaseClient)
-          if let basicCategory = categoryList.first(where: { $0.baseCategoryCode == .basic }) {
-            await self.pomodoroService.changeSelectedCategory(
+          if let basicCategory = categoryList.first(where: { $0.iconType == .cat }) { // TODO: 로직 확인 25.0317
+            try await self.pomodoroService.changeSelectedCategory(
+              apiClient: self.apiClient,
               userDefaultsClient: self.userDefaultsClient,
               categoryID: basicCategory.id
             )
@@ -204,8 +217,20 @@ public struct HomeCore {
           }
         }
       }
-      
-    case .categorySelect(.presented(.bottomCheckButtonTapped)):
+
+    case .deleteCategories(let ids):
+      analyticsClient.sendEvent(
+        EventData(
+          name: "deleted_category_count",
+          properties: ["count": ids.count]
+        )
+      )
+      return .run { send in
+        try await self.pomodoroService.deleteCategories(apiClient: apiClient, databaseClient: databaseClient, ids: ids)
+        await send(.categorySelect(.dismiss))
+      }
+
+    case .categorySelect(.presented(.selectCategory)):
       state.toast = DefaultToast(
         message: "카테고리를 변경했어요",
         image: DesignSystemAsset.Image._24CheckSecondary.swiftUIImage
@@ -216,7 +241,15 @@ public struct HomeCore {
       return .run { send in
         await send(.syncCategory)
       }
-      
+
+    case .categorySelect(.presented(.addCategoryTapped)):
+      state.categoryForm = CategoryFormCore.State(type: .add)
+      return .none
+
+    case let .categorySelect(.presented(.selectEditCategory(category))):
+      state.categoryForm = CategoryFormCore.State(type: .edit(category))
+      return .none
+
     case .categorySelect:
       return .none
       
@@ -274,6 +307,16 @@ public struct HomeCore {
       
     case .pomodoro:
       return .none
+
+    case .categoryForm(.presented(.categorySaved)):
+      state.categoryForm = nil
+      return .run { send in
+        await send(.syncCategory)
+      }
+
+    case .categoryForm:
+      return .none
+
     }
   }
   

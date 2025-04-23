@@ -11,7 +11,7 @@ import StreamListenerInterface
 
 import Dependencies
 
-extension StreamListener: DependencyKey {
+extension StreamListener: @retroactive DependencyKey {
   public static let liveValue: StreamListener = .live()
 
   public static func live() -> StreamListener {

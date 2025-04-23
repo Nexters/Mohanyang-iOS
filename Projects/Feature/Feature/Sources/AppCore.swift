@@ -24,6 +24,8 @@ import DatabaseClientInterface
 import StreamListenerInterface
 import BackgroundTaskClientInterface
 import LiveActivityClientInterface
+import APIClientInterface
+import DesignSystem
 
 import ComposableArchitecture
 
@@ -37,6 +39,7 @@ public struct AppCore {
     var splash: SplashCore.State?
     var home: HomeCore.State?
     var onboarding: OnboardingCore.State?
+    var dialog: DefaultDialog?
     @Presents var networkError: NetworkErrorCore.State?
     @Presents var requestError: RequestErrorCore.State?
     
@@ -60,12 +63,14 @@ public struct AppCore {
   
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(UserNotificationClient.self) var userNotificationClient
+  @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(UserService.self) var userService
   @Dependency(DatabaseClient.self) var databaseClient
   @Dependency(StreamListener.self) var streamListener
   @Dependency(BackgroundTaskClient.self) var backgroundTaskClient
   @Dependency(LiveActivityClient.self) var liveActivityClient
-  
+  @Dependency(APIClient.self) var apiClient
+
   public init() {}
   
   public var body: some ReducerOf<Self> {
@@ -145,10 +150,18 @@ public struct AppCore {
       
     case .splash:
       return .none
-      
+
+    case let .home(.categorySelect(.presented(.deleteCategoriesTapped(ids)))):
+      return .run { send in
+        let deleteDialog = deleteCategoriesDialog {
+          await send(.home(.deleteCategories(ids)))
+        }
+        await send(.set(\.dialog, deleteDialog))
+      }
+
     case .home:
       return .none
-      
+
     case .onboarding(.selectCat(.presented(.namingCat(.presented(.moveToHome))))):
       state.onboarding = nil
       state.home = HomeCore.State()
@@ -194,5 +207,17 @@ public struct AppCore {
     request.requiresNetworkConnectivity = false
     request.earliestBeginDate = earliestBeginDate
     try backgroundTaskClient.submit(taskRequest: request)
+  }
+}
+
+extension AppCore {
+  private func deleteCategoriesDialog(action: @escaping () async -> Void) -> DefaultDialog {
+    return DefaultDialog(
+      title: "카테고리를 삭제할까요?",
+      subTitle: "카테고리로 집중한 기록도 함께 사라져요",
+      firstButton: DialogButtonModel(title: "취소"),
+      secondButton: DialogButtonModel(title: "삭제하기", action: action),
+      showCloseButton: false
+    )
   }
 }

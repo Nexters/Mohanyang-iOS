@@ -13,11 +13,10 @@ import APIClientInterface
 
 import Dependencies
 
-extension APIClient: DependencyKey {
+extension APIClient: @retroactive DependencyKey {
   public static let liveValue: APIClient = .live()
   
   public static func live() -> Self {
-    
     actor Session {
       nonisolated let tokenInterceptor: TokenInterceptor
       
@@ -67,7 +66,11 @@ extension APIClient: DependencyKey {
           try await tokenInterceptor.retry(for: self.session)
           return try await sendRequest(request, isWithInterceptor: isWithInterceptor, retryCnt: retryCnt + 1)
         case 400..<500:
-          throw throwNetworkErr(.requestError("bad request"), statusCode: httpResponse.statusCode)
+          if let apiError = try? decoder.decode(APIErrorResponse.self, from: data) {
+            throw throwNetworkErr(.apiError(apiError.message), statusCode: httpResponse.statusCode)
+          } else {
+            throw throwNetworkErr(.requestError("bad request"), statusCode: httpResponse.statusCode)
+          }
         case 500..<600:
           throw throwNetworkErr(.serverError, statusCode: httpResponse.statusCode)
         default:

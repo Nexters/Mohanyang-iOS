@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "40_bubble_ellipses.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "preserves-vector-representation" : true
+  }
+}
