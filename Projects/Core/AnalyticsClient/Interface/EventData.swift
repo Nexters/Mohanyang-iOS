@@ -12,7 +12,7 @@ public struct EventData {
 
   public init(
     name: String,
-    properties: [String : Any]? = nil
+    properties: [String: Any]? = nil
   ) {
     self.name = name
     self.properties = properties
