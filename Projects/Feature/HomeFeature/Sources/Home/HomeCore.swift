@@ -19,6 +19,7 @@ import DatabaseClientInterface
 import APIClientInterface
 import MyPageFeature
 import DesignSystem
+import AnalyticsClientInterface
 
 import ComposableArchitecture
 import RiveRuntime
@@ -81,6 +82,7 @@ public struct HomeCore {
   @Dependency(PomodoroService.self) var pomodoroService
   @Dependency(NetworkTracking.self) var networkTracking
   @Dependency(UserService.self) var userService
+  @Dependency(AnalyticsClient.self) var analyticsClient
   let isHomeGuideCompletedKey = "mohanyang_userdefaults_isHomeGuideCompleted"
   
   public init() {}
@@ -152,6 +154,9 @@ public struct HomeCore {
       return .none
       
     case .categoryButtonTapped:
+      analyticsClient.sendEvent(
+        EventData(name: "user_home_category_click")
+      )
       state.categorySelect = CategorySelectCore.State()
       return .none
       
@@ -214,6 +219,12 @@ public struct HomeCore {
       }
 
     case .deleteCategories(let ids):
+      analyticsClient.sendEvent(
+        EventData(
+          name: "deleted_category_count",
+          properties: ["count": ids.count]
+        )
+      )
       return .run { send in
         try await self.pomodoroService.deleteCategories(apiClient: apiClient, databaseClient: databaseClient, ids: ids)
         await send(.categorySelect(.dismiss))

@@ -20,4 +20,5 @@ public enum Core: String, Modulable {
   case LiveActivityClient
   case AudioClient
   case BackgroundTaskClient
+  case AnalyticsClient
 }
