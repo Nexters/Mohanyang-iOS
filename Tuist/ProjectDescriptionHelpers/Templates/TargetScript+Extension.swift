@@ -11,7 +11,7 @@ import UtilityPlugin
 
 public extension TargetScript {
   // MARK: - Swiftlint 스크립트 (로컬 빌드에서는 사용하지 않고 있음)
-  
+
   static let swiftLint: TargetScript = .pre(
     script: """
     ROOT_DIR=\(rootDirectory)
@@ -20,9 +20,9 @@ public extension TargetScript {
     name: "SwiftLint",
     basedOnDependencyAnalysis: false
   )
-  
+
   // MARK: - Reveal 스크립트
-  
+
   // configuration을 커스텀 했기에 REVEAL_LOAD_FOR_CONFIGURATION 환경변수를 override 해야함
   static func reveal(target: BuildConfiguration) -> TargetScript {
     return .pre(
@@ -42,13 +42,13 @@ public extension TargetScript {
       basedOnDependencyAnalysis: false
     )
   }
-  
+
   // MARK: - FirebaseCrashlytics 스크립트
-  
+
   static let firebaseCrashlytics: TargetScript = .post(
     script: """
     ROOT_DIR=\(rootDirectory)
-    ${ROOT_DIR}/XCFramework/FirebaseScripts/run
+    ${ROOT_DIR}/.build/checkouts/firebase-ios-sdk/Crashlytics/run
     """,
     name: "FirebaseCrashlytics",
     inputPaths: [

@@ -10,7 +10,7 @@ let project: Project = .makeProject(
   scripts: [],
   product: .framework,
   dependencies: [
-    DEP.XCFramework.Realm,
-    DEP.XCFramework.RealmSwift
+    DEP.SPMTarget.Realm,
+    DEP.SPMTarget.RealmSwift
   ]
 )
