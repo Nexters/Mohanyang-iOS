@@ -25,7 +25,7 @@ struct DialogDetailView: View {
           title: "Dialog Title",
           subTitle: "Dialog Subtext를 입력해주세요.\n최대 2줄을 넘지 않도록 해요.",
           firstButton: DialogButtonModel(title: "Button1"),
-          secondButton: DialogButtonModel(title: "Button2", action: { print(" PRINT !!") })
+          secondButton: DialogButtonModel(title: "Button2", action: { print(" PRINT !!") }), showCloseButton: true
         )
       } label: {
         Text("title SubTitle & Two Button")
@@ -35,7 +35,7 @@ struct DialogDetailView: View {
         titleSubTitleOneButtonDialog = DefaultDialog(
           title: "Dialog Title",
           subTitle: "Dialog Subtext를 입력해주세요.\n최대 2줄을 넘지 않도록 해요.",
-          firstButton: DialogButtonModel(title: "Button1")
+          firstButton: DialogButtonModel(title: "Button1"), showCloseButton: false
         )
       } label: {
         Text("title SubTitle & One Button")
@@ -45,7 +45,7 @@ struct DialogDetailView: View {
         titleTwoButtonDialog = DefaultDialog(
           title: "Dialog Title",
           firstButton: DialogButtonModel(title: "Button1"),
-          secondButton: DialogButtonModel(title: "Button2", action: { print(" PRINT !!") })
+          secondButton: DialogButtonModel(title: "Button2", action: { print(" PRINT !!") }), showCloseButton: true
         )
       } label: {
         Text("title & Two Button")
@@ -54,7 +54,7 @@ struct DialogDetailView: View {
       Button {
         titleOneButtonDialog = DefaultDialog(
           title: "Dialog Title",
-          firstButton: DialogButtonModel(title: "Button1")
+          firstButton: DialogButtonModel(title: "Button1"), showCloseButton: false
         )
       } label: {
         Text("title & One Button")

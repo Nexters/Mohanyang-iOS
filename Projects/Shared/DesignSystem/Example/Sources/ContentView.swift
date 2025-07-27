@@ -36,11 +36,11 @@ struct ContentView: View {
         }
         
         Section("Component") {
-          NavigationLink {
-            ButtonDetailView()
-          } label: {
-            Text("Button")
-          }
+//          NavigationLink {
+//            ButtonDetailView()
+//          } label: {
+//            Text("Button")
+//          }
           
           NavigationLink {
             NavigationDetailView()
@@ -74,6 +74,12 @@ struct ContentView: View {
 
           NavigationLink {
             InputFieldDetailView()
+          } label: {
+            Text("InputField")
+          }
+
+          NavigationLink {
+            TimeColumnVerticalChartView(dataList: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics, selectedData: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics.first)
           } label: {
             Text("InputField")
           }
