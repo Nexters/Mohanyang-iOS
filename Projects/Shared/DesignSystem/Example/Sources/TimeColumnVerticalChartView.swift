@@ -47,15 +47,15 @@ struct WeeklyFocusTimeTrend { // Response  Model
         .init(date: dateFormatter.date(from: "2024-04-01")!,
               totalFocusTime: "PT30M"),
         .init(date: dateFormatter.date(from: "2024-04-02")!,
-              totalFocusTime: "PT1H"),
+              totalFocusTime: "PT29M"),
         .init(date: dateFormatter.date(from: "2024-04-03")!,
-              totalFocusTime: "PT2H"),
+              totalFocusTime: "PT10M"),
         .init(date: dateFormatter.date(from: "2024-04-04")!,
-              totalFocusTime: "PT3H"),
+              totalFocusTime: "PT20M"),
         .init(date: dateFormatter.date(from: "2024-04-05")!,
-              totalFocusTime: "PT4H"),
+              totalFocusTime: "PT1H"),
         .init(date: dateFormatter.date(from: "2024-04-06")!,
-              totalFocusTime: "PT1M"),
+              totalFocusTime: "PT47M"),
         .init(date: dateFormatter.date(from: "2024-04-07")!,
               totalFocusTime: "PT0M")
       ])
@@ -69,7 +69,7 @@ struct DateToFocusTimeStatistics { // Response Model
 
 extension DateToFocusTimeStatistics: ChartDatable {
   var title: String {
-    return date.toString(format: "mm/dd")
+    return date.toString(format: "M/d")
   }
 
   var value: Int {
@@ -100,6 +100,27 @@ extension Date {
 }
 
 
+// MARK: - Y축 라벨 구조체
+struct YAxisLabel {
+  let value: Int // 분 단위 값
+  let title: String // 표시될 문자열
+  
+  init(value: Int, title: String) {
+    self.value = value
+    self.title = title
+  }
+  
+  init(hour: Int) {
+    self.value = hour * 60
+    self.title = "\(hour)h"
+  }
+  
+  init(minute: Int) {
+    self.value = minute
+    self.title = "\(minute)m"
+  }
+}
+
 // MARK: - 그래프 UI
 
 import SwiftUI
@@ -111,7 +132,7 @@ struct TimeColumnVerticalChartView<ColumnData: ChartDatable>: View {
   var body: some View {
     Chart(maxValue: maxValue) {
       ForEach(dataList) { data in
-        BarMark(title: data.title, ratio: CGFloat(data.value) / CGFloat(maxValue))
+        BarMark(title: data.title, ratio: calculateRatio(value: data.value))
         .highlighted(data.id == selectedData?.id)
       }
     }
@@ -122,6 +143,55 @@ struct TimeColumnVerticalChartView<ColumnData: ChartDatable>: View {
   private var maxValue: Int {
     let max = dataList.map { $0.value }.max() ?? 0
     return max > 0 ? max : 10 // 기본값 설정
+  }
+  
+  // Y축 최대값 계산 (Chart의 yAxisLabels 로직과 동일)
+  private var yAxisMaxValue: Int {
+    let maxMinutes = maxValue // 최대값 (분 단위)
+    
+    if maxMinutes == 0 {
+      return 10
+    }
+    else if maxMinutes < 60 { // 1시간 미만
+      return 60
+    }
+    else if maxMinutes >= 60 && maxMinutes < 300 { // 1~5시간
+      // 시간대에 따라 눈금 결정
+      if maxMinutes < 120 { // 1~2시간
+        return 120
+      }
+      else if maxMinutes < 180 { // 2~3시간
+        return 180
+      }
+      else if maxMinutes < 240 { // 3~4시간
+        return 240
+      }
+      else { // 4~5시간
+        return 300
+      }
+    }
+    else if maxMinutes >= 300 && maxMinutes < 480 { // 5~8시간
+      return 480
+    }
+    else if maxMinutes >= 480 && maxMinutes < 1200 { // 8~20시간
+      if maxMinutes < 600 { // 8~10시간
+        return 600
+      }
+      else if maxMinutes < 900 { // 10~15시간
+        return 900
+      }
+      else { // 15~20시간
+        return 1200
+      }
+    }
+    else { // 20~24시간
+      return 1440
+    }
+  }
+  
+  // Y축 최대값 기준으로 비율 계산
+  private func calculateRatio(value: Int) -> CGFloat {
+    return CGFloat(value) / CGFloat(yAxisMaxValue)
   }
 }
 
@@ -140,67 +210,64 @@ struct Chart<Content: View>: View {
   
   var body: some View {
     ZStack {
-      YAxisGridLines(labels: yAxisLabels)
-        .padding(.bottom, 8)
+      YAxisGridLines(labels: yAxisLabels.map { $0.title })
+        .padding(.bottom, 12)
 
       HStack(spacing: 0) {
         content
-
-        VStack {
-          Spacer()
-          Text("0m")
-            .font(Typography.captionR)
-            .foregroundStyle(Alias.Color.Text.tertiary)
-            .padding(.bottom, 12)
-            .frame(alignment: .trailing)
-        }
-        .padding(.leading, 8)
       }
+      .padding(.top, 8)
+      .padding(.trailing, 30)
     }
-    .frame(height: 180)
+    .frame(height: 188)
   }
 
-  private var yAxisLabels: [String] {
+  private var yAxisLabels: [YAxisLabel] {
      let maxMinutes = maxValue // 최대값 (분 단위)
 
      if maxMinutes == 0 {
-       return ["10m", "0m"]
+       return [YAxisLabel(minute: 10), YAxisLabel(minute: 0)]
      }
      else if maxMinutes < 60 { // 1시간 미만
-       return ["60m", "45m", "30m", "15m", "0m"]
+       return [YAxisLabel(minute: 60), YAxisLabel(minute: 45), YAxisLabel(minute: 30), YAxisLabel(minute: 15), YAxisLabel(minute: 0)]
      }
      else if maxMinutes >= 60 && maxMinutes < 300 { // 1~5시간
        // 시간대에 따라 눈금 결정
        if maxMinutes < 120 { // 1~2시간
-         return ["2h", "1h", "0h"]
+         return [YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
        }
        else if maxMinutes < 180 { // 2~3시간
-         return ["3h", "2h", "1h", "0h"]
+         return [YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
        }
        else if maxMinutes < 240 { // 3~4시간
-         return ["4h", "3h", "2h", "1h", "0h"]
+         return [YAxisLabel(hour: 4), YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
        }
        else { // 4~5시간
-         return ["5h", "4h", "3h", "2h", "1h", "0h"]
+         return [YAxisLabel(hour: 5), YAxisLabel(hour: 4), YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
        }
      }
      else if maxMinutes >= 300 && maxMinutes < 480 { // 5~8시간
-       return ["8h", "6h", "4h", "2h", "0h"]
+       return [YAxisLabel(hour: 8), YAxisLabel(hour: 6), YAxisLabel(hour: 4), YAxisLabel(hour: 2), YAxisLabel(minute: 0)]
      }
      else if maxMinutes >= 480 && maxMinutes < 1200 { // 8~20시간
        if maxMinutes < 600 { // 8~10시간
-         return ["10h", "5h", "0h"]
+         return [YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
        }
        else if maxMinutes < 900 { // 10~15시간
-         return ["15h", "10h", "5h", "0h"]
+         return [YAxisLabel(hour: 15), YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
        }
        else { // 15~20시간
-         return ["20h", "15h", "10h", "5h", "0h"]
+         return [YAxisLabel(hour: 20), YAxisLabel(hour: 15), YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
        }
      }
      else { // 20~24시간
-       return ["24h", "18h", "12h", "6h", "0h"]
+       return [YAxisLabel(hour: 24), YAxisLabel(hour: 18), YAxisLabel(hour: 12), YAxisLabel(hour: 6), YAxisLabel(minute: 0)]
      }
+   }
+   
+   // 그래프 높이에 사용할 최대 값 (배열의 첫 번째 값)
+   var yAxisMaxValue: Int {
+     return yAxisLabels.first?.value ?? maxValue
    }
 }
 
@@ -213,7 +280,7 @@ struct BarMark: View {
     if isHighlighted {
       return Alias.Color.Background.accent1
     } else {
-      return ratio == 0 ? Alias.Color.Icon.disabled : Alias.Color.Background.secondary
+      return ratio == 0 ? Alias.Color.Icon.disabled : Alias.Color.Icon.secondary
     }
   }
 
@@ -230,7 +297,7 @@ struct BarMark: View {
       Rectangle()
         .fill(color)
         .frame(height: calculateBarHeight())
-        .cornerRadius(16, corners: [.topLeft, .topRight])
+        .cornerRadius(8, corners: [.topLeft, .topRight])
         .padding(.horizontal, 8)
 
       // 0 위치 경계선
@@ -241,8 +308,8 @@ struct BarMark: View {
       Text(title)
         .font(Typography.captionR)
         .foregroundStyle(Alias.Color.Text.tertiary)
-        .padding(.top, 4)
         .frame(height: 16)
+        .padding(.top, 4)
     }
   }
 
@@ -267,16 +334,16 @@ struct YAxisGridLines: View {
   var body: some View {
     VStack(spacing: 0) {
       ForEach(0 ..< labels.count, id: \.self) { index in
-        HStack {
-          Rectangle()
-            .stroke(style: StrokeStyle(lineWidth: 1, dash: [5, 3]))
+        HStack(spacing: 8) {
+          Line()
+            .stroke(style: StrokeStyle(lineWidth: 1, dash: index == labels.count - 1 ? [] : [5, 3]))
             .foregroundColor(Alias.Color.Icon.disabled)
             .frame(height: 1)
 
           Text(labels[index])
             .font(Typography.captionR)
             .foregroundStyle(Alias.Color.Text.tertiary)
-            .frame(alignment: .trailing)
+            .frame(width: 22, alignment: .trailing)
         }
         if index < labels.count - 1 {
           Spacer()
@@ -284,4 +351,13 @@ struct YAxisGridLines: View {
       }
     }
   }
+}
+
+struct Line: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: rect.width, y: 0))
+        return path
+    }
 }
