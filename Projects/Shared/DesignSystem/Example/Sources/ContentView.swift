@@ -79,9 +79,12 @@ struct ContentView: View {
           }
 
           NavigationLink {
-            TimeColumnVerticalChartView(dataList: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics, selectedData: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics.first)
+            TimeColumnVerticalChartView(
+              dataList: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics,
+              selectedData: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics.first
+            )
           } label: {
-            Text("InputField")
+            Text("TimeColumnVerticalChart")
           }
         }
       }
