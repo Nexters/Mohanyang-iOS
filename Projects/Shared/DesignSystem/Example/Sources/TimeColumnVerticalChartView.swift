@@ -130,7 +130,7 @@ struct TimeColumnVerticalChartView<ColumnData: ChartDatable>: View {
   let selectedData: ColumnData? // 선택한 거 하이라이트 해야함
   
   var body: some View {
-    Chart(maxValue: maxValue) {
+    Chart(maxValue: maxValue, yAxisLabels: yAxisLabels) {
       ForEach(dataList) { data in
         BarMark(title: data.title, ratio: calculateRatio(value: data.value))
         .highlighted(data.id == selectedData?.id)
@@ -145,66 +145,70 @@ struct TimeColumnVerticalChartView<ColumnData: ChartDatable>: View {
     return max > 0 ? max : 10 // 기본값 설정
   }
   
-  // Y축 최대값 계산 (Chart의 yAxisLabels 로직과 동일)
-  private var yAxisMaxValue: Int {
+  // Y축 라벨 계산
+  private var yAxisLabels: [YAxisLabel] {
     let maxMinutes = maxValue // 최대값 (분 단위)
-    
+
     if maxMinutes == 0 {
-      return 10
+      return [YAxisLabel(minute: 10), YAxisLabel(minute: 0)]
     }
     else if maxMinutes < 60 { // 1시간 미만
-      return 60
+      return [YAxisLabel(minute: 60), YAxisLabel(minute: 45), YAxisLabel(minute: 30), YAxisLabel(minute: 15), YAxisLabel(minute: 0)]
     }
     else if maxMinutes >= 60 && maxMinutes < 300 { // 1~5시간
       // 시간대에 따라 눈금 결정
       if maxMinutes < 120 { // 1~2시간
-        return 120
+        return [YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
       }
       else if maxMinutes < 180 { // 2~3시간
-        return 180
+        return [YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
       }
       else if maxMinutes < 240 { // 3~4시간
-        return 240
+        return [YAxisLabel(hour: 4), YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
       }
       else { // 4~5시간
-        return 300
+        return [YAxisLabel(hour: 5), YAxisLabel(hour: 4), YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
       }
     }
     else if maxMinutes >= 300 && maxMinutes < 480 { // 5~8시간
-      return 480
+      return [YAxisLabel(hour: 8), YAxisLabel(hour: 6), YAxisLabel(hour: 4), YAxisLabel(hour: 2), YAxisLabel(minute: 0)]
     }
     else if maxMinutes >= 480 && maxMinutes < 1200 { // 8~20시간
       if maxMinutes < 600 { // 8~10시간
-        return 600
+        return [YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
       }
       else if maxMinutes < 900 { // 10~15시간
-        return 900
+        return [YAxisLabel(hour: 15), YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
       }
       else { // 15~20시간
-        return 1200
+        return [YAxisLabel(hour: 20), YAxisLabel(hour: 15), YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
       }
     }
     else { // 20~24시간
-      return 1440
+      return [YAxisLabel(hour: 24), YAxisLabel(hour: 18), YAxisLabel(hour: 12), YAxisLabel(hour: 6), YAxisLabel(minute: 0)]
     }
   }
   
   // Y축 최대값 기준으로 비율 계산
   private func calculateRatio(value: Int) -> CGFloat {
+    let yAxisMaxValue = yAxisLabels.first?.value ?? maxValue
     return CGFloat(value) / CGFloat(yAxisMaxValue)
   }
 }
 
 // MARK: - 차트 구현
+
 struct Chart<Content: View>: View {
   var maxValue: Int
   let content: Content
+  let yAxisLabels: [YAxisLabel]
 
   private var barSpacing: CGFloat = 16
   private var padding: CGFloat = 12
   
-  init(maxValue: Int, @ViewBuilder content: () -> Content) {
+  init(maxValue: Int, yAxisLabels: [YAxisLabel], @ViewBuilder content: () -> Content) {
     self.maxValue = maxValue
+    self.yAxisLabels = yAxisLabels
     self.content = content()
   }
   
@@ -221,54 +225,11 @@ struct Chart<Content: View>: View {
     }
     .frame(height: 188)
   }
-
-  private var yAxisLabels: [YAxisLabel] {
-     let maxMinutes = maxValue // 최대값 (분 단위)
-
-     if maxMinutes == 0 {
-       return [YAxisLabel(minute: 10), YAxisLabel(minute: 0)]
-     }
-     else if maxMinutes < 60 { // 1시간 미만
-       return [YAxisLabel(minute: 60), YAxisLabel(minute: 45), YAxisLabel(minute: 30), YAxisLabel(minute: 15), YAxisLabel(minute: 0)]
-     }
-     else if maxMinutes >= 60 && maxMinutes < 300 { // 1~5시간
-       // 시간대에 따라 눈금 결정
-       if maxMinutes < 120 { // 1~2시간
-         return [YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
-       }
-       else if maxMinutes < 180 { // 2~3시간
-         return [YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
-       }
-       else if maxMinutes < 240 { // 3~4시간
-         return [YAxisLabel(hour: 4), YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
-       }
-       else { // 4~5시간
-         return [YAxisLabel(hour: 5), YAxisLabel(hour: 4), YAxisLabel(hour: 3), YAxisLabel(hour: 2), YAxisLabel(hour: 1), YAxisLabel(minute: 0)]
-       }
-     }
-     else if maxMinutes >= 300 && maxMinutes < 480 { // 5~8시간
-       return [YAxisLabel(hour: 8), YAxisLabel(hour: 6), YAxisLabel(hour: 4), YAxisLabel(hour: 2), YAxisLabel(minute: 0)]
-     }
-     else if maxMinutes >= 480 && maxMinutes < 1200 { // 8~20시간
-       if maxMinutes < 600 { // 8~10시간
-         return [YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
-       }
-       else if maxMinutes < 900 { // 10~15시간
-         return [YAxisLabel(hour: 15), YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
-       }
-       else { // 15~20시간
-         return [YAxisLabel(hour: 20), YAxisLabel(hour: 15), YAxisLabel(hour: 10), YAxisLabel(hour: 5), YAxisLabel(minute: 0)]
-       }
-     }
-     else { // 20~24시간
-       return [YAxisLabel(hour: 24), YAxisLabel(hour: 18), YAxisLabel(hour: 12), YAxisLabel(hour: 6), YAxisLabel(minute: 0)]
-     }
-   }
-   
-   // 그래프 높이에 사용할 최대 값 (배열의 첫 번째 값)
-   var yAxisMaxValue: Int {
-     return yAxisLabels.first?.value ?? maxValue
-   }
+  
+  // 그래프 높이에 사용할 최대 값 (배열의 첫 번째 값)
+  var yAxisMaxValue: Int {
+    return yAxisLabels.first?.value ?? maxValue
+  }
 }
 
 // MARK: - 바 마크 뷰
