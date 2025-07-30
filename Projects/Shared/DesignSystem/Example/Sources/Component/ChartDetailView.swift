@@ -11,6 +11,7 @@ import SwiftUI
 import DesignSystem
 
 struct ChartDetailView: View {
+  @State var selectedData: DateToFocusTimeStatistics? = WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics.first
 
   var body: some View {
     VStack {
@@ -28,7 +29,7 @@ struct ChartDetailView: View {
 
         TimeColumnVerticalChartView(
           dataList: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics,
-          selectedData: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics.first
+          selectedData: $selectedData
         )
       }
       .padding(16)

@@ -122,11 +122,11 @@ struct YAxisLabel {
 
 public struct TimeColumnVerticalChartView<ColumnData: ChartDatable>: View {
   let dataList: [ColumnData]
-  let selectedData: ColumnData? // 선택한 거 하이라이트 해야함
+  @Binding var selectedData: ColumnData? // 선택한 거 하이라이트 해야함
 
-  public init(dataList: [ColumnData], selectedData: ColumnData?) {
+  public init(dataList: [ColumnData], selectedData: Binding<ColumnData?>) {
     self.dataList = dataList
-    self.selectedData = selectedData
+    self._selectedData = selectedData
   }
 
   public var body: some View {
@@ -134,6 +134,11 @@ public struct TimeColumnVerticalChartView<ColumnData: ChartDatable>: View {
       ForEach(dataList) { data in
         BarMark(data: data, ratio: calculateRatio(value: data.value))
           .highlighted(selectedData == data)
+          .onTapGesture {
+            if data.value > 0 {
+              self.selectedData = data
+            }
+          }
       }
     }
     .padding(.top, 40)
