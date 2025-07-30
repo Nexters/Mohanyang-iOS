@@ -52,6 +52,7 @@ public enum Alias {
   }
   
   public enum BorderRadius {
+    public static let xxSmall = Global.Dimension._8f
     public static let xSmall = Global.Dimension._12f
     public static let small = Global.Dimension._16f
     public static let medium = Global.Dimension._20f

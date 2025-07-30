@@ -52,7 +52,7 @@ public struct WeeklyFocusTimeTrend { // Response  Model
         .init(date: dateFormatter.date(from: "2024-04-05")!,
               totalFocusTime: "PT1H"),
         .init(date: dateFormatter.date(from: "2024-04-06")!,
-              totalFocusTime: "PT47M"),
+              totalFocusTime: "PT1H47M"),
         .init(date: dateFormatter.date(from: "2024-04-07")!,
               totalFocusTime: "PT0M")
       ])
@@ -265,6 +265,13 @@ struct BarMark: View {
         .frame(height: calculateBarHeight())
         .cornerRadius(8, corners: [.topLeft, .topRight])
         .padding(.horizontal, 8)
+        .overlay {
+          if isHighlighted {
+            GeometryReader { proxy in
+              ColumnChartTooltipView(title: formatTimeValue(data.value), position: proxy.frame(in: .local))
+            }
+          }
+        }
 
       // 0 위치 경계선
       Rectangle()
@@ -279,9 +286,25 @@ struct BarMark: View {
     }
   }
 
+  // 바 높이 계산
   private func calculateBarHeight() -> CGFloat {
     let height = CGFloat(ratio) * 160
     return max(height, 4) // 최소 높이 설정
+  }
+
+  private func formatTimeValue(_ minutes: Int) -> String {
+    let hours = minutes / 60
+    let remainingMinutes = minutes % 60
+    
+    if hours > 0 {
+      if remainingMinutes > 0 {
+        return "\(hours)시간\n\(remainingMinutes)분"
+      } else {
+        return "\(hours)시간"
+      }
+    } else {
+      return "\(remainingMinutes)분"
+    }
   }
 
   func highlighted(_ isHighlighted: Bool) -> BarMark { // 수정예정
