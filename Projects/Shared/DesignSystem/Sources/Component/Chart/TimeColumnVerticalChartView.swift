@@ -6,9 +6,8 @@
 //  Copyright © 2025 PomoNyang. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
 import Utils
-import DesignSystem
 
 /** 집중추세 api response
 "weeklyFocusTimeTrend": {
@@ -25,14 +24,12 @@ import DesignSystem
 
 // MARK: - 모델
 
-import Foundation
+public struct WeeklyFocusTimeTrend { // Response  Model
+  public let startDate: Date // "2024-04-01"
+  public let endDate: Date // "2024-04-07"
+  public let dateToFocusTimeStatistics: [DateToFocusTimeStatistics]
 
-struct WeeklyFocusTimeTrend { // Response  Model
-  let startDate: Date // "2024-04-01"
-  let endDate: Date // "2024-04-07"
-  let dateToFocusTimeStatistics: [DateToFocusTimeStatistics]
-
-  static let exampleResponse: Self = {
+  public static let exampleResponse: Self = {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd"
     dateFormatter.timeZone = TimeZone(identifier: "UTC")
@@ -62,21 +59,21 @@ struct WeeklyFocusTimeTrend { // Response  Model
   }()
 }
 
-struct DateToFocusTimeStatistics { // Response Model
+public struct DateToFocusTimeStatistics { // Response Model
   let date: Date // "2024-04-01"
   let totalFocusTime: String // "PT30M", "PT1H", ...
 }
 
 extension DateToFocusTimeStatistics: ChartDatable {
-  var title: String {
+  public var title: String {
     return date.toString(format: "M/d")
   }
 
-  var value: Int {
+  public var value: Int {
     return DateComponents.durationFrom8601String(totalFocusTime)?.totalMinutes ?? 0
   }
 
-  var id: String {
+  public var id: String {
     return UUID().uuidString
   }
 }
@@ -84,7 +81,7 @@ extension DateToFocusTimeStatistics: ChartDatable {
 
 // MARK: - 차트 데이터 인터페이스
 
-protocol ChartDatable: Identifiable {
+public protocol ChartDatable: Identifiable, Equatable {
   var title: String { get } // x축 타이틀
   var value: Int { get } // 높이값 (예: 30분 -> 30, 2시간 -> 120)
 }
@@ -123,20 +120,23 @@ struct YAxisLabel {
 
 // MARK: - 그래프 UI
 
-import SwiftUI
-
-struct TimeColumnVerticalChartView<ColumnData: ChartDatable>: View {
+public struct TimeColumnVerticalChartView<ColumnData: ChartDatable>: View {
   let dataList: [ColumnData]
   let selectedData: ColumnData? // 선택한 거 하이라이트 해야함
-  
-  var body: some View {
+
+  public init(dataList: [ColumnData], selectedData: ColumnData?) {
+    self.dataList = dataList
+    self.selectedData = selectedData
+  }
+
+  public var body: some View {
     Chart(maxValue: maxValue, yAxisLabels: yAxisLabels) {
       ForEach(dataList) { data in
-        BarMark(title: data.title, ratio: calculateRatio(value: data.value))
-        .highlighted(data.id == selectedData?.id)
+        BarMark(data: data, ratio: calculateRatio(value: data.value))
+          .highlighted(selectedData == data)
       }
     }
-    .padding(.horizontal, 40)
+    .padding(.top, 40)
   }
   
   // 최대값 계산
@@ -234,7 +234,7 @@ struct Chart<Content: View>: View {
 
 // MARK: - 바 마크 뷰
 struct BarMark: View {
-  var title: String
+  var data: any ChartDatable
   var ratio: CGFloat
   private var isHighlighted: Bool = false
   private var color: Color {
@@ -245,8 +245,8 @@ struct BarMark: View {
     }
   }
 
-  init(title: String, ratio: CGFloat) {
-    self.title = title
+  init(data: any ChartDatable, ratio: CGFloat) {
+    self.data = data
     self.ratio = ratio
   }
 
@@ -266,7 +266,7 @@ struct BarMark: View {
         .fill(Alias.Color.Icon.disabled)
         .frame(height: 1)
 
-      Text(title)
+      Text(data.title)
         .font(Typography.captionR)
         .foregroundStyle(Alias.Color.Text.tertiary)
         .frame(height: 16)
@@ -275,13 +275,11 @@ struct BarMark: View {
   }
 
   private func calculateBarHeight() -> CGFloat {
-    
     let height = CGFloat(ratio) * 160
-    print(ratio, height)
     return max(height, 4) // 최소 높이 설정
   }
 
-  func highlighted(_ isHighlighted: Bool) -> BarMark {
+  func highlighted(_ isHighlighted: Bool) -> BarMark { // 수정예정
     var copy = self
     copy.isHighlighted = isHighlighted
     return copy

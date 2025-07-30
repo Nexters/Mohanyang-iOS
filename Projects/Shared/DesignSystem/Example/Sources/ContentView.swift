@@ -79,10 +79,7 @@ struct ContentView: View {
           }
 
           NavigationLink {
-            TimeColumnVerticalChartView(
-              dataList: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics,
-              selectedData: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics.first
-            )
+            ChartDetailView()
           } label: {
             Text("TimeColumnVerticalChart")
           }
