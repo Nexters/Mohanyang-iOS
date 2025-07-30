@@ -22,7 +22,7 @@ public struct PomodoroService {
   public var getSelectedCategory: @Sendable (_ userDefaultsClient: UserDefaultsClient, _ databaseClient: DatabaseClient) async throws -> PomodoroCategory?
   public var editCategory: @Sendable (_ apiClient: APIClient, _ categoryID: Int, _ request: EditCategoryRequest) async throws -> Void
   public var saveFocusTimeHistory: @Sendable (_ apiClient: APIClient, _ databaseClient: DatabaseClient, _ request: [FocusTimeHistory]) async throws -> Void
-  public var getFocusTimeSummaries: @Sendable (_ apiClient: APIClient) async throws -> FocusTimeSummary
+  public var getStatistics: @Sendable (_ apiClient: APIClient, _ date: String) async throws -> Statistics?
   public var addCategory: @Sendable (_ apiClient: APIClient, _ request: AddCategoryRequest) async throws -> Void
   public var deleteCategories: @Sendable (_ apiClient: APIClient, _ databaseClient: DatabaseClient, _ ids: [Int]) async throws -> Void
 

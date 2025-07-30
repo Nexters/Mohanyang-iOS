@@ -11,7 +11,6 @@ import APIClientInterface
 @_spi(Internal)
 public enum FocusTimeAPI {
   case saveFocusTimes(request: [FocusTimeHistory])
-  case getSummaries
 }
 
 extension FocusTimeAPI: APIBaseRequest {
@@ -22,10 +21,7 @@ extension FocusTimeAPI: APIBaseRequest {
   public var path: String {
     switch self {
     case .saveFocusTimes:
-      return "/api/v1/focus-times"
-      
-    case .getSummaries:
-      return "/api/v1/focus-times/summaries"
+      return "/api/v2/focus-times"
     }
   }
   
@@ -33,9 +29,6 @@ extension FocusTimeAPI: APIBaseRequest {
     switch self {
     case .saveFocusTimes:
       return .post
-      
-    case .getSummaries:
-      return .get
     }
   }
   
@@ -43,9 +36,6 @@ extension FocusTimeAPI: APIBaseRequest {
     switch self {
     case let .saveFocusTimes(request):
       return .body(request)
-      
-    case .getSummaries:
-      return .requestPlain
     }
   }
 }
