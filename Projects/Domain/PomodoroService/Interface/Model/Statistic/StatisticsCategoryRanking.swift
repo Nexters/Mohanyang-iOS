@@ -8,15 +8,15 @@
 
 import Foundation
 
-public struct StatisticsCategoryRanking: Decodable {
+public struct StatisticsCategoryRanking: Decodable, Equatable {
   /// yyyy-mm-dd
-  public let startDate: String
+  public let startDate: Date
   /// yyyy-mm-dd
-  public let endDate: String
+  public let endDate: Date
   public let rankingItems: [StatisticsCategoryRankingItem]
 }
 
-public struct StatisticsCategoryRankingItem: Decodable {
+public struct StatisticsCategoryRankingItem: Decodable, Equatable {
   public let rank: Int
   public let category: StatisticsCategory
   /// PT30M

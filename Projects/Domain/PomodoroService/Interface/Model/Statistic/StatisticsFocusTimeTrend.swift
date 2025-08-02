@@ -8,17 +8,17 @@
 
 import Foundation
 
-public struct StatisticsFocusTimeTrend: Decodable {
+public struct StatisticsFocusTimeTrend: Decodable, Equatable {
   /// yyyy-mm-dd
-  public let startDate: String
+  public let startDate: Date
   /// yyyy-mm-dd
-  public let endDate: String
+  public let endDate: Date
   public let dateToFocusTimeStatistics: [StatisticsFocusTimeTrendItem]
 }
 
-public struct StatisticsFocusTimeTrendItem: Decodable {
+public struct StatisticsFocusTimeTrendItem: Decodable, Equatable {
   /// yyyy-mm-dd
-  public let date: String
+  public let date: Date
   /// PT30M
   public let totalFocusTime: String
 }

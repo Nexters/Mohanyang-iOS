@@ -5,6 +5,8 @@
 //  Created by devMinseok on 8/17/24.
 //
 
+import Foundation
+
 import UserDefaultsClientInterface
 import DatabaseClientInterface
 import APIClientInterface
@@ -22,7 +24,7 @@ public struct PomodoroService {
   public var getSelectedCategory: @Sendable (_ userDefaultsClient: UserDefaultsClient, _ databaseClient: DatabaseClient) async throws -> PomodoroCategory?
   public var editCategory: @Sendable (_ apiClient: APIClient, _ categoryID: Int, _ request: EditCategoryRequest) async throws -> Void
   public var saveFocusTimeHistory: @Sendable (_ apiClient: APIClient, _ databaseClient: DatabaseClient, _ request: [FocusTimeHistory]) async throws -> Void
-  public var getStatistics: @Sendable (_ apiClient: APIClient, _ date: String) async throws -> Statistics?
+  public var getStatistics: @Sendable (_ apiClient: APIClient, _ date: Date) async throws -> Statistics?
   public var addCategory: @Sendable (_ apiClient: APIClient, _ request: AddCategoryRequest) async throws -> Void
   public var deleteCategories: @Sendable (_ apiClient: APIClient, _ databaseClient: DatabaseClient, _ ids: [Int]) async throws -> Void
 

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct StatisticsCategory: Decodable {
+public struct StatisticsCategory: Decodable, Equatable {
   public let no: Int
   public let title: String
   public let iconType: PomodoroIconType

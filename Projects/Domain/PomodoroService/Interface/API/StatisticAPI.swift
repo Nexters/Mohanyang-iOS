@@ -6,11 +6,13 @@
 //  Copyright © 2025 PomoNyang. All rights reserved.
 //
 
+import Foundation
+
 import APIClientInterface
 
 @_spi(Internal)
 public enum StatisticAPI {
-  case getStatistics(date: String)
+  case getStatistics(date: Date)
 }
 
 extension StatisticAPI: APIBaseRequest {
@@ -21,7 +23,8 @@ extension StatisticAPI: APIBaseRequest {
   public var path: String {
     switch self {
     case let .getStatistics(date):
-      return "/api/v1/statistics/\(date)"
+      let dateString = date.toString(format: .yyyy_MM_dd)
+      return "/api/v1/statistics/\(dateString)"
     }
   }
 

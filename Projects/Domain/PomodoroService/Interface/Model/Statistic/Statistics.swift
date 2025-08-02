@@ -8,11 +8,11 @@
 
 import Foundation
 
-public struct Statistics: Decodable {
-  public let date: String
+public struct Statistics: Decodable, Equatable {
+  public let date: Date
   /// PT30M
   public let totalFocusTime: String
   public let focusTimes: [StatisticsFocusTime]
   public let weeklyFocusTimeTrend: StatisticsFocusTimeTrend
-  public let categoryRanking: StatisticsCategoryRankingItem
+  public let categoryRanking: StatisticsCategoryRanking
 }

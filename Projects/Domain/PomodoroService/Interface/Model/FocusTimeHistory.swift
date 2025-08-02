@@ -17,6 +17,7 @@ public struct FocusTimeHistory: Encodable, Persistable {
   let categoryNo: Int
   let focusedTime: String
   let restedTime: String
+  let startedAt: Date
   let doneAt: Date
   
   public init(
@@ -24,12 +25,14 @@ public struct FocusTimeHistory: Encodable, Persistable {
     categoryNo: Int,
     focusedTime: String,
     restedTime: String,
+    startedAt: Date,
     doneAt: Date
   ) {
     self.clientFocusTimeId = clientFocusTimeId
     self.categoryNo = categoryNo
     self.focusedTime = focusedTime
     self.restedTime = restedTime
+    self.startedAt = startedAt
     self.doneAt = doneAt
   }
   
@@ -39,6 +42,7 @@ public struct FocusTimeHistory: Encodable, Persistable {
     self.categoryNo = managedObject.categoryNo
     self.focusedTime = managedObject.focusedTime
     self.restedTime = managedObject.restedTime
+    self.startedAt = managedObject.doneAt
     self.doneAt = managedObject.doneAt
   }
   
@@ -49,6 +53,7 @@ public struct FocusTimeHistory: Encodable, Persistable {
     object.categoryNo = categoryNo
     object.focusedTime = focusedTime
     object.restedTime = restedTime
+    object.startedAt = startedAt
     object.doneAt = doneAt
     return object
   }
@@ -61,5 +66,6 @@ public final class FocusTimeHistoryObject: Object {
   @Persisted var categoryNo: Int
   @Persisted var focusedTime: String
   @Persisted var restedTime: String
+  @Persisted var startedAt: Date
   @Persisted var doneAt: Date
 }
