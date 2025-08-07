@@ -32,6 +32,8 @@ public enum DateFormatType: String {
   case 분초 = "mm ss"
   ///
   case yyyy_MM_dd = "yyyy-MM-dd"
+  ///
+  case Md = "M/d"
 
 
   /// 현지화가 필요한 format

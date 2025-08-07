@@ -16,7 +16,7 @@ import ComposableArchitecture
 public struct MainTabCore {
   @ObservableState
   public struct State: Equatable {
-    var selectedTab: TabType = .statistics
+    var selectedTab: TabType = .home
     var home: HomeCore.State = .init()
     var statisticsHome: StatisticsHomeCore.State = .init()
     var myPage: MyPageCore.State = .init()

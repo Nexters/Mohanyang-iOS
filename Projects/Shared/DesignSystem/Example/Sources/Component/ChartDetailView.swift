@@ -11,39 +11,65 @@ import SwiftUI
 import DesignSystem
 
 struct ChartDetailView: View {
-  @State var selectedData: DateToFocusTimeStatistics? = WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics.first
+  @State var selectedData: ExampleChartData?
 
   var body: some View {
-    VStack {
-      Spacer()
-
+    ScrollView {
       VStack {
-        HStack {
-          Text("총 5시간 55분")
-            .font(Typography.header4)
-            .foregroundStyle(Alias.Color.Text.secondary)
-            .padding(.bottom, 10)
-
-          Spacer()
-        }
-
         TimeColumnVerticalChartView(
-          dataList: WeeklyFocusTimeTrend.exampleResponse.dateToFocusTimeStatistics,
+          dataList: demoData,
           selectedData: $selectedData
         )
-      }
-      .padding(16)
-      .background(.white)
-      .cornerRadius(16)
+        .padding(.horizontal, 0)
 
-      Spacer()
+        TimeColumnVerticalChartView(
+          dataList: demoData,
+          selectedData: $selectedData
+        )
+        .padding(.horizontal, 30)
+
+        TimeColumnVerticalChartView(
+          dataList: demoData,
+          selectedData: $selectedData
+        )
+        .padding(.horizontal, 60)
+      }
     }
-    .padding(.horizontal, 20)
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Alias.Color.Background.primary)
   }
 }
 
 #Preview {
-  InputFieldDetailView()
+  ChartDetailView()
 }
+
+
+// MARK: - Example data
+
+struct ExampleChartData: ChartDatable {
+  let date: Date // "2024-04-01"
+  let totalFocusTime: String // "PT30M", "PT1H", ...
+
+  public var title: String {
+    return date.toString(format: .Md)
+  }
+  public var value: Int {
+    return DateComponents.durationFrom8601String(totalFocusTime)?.totalMinutes ?? 0
+  }
+  public var id: UUID {
+    return UUID()
+  }
+}
+
+var demoData: [ExampleChartData] = {
+  let dateFormatter = DateFormatter()
+  dateFormatter.dateFormat = "yyyy-MM-dd"
+  return [
+    .init(date: dateFormatter.date(from: "2024-04-01")!, totalFocusTime: "PT30M"),
+    .init(date: dateFormatter.date(from: "2024-04-02")!, totalFocusTime: "PT29M"),
+    .init(date: dateFormatter.date(from: "2024-04-03")!, totalFocusTime: "PT10M"),
+    .init(date: dateFormatter.date(from: "2024-04-04")!, totalFocusTime: "PT20M"),
+    .init(date: dateFormatter.date(from: "2024-04-05")!, totalFocusTime: "PT1H"),
+    .init(date: dateFormatter.date(from: "2024-04-06")!, totalFocusTime: "PT1H47M"),
+    .init(date: dateFormatter.date(from: "2024-04-07")!, totalFocusTime: "PT0M")
+  ]
+}()

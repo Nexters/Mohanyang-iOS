@@ -20,24 +20,3 @@ public struct StatisticsFocusTime: Decodable, Equatable, Identifiable {
     return no
   }
 }
-
-extension StatisticsFocusTime {
-  public func getTotalFocusTimeText(units: NSCalendar.Unit) -> String {
-    guard let dateComponents = DateComponents.durationFrom8601String(totalFocusTime) else { return "" }
-    let formatter = DateComponentsFormatter()
-    formatter.unitsStyle = .full
-    formatter.allowedUnits = units
-    return formatter.string(from: dateComponents) ?? ""
-  }
-}
-
-
-extension String {
-  public func iso8601DurationToText(units: NSCalendar.Unit) -> String {
-    guard let dateComponents = DateComponents.durationFrom8601String(totalFocusTime) else { return "" }
-    let formatter = DateComponentsFormatter()
-    formatter.unitsStyle = .full
-    formatter.allowedUnits = units
-    return formatter.string(from: dateComponents) ?? ""
-  }
-}

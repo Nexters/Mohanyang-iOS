@@ -23,9 +23,7 @@ public struct StatisticsHomeCore {
     var statisticsOfDate: Statistics?
     var selectedDate: Date = Date()
 
-    public init() {
-
-    }
+    public init() {}
 
     var isPrevAvailable: Bool {
       guard let createdAt = userInfo?.createdAt else { return false }
@@ -45,7 +43,7 @@ public struct StatisticsHomeCore {
 
     case prevDateButtonTapped
     case nextDateButtonTapped
-    case setSelectedDate(Date)
+    case calendarDateSelected(Date)
 
     case responseGetStatistics(Result<Statistics?, Error>)
     case responseGetUserInfo(Result<User?, Error>)
@@ -67,7 +65,6 @@ public struct StatisticsHomeCore {
     case .onAppear:
       let selectedDate = state.selectedDate
       return .run { send in
-
         await send(
           .responseGetUserInfo(
             Result {
@@ -100,9 +97,11 @@ public struct StatisticsHomeCore {
         await self.getStatistics(send: send, selectedDate: nextDate)
       }
 
-    case let .setSelectedDate(selectedDate):
+    case let .calendarDateSelected(selectedDate):
       state.selectedDate = selectedDate
-      return .none
+      return .run { send in
+        await self.getStatistics(send: send, selectedDate: selectedDate)
+      }
 
     case let .responseGetStatistics(.success(response)):
       state.statisticsOfDate = response
