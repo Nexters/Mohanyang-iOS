@@ -36,11 +36,11 @@ struct ContentView: View {
         }
         
         Section("Component") {
-          NavigationLink {
-            ButtonDetailView()
-          } label: {
-            Text("Button")
-          }
+//          NavigationLink {
+//            ButtonDetailView()
+//          } label: {
+//            Text("Button")
+//          }
           
           NavigationLink {
             NavigationDetailView()
@@ -76,6 +76,12 @@ struct ContentView: View {
             InputFieldDetailView()
           } label: {
             Text("InputField")
+          }
+
+          NavigationLink {
+            ChartDetailView()
+          } label: {
+            Text("TimeColumnVerticalChart")
           }
         }
       }
