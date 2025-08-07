@@ -22,7 +22,7 @@ public struct RoundButtonStyle: ButtonStyle {
         getBackgroundColor(isPressed: configuration.isPressed),
         in: RoundedRectangle(cornerRadius: 44)
       )
-      .foregroundColor(Global.Color.white)
+      .foregroundStyle(Global.Color.white)
       .singleIconButtonDetailStyle(DefaultSingleIconButtonDetailStyle())
   }
   

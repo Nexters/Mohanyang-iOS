@@ -17,4 +17,5 @@ public enum Feature: String, Modulable {
   case CatFeature
   case ErrorFeature
   case LAPomodoroFeature
+  case StatisticsFeature
 }

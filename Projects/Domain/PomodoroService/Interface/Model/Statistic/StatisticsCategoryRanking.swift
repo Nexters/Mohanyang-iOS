@@ -22,3 +22,13 @@ public struct StatisticsCategoryRankingItem: Decodable, Equatable {
   /// PT30M
   public let totalFocusTime: String
 }
+
+extension StatisticsCategoryRankingItem {
+  public func getTotalFocusTimeText(units: NSCalendar.Unit) -> String {
+    guard let dateComponents = DateComponents.durationFrom8601String(totalFocusTime) else { return "" }
+    let formatter = DateComponentsFormatter()
+    formatter.unitsStyle = .full
+    formatter.allowedUnits = units
+    return formatter.string(from: dateComponents) ?? ""
+  }
+}

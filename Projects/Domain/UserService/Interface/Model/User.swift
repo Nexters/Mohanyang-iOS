@@ -6,6 +6,8 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import Foundation
+
 @_spi(Internal)
 import CatServiceInterface
 import DatabaseClientInterface
@@ -16,7 +18,8 @@ public struct User: Persistable, Equatable, Codable {
   public var registeredDeviceNo: Int
   public var isPushEnabled: Bool
   public var cat: Cat?
-  
+  public var createdAt: Date
+
   @_spi(Internal)
   public init(managedObject: UserObject) {
     self.registeredDeviceNo = managedObject.registeredDeviceNo
@@ -24,6 +27,7 @@ public struct User: Persistable, Equatable, Codable {
     if let catObject = managedObject.cat {
       self.cat = Cat(managedObject: catObject)
     }
+    self.createdAt = managedObject.createdAt
   }
   
   @_spi(Internal)
@@ -32,6 +36,7 @@ public struct User: Persistable, Equatable, Codable {
     object.registeredDeviceNo = registeredDeviceNo
     object.isPushEnabled = isPushEnabled
     object.cat = cat?.managedObject()
+    object.createdAt = createdAt
     return object
   }
 }
@@ -41,4 +46,5 @@ public final class UserObject: Object {
   @Persisted(primaryKey: true) var registeredDeviceNo: Int
   @Persisted var isPushEnabled: Bool
   @Persisted var cat: CatObject?
+  @Persisted var createdAt: Date
 }

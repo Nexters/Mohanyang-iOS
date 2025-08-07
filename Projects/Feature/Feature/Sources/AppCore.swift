@@ -7,12 +7,11 @@
 //
 
 import SwiftUI
+import BackgroundTasks
 
 import SplashFeature
-import HomeFeature
 import OnboardingFeature
 import ErrorFeature
-import MyPageFeature
 import PushService
 import AppService
 import UserDefaultsClientInterface
@@ -29,15 +28,13 @@ import DesignSystem
 
 import ComposableArchitecture
 
-import BackgroundTasks
-
 @Reducer
 public struct AppCore {
   @ObservableState
   public struct State: Equatable {
     public var appDelegate: AppDelegateCore.State = .init()
     var splash: SplashCore.State?
-    var home: HomeCore.State?
+    var mainTab: MainTabCore.State?
     var onboarding: OnboardingCore.State?
     var dialog: DefaultDialog?
     @Presents var networkError: NetworkErrorCore.State?
@@ -54,7 +51,7 @@ public struct AppCore {
     case appDelegate(AppDelegateCore.Action)
     case didChangeScenePhase(ScenePhase)
     case splash(SplashCore.Action)
-    case home(HomeCore.Action)
+    case mainTab(MainTabCore.Action)
     case onboarding(OnboardingCore.Action)
     case networkError(PresentationAction<NetworkErrorCore.Action>)
     case requestError(PresentationAction<RequestErrorCore.Action>)
@@ -82,8 +79,8 @@ public struct AppCore {
       .ifLet(\.splash, action: \.splash) {
         SplashCore()
       }
-      .ifLet(\.home, action: \.home) {
-        HomeCore()
+      .ifLet(\.mainTab, action: \.mainTab) {
+        MainTabCore()
       }
       .ifLet(\.onboarding, action: \.onboarding) {
         OnboardingCore()
@@ -140,7 +137,7 @@ public struct AppCore {
       
     case .splash(.moveToHome):
       state.splash = nil
-      state.home = HomeCore.State()
+      state.mainTab = MainTabCore.State()
       return .none
       
     case .splash(.moveToOnboarding):
@@ -151,20 +148,20 @@ public struct AppCore {
     case .splash:
       return .none
 
-    case let .home(.categorySelect(.presented(.deleteCategoriesTapped(ids)))):
+    case let .mainTab(.home(.categorySelect(.presented(.deleteCategoriesTapped(ids))))):
       return .run { send in
         let deleteDialog = deleteCategoriesDialog {
-          await send(.home(.deleteCategories(ids)))
+          await send(.mainTab(.home(.deleteCategories(ids))))
         }
         await send(.set(\.dialog, deleteDialog))
       }
 
-    case .home:
+    case .mainTab:
       return .none
 
     case .onboarding(.selectCat(.presented(.namingCat(.presented(.moveToHome))))):
       state.onboarding = nil
-      state.home = HomeCore.State()
+      state.mainTab = MainTabCore.State()
       return .none
       
     case .onboarding:
@@ -176,8 +173,8 @@ public struct AppCore {
     case .requestError(.presented(.moveToHome)):
       if state.onboarding != nil {
         state.onboarding = OnboardingCore.State()
-      } else if state.home != nil {
-        state.home = HomeCore.State()
+      } else if state.mainTab != nil {
+        state.mainTab = MainTabCore.State()
       }
       return .none
       
