@@ -1,15 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "40_box_pen.svg",
+      "filename" : "box_pen.svg",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }
