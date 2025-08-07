@@ -57,9 +57,9 @@ extension PomodoroService: @retroactive DependencyKey {
         let api = FocusTimeAPI.saveFocusTimes(request: request)
         _ = try await apiClient.apiRequest(request: api, as: EmptyResponse.self)
       },
-      getFocusTimeSummaries: { apiClient in
-        let api = FocusTimeAPI.getSummaries
-        return try await apiClient.apiRequest(request: api, as: FocusTimeSummary.self)
+      getStatistics: { apiClient, date in
+        let api = StatisticAPI.getStatistics(date: date)
+        return try await apiClient.apiRequest(request: api, as: Statistics.self)
       },
       addCategory: { apiClient, request in
         let api = CategoryAPI.addCategory(request: request)

@@ -1,15 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "40_fire.svg",
+      "filename" : "fire.svg",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }

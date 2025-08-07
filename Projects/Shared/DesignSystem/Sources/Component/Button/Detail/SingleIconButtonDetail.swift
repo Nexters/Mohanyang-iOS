@@ -8,15 +8,25 @@
 
 import SwiftUI
 
-extension Button where Label == SingleIconButtonDetail<Image> {
+extension Button {
   public init(
     icon: Image,
     action: @escaping () -> Void
-  ) {
+  ) where Label == SingleIconButtonDetail<Image> {
     self.init(action: action) {
       SingleIconButtonDetail {
-        icon.renderingMode(.template)
+        icon
+          .renderingMode(.template)
       }
+    }
+  }
+  
+  public init<Icon: View>(
+    action: @escaping () -> Void,
+    @ViewBuilder icon: () -> Icon
+  ) where Label == SingleIconButtonDetail<Icon> {
+    self.init(action: action) {
+      SingleIconButtonDetail(icon: icon)
     }
   }
 }

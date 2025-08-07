@@ -6,13 +6,13 @@
 //  Copyright © 2024 PomoNyang. All rights reserved.
 //
 
+import Foundation
 import Logger
 import DatabaseClientInterface
 import UserDefaultsClientInterface
-
 import RealmSwift
 
-let currentSchemaVersion: UInt64 = 2
+let currentSchemaVersion: UInt64 = 3
 
 public func initilizeDatabaseSystem(
   databaseClient: DatabaseClient
@@ -44,6 +44,14 @@ public func initilizeDatabaseSystem(
         }
 
         newObject?["isSelected"] = false
+      }
+    }
+
+    // MARK: - 1.0.1 -> 1.1.0
+    if oldSchemaVersion < 3 {
+      migration.enumerateObjects(ofType: "UserObject") { _, newObject in
+        let nowDate = Date()
+        newObject?["createdAt"] = nowDate
       }
     }
 

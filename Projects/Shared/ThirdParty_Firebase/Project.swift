@@ -10,25 +10,9 @@ let project: Project = .makeProject(
   scripts: [],
   product: .framework,
   dependencies: [
-    DEP.XCFramework.FirebaseAnalytics,
-    DEP.XCFramework.FirebaseCrashlytics,
-    DEP.XCFramework.FirebaseInAppMessaging,
-    DEP.XCFramework.FirebaseMessaging,
-    DEP.XCFramework.FirebaseCore,
-    DEP.XCFramework.FirebaseInstallations,
-    DEP.XCFramework.FirebaseCoreInternal,
-    DEP.XCFramework.GoogleAppMeasurement,
-    DEP.XCFramework.GoogleDataTransport,
-    DEP.XCFramework.GoogleUtilities,
-    DEP.XCFramework.nanopb,
-    DEP.XCFramework.FBLPromises,
-    DEP.XCFramework.FirebaseABTesting,
-    DEP.XCFramework.FirebasePerformance,
-    DEP.XCFramework.FirebaseSessions,
-    DEP.XCFramework.FirebaseRemoteConfig,
-    DEP.XCFramework.FirebaseRemoteConfigInterop,
-    DEP.XCFramework.Promises,
-    DEP.XCFramework.FirebaseCoreExtension,
-    DEP.XCFramework.FirebaseSharedSwift
+    DEP.SPMTarget.FirebaseAnalytics,
+    DEP.SPMTarget.FirebaseCrashlytics,
+    DEP.SPMTarget.FirebaseMessaging,
+    DEP.SPMTarget.FirebasePerformance
   ]
 )

@@ -42,7 +42,14 @@ extension Encodable {
         try container.encode(dateString)
         return
       }
-      
+
+      // 2023-07-26
+      formatter.formatOptions = [.withFullDate]
+      if let dateString = formatter.string(for: date) {
+        try container.encode(dateString)
+        return
+      }
+
       throw EncodingError.invalidValue(date, EncodingError.Context(codingPath: encoder.codingPath, debugDescription: "⚠️ Date encode 실패"))
     }
     return encoder

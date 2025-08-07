@@ -34,14 +34,12 @@ public struct AppView: View {
             OnboardingView(store: onboardingStore)
               .zIndex(1)
           }
-        } else if let homeStore = store.scope(state: \.home, action: \.home) {
-          NavigationStack {
-            HomeView(store: homeStore)
-              .transition(.opacity.animation(.easeInOut))
-              .zIndex(2)
-          }
+        } else if let mainTabStore = store.scope(state: \.mainTab, action: \.mainTab) {
+          MainTabView(store: mainTabStore)
+            .transition(.opacity.animation(.easeInOut))
+            .zIndex(2)
         } else {
-          Global.Color.black // MARK: - DB정보 없고 오프라인일때 Dialog 띄우기
+          Global.Color.black // TODO: - DB정보 없고 오프라인일때 Dialog 띄우기
             .zIndex(3)
         }
       }

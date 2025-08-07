@@ -26,15 +26,6 @@ public struct HomeView: View {
   public var body: some View {
     NavigationContainer(
       leading: { Spacer() },
-      trailing: {
-        Button(
-          icon: DesignSystemAsset.Image._24MenuPrimary.swiftUIImage,
-          action: {
-            store.send(.mypageButtonTappd)
-          }
-        )
-        .buttonStyle(.icon(isFilled: false, level: .primary))
-      },
       style: .navigation
     ) {
       VStack(spacing: 40) {
@@ -153,14 +144,6 @@ public struct HomeView: View {
       )
     ) { store in
       PomodoroView(store: store)
-    }
-    .navigationDestination(
-      item: $store.scope(
-        state: \.myPage,
-        action: \.myPage
-      )
-    ) { store in
-      MyPageView(store: store)
     }
     .navigationDestination(
       item: $store.scope(

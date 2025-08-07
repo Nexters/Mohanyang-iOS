@@ -8,15 +8,16 @@
 
 import Foundation
 
-import APIClientInterface
 import UserServiceInterface
+import APIClientInterface
 
 import Dependencies
 
 extension UserService: @retroactive DependencyKey {
   public static let liveValue: UserService = .live()
-  private static func live() -> Self {
-    return UserService(
+
+  private static func live() -> UserService {
+    return .init(
       selectCat: { apiClient, request in
         let api = UserAPIrequest.selectCat(request: request)
         _ = try await apiClient.apiRequest(

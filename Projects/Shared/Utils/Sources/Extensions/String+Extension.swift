@@ -26,4 +26,12 @@ extension String {
     let range = NSRange(location: 0, length: self.utf16.count)
     return regex.firstMatch(in: self, options: [], range: range) != nil
   }
+
+  public func iso8601DurationToText(units: NSCalendar.Unit) -> String {
+    guard let dateComponents = DateComponents.durationFrom8601String(self) else { return "" }
+    let formatter = DateComponentsFormatter()
+    formatter.unitsStyle = .full
+    formatter.allowedUnits = units
+    return formatter.string(from: dateComponents) ?? ""
+  }
 }

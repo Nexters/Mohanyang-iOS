@@ -36,11 +36,11 @@ struct ContentView: View {
         }
         
         Section("Component") {
-//          NavigationLink {
-//            ButtonDetailView()
-//          } label: {
-//            Text("Button")
-//          }
+          NavigationLink {
+            ButtonDetailView()
+          } label: {
+            Text("Button")
+          }
           
           NavigationLink {
             NavigationDetailView()

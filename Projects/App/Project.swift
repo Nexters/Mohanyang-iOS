@@ -27,7 +27,9 @@ let widgetExtensionTarget: Target = .target(
   ],
   entitlements: Entitlements.Mohanyang.widgetExtension,
   dependencies: [
-    .dependency(module: Feature.LAPomodoroFeature)
+    .dependency(module: Feature.LAPomodoroFeature),
+    DEP.SPMTarget.RealmSwift,
+    DEP.SPMTarget.Realm
   ],
   settings: .targetSettings(product: .appExtension)
 )
@@ -63,7 +65,9 @@ let appTarget: Target = .target(
   scripts: scripts,
   dependencies: [
     .dependency(rootModule: Feature.self),
-    .target(widgetExtensionTarget)
+    .target(widgetExtensionTarget),
+    DEP.SPMTarget.RealmSwift,
+    DEP.SPMTarget.Realm
   ],
   settings: .targetSettings(product: .app)
 )

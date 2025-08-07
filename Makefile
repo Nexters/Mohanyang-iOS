@@ -6,7 +6,6 @@ manifests:
 
 .PHONY: install
 install:
-	carthage update --platform iOS --use-xcframeworks --use-netrc --cache-builds --verbose --project-directory "XCFramework/"
 	tuist install
 
 .PHONY: generate
@@ -24,7 +23,6 @@ module:
 .PHONY: clean
 clean:
 	tuist clean
-	rm -rf XCFramework/Carthage
 	rm -rf *.xcworkspace
 	find Projects -name "*.xcodeproj" -exec rm -rf {} \;
 

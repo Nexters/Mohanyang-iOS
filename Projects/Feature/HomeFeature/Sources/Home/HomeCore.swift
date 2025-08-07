@@ -44,7 +44,6 @@ public struct HomeCore {
     
     @Presents var categorySelect: CategorySelectCore.State?
     @Presents var timeSelect: TimeSelectCore.State?
-    @Presents var myPage: MyPageCore.State?
     @Presents var pomodoro: PomodoroCore.State?
     @Presents var categoryForm: CategoryFormCore.State?
 
@@ -62,7 +61,6 @@ public struct HomeCore {
     case categoryButtonTapped
     case focusTimeButtonTapped
     case restTimeButtonTapped
-    case mypageButtonTappd
     case playButtonTapped
     case catTapped
     case catSetInput
@@ -71,7 +69,6 @@ public struct HomeCore {
     case deleteCategories([Int])
     case categorySelect(PresentationAction<CategorySelectCore.Action>)
     case timeSelect(PresentationAction<TimeSelectCore.Action>)
-    case myPage(PresentationAction<MyPageCore.Action>)
     case pomodoro(PresentationAction<PomodoroCore.Action>)
     case categoryForm(PresentationAction<CategoryFormCore.Action>)
   }
@@ -95,9 +92,6 @@ public struct HomeCore {
       }
       .ifLet(\.$timeSelect, action: \.timeSelect) {
         TimeSelectCore()
-      }
-      .ifLet(\.$myPage, action: \.myPage) {
-        MyPageCore()
       }
       .ifLet(\.$pomodoro, action: \.pomodoro) {
         PomodoroCore()
@@ -166,10 +160,6 @@ public struct HomeCore {
       
     case .restTimeButtonTapped:
       state.timeSelect = TimeSelectCore.State(mode: .rest)
-      return .none
-      
-    case .mypageButtonTappd:
-      state.myPage = MyPageCore.State()
       return .none
 
     case .playButtonTapped:
@@ -278,9 +268,6 @@ public struct HomeCore {
     case .timeSelect:
       return .none
       
-    case .myPage:
-      return .none
-      
     case let .pomodoro(.presented(.focusPomodoro(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))), // FocusPomodoro
       let .pomodoro(.presented(.restWaiting(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))), // RestWaiting
       let .pomodoro(.presented(.restPomodoro(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))): // RestPomodoro
@@ -327,11 +314,14 @@ public struct HomeCore {
   ) async throws -> Void {
     let focusedTime = DateComponents(minute: focusTimeBySeconds / 60, second: focusTimeBySeconds % 60).to8601DurationString()
     let restedTime = DateComponents(minute: restTimeBySeconds / 60, second: restTimeBySeconds % 60).to8601DurationString()
+    let doneAt = Date()
+    let startedAt = Calendar.current.date(byAdding: .second, value: -(focusTimeBySeconds + restTimeBySeconds), to: doneAt)
     let request = FocusTimeHistory(
       categoryNo: selectedCategoryID,
       focusedTime: focusedTime ?? "PT0M",
       restedTime: restedTime ?? "PT0M",
-      doneAt: Date()
+      startedAt: startedAt ?? Date(),
+      doneAt: doneAt
     )
     try await self.pomodoroService.saveFocusTimeHistory(
       apiClient: self.apiClient,

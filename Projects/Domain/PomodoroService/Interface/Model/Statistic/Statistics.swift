@@ -1,0 +1,18 @@
+//
+//  Statistics.swift
+//  PomodoroService
+//
+//  Created by devMinseok on 7/20/25.
+//  Copyright © 2025 PomoNyang. All rights reserved.
+//
+
+import Foundation
+
+public struct Statistics: Decodable, Equatable {
+  public let date: Date
+  /// PT30M
+  public let totalFocusTime: String
+  public let focusTimes: [StatisticsFocusTime]
+  public let weeklyFocusTimeTrend: StatisticsFocusTimeTrend
+  public let categoryRanking: StatisticsCategoryRanking
+}

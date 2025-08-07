@@ -35,7 +35,7 @@ struct DialogDetailView: View {
         titleSubTitleOneButtonDialog = DefaultDialog(
           title: "Dialog Title",
           subTitle: "Dialog Subtext를 입력해주세요.\n최대 2줄을 넘지 않도록 해요.",
-          firstButton: DialogButtonModel(title: "Button1"), showCloseButton: false
+          firstButton: DialogButtonModel(title: "Button1"), showCloseButton: true
         )
       } label: {
         Text("title SubTitle & One Button")
@@ -54,7 +54,7 @@ struct DialogDetailView: View {
       Button {
         titleOneButtonDialog = DefaultDialog(
           title: "Dialog Title",
-          firstButton: DialogButtonModel(title: "Button1"), showCloseButton: false
+          firstButton: DialogButtonModel(title: "Button1"), showCloseButton: true
         )
       } label: {
         Text("title & One Button")

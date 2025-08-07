@@ -15,6 +15,7 @@ import UserDefaultsClientInterface
 import AppService
 import NetworkTrackingInterface
 import DesignSystem
+import UserServiceInterface
 
 import ComposableArchitecture
 
@@ -51,6 +52,7 @@ public struct SplashCore {
   @Dependency(KeychainClient.self) var keychainClient
   @Dependency(UserDefaultsClient.self) var userDefaultsClient
   @Dependency(NetworkTracking.self) var networkTracking
+  @Dependency(UserService.self) var userService
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -79,10 +81,10 @@ public struct SplashCore {
         }
       } else {
         return .run { send in
-          if try await !databaseClient.checkHasTable() {
-            await send(.presentNetworkDialog)
-          } else {
+          if try await databaseClient.checkHasTable() {
             await send(._checkDeviceIDExist)
+          } else {
+            await send(.presentNetworkDialog)
           }
         }
       }
@@ -117,8 +119,12 @@ extension SplashCore {
       )
 
       try await Task.sleep(for: .seconds(1.5))
-      userDefaultsClient.boolForKey(isOnboardedKey) ?
-      await send(.moveToHome, animation: .easeOut(duration: 0.5)) : await send(.moveToOnboarding, animation: .easeOut(duration: 0.5))
+      if userDefaultsClient.boolForKey(isOnboardedKey) {
+        try await userService.syncUserInfo(apiClient: apiClient, databaseClient: databaseClient)
+        await send(.moveToHome, animation: .easeOut(duration: 0.5))
+      } else {
+        await send(.moveToOnboarding, animation: .easeOut(duration: 0.5))
+      }
     }
   }
 

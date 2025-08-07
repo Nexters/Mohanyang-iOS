@@ -1,15 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "40_heart.svg",
+      "filename" : "heart.svg",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }
