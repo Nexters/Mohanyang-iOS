@@ -22,7 +22,7 @@ let project: Project = .makeTMABasedProject(
   ],
   dependencies: [
     .sources: [
-      .dependency(module: Domain.PomodoroService, target: .interface)
+      .dependency(rootModule: Domain.self)
     ]
   ]
 )

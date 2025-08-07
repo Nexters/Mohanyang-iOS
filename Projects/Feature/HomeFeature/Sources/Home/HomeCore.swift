@@ -272,21 +272,21 @@ public struct HomeCore {
       let .pomodoro(.presented(.restWaiting(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))), // RestWaiting
       let .pomodoro(.presented(.restPomodoro(.saveHistory(focusTimeBySeconds, restTimeBySeconds)))): // RestPomodoro
       guard let selectedCategoryID = state.selectedCategory?.id else { return .none }
-//      if focusTimeBySeconds >= 60 {
+      if focusTimeBySeconds >= 60 {
         return .run { _ in
           try await self.saveFocusTime(
             selectedCategoryID: selectedCategoryID,
-            focusTimeBySeconds: 60 * 60,
-            restTimeBySeconds: 0
+            focusTimeBySeconds: focusTimeBySeconds,
+            restTimeBySeconds: restTimeBySeconds
           )
         }
-//      } else {
-//        state.toast = DefaultToast(
-//          message: "최소 1분 이상은 집중해야 기록돼요",
-//          image: DesignSystemAsset.Image._24Clock.swiftUIImage
-//        )
-//        return .none
-//      }
+      } else {
+        state.toast = DefaultToast(
+          message: "최소 1분 이상은 집중해야 기록돼요",
+          image: DesignSystemAsset.Image._24Clock.swiftUIImage
+        )
+        return .none
+      }
       
     case .pomodoro(.presented(.restWaiting(.goToHomeByOver60Minute))):
       state.dialog = focusEndDialog()
